@@ -1,8 +1,6 @@
 "use client";
-import Authentication from "./_components/Authentication";
-import { motion } from "framer-motion";
-import Image from "next/image";
-import { useEffect, useState } from "react";
+import { motion, useScroll, useTransform } from "framer-motion";
+import { useEffect, useState, useRef } from "react";
 import {
   SparklesIcon,
   BoltIcon,
@@ -15,7 +13,6 @@ import {
   CheckCircleIcon,
 } from "@heroicons/react/24/outline";
 import {
-  ClerkProvider,
   SignInButton,
   SignedIn,
   SignedOut,
@@ -23,13 +20,42 @@ import {
 } from "@clerk/nextjs";
 import Link from "next/link";
 
+// Import components
+import AnimatedCodeSnippet from "./_components/AnimatedCodeSnippet";
+import Testimonial from "./_components/Testimonial";
+import PricingCard from "./_components/PricingCard";
+import ClientFloatingElements from "./_components/ClientFloatingElements"; // Updated import
+import HomeCreditBalanceCard from "./_components/HomeCreditBalanceCard";
+import Footer from "./_components/Footer";
+
 export default function Home() {
   const [animateHero, setAnimateHero] = useState(false);
+  const [currentTestimonial, setCurrentTestimonial] = useState(0);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ["start start", "end end"],
+  });
+
+  // Parallax effect values
+  const y1 = useTransform(scrollYProgress, [0, 1], [0, -200]);
+  const y2 = useTransform(scrollYProgress, [0, 1], [0, -100]);
+  const y3 = useTransform(scrollYProgress, [0, 1], [0, -300]);
+  const opacity = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
 
   useEffect(() => {
     // Start hero animation after page load
     const timer = setTimeout(() => setAnimateHero(true), 500);
-    return () => clearTimeout(timer);
+    
+    // Auto-rotate testimonials
+    const testimonialTimer = setInterval(() => {
+      setCurrentTestimonial((prev) => (prev + 1) % testimonials.length);
+    }, 5000);
+    
+    return () => {
+      clearTimeout(timer);
+      clearInterval(testimonialTimer);
+    };
   }, []);
 
   const features = [
@@ -84,8 +110,101 @@ export default function Home() {
     { value: "100+", label: "Countries", icon: GlobeAltIcon },
   ];
 
+  const testimonials = [
+    {
+      quote: "This tool has completely transformed our design-to-development workflow. We've cut our frontend development time by 70%!",
+      author: "Sarah Johnson",
+      role: "CTO",
+      company: "TechFlow Inc.",
+      image: "https://randomuser.me/api/portraits/women/32.jpg",
+      rating: 5,
+    },
+    {
+      quote: "As a solo developer, Img2Code feels like having an entire frontend team at my fingertips. The code quality is outstanding.",
+      author: "Michael Chen",
+      role: "Indie Developer",
+      company: "PixelPerfect Apps",
+      image: "https://randomuser.me/api/portraits/men/46.jpg",
+      rating: 5,
+    },
+    {
+      quote: "We've integrated Img2Code into our CI/CD pipeline and it's been a game-changer for our rapid prototyping process.",
+      author: "Jessica Williams",
+      role: "Lead Engineer",
+      company: "Innovate Solutions",
+      image: "https://randomuser.me/api/portraits/women/65.jpg",
+      rating: 4,
+    },
+  ];
+
+  const pricingPlans = [
+    {
+      title: "Starter",
+      price: 0,
+      features: [
+        "10 image-to-code conversions/month",
+        "Basic component library",
+        "HTML & CSS output",
+        "24-hour support response time",
+      ],
+      popular: false,
+      cta: "Start Free",
+    },
+    {
+      title: "Professional",
+      price: 29,
+      features: [
+        "100 image-to-code conversions/month",
+        "Advanced component library",
+        "React, Vue & Angular output",
+        "4-hour support response time",
+        "API access",
+        "Team collaboration",
+      ],
+      popular: true,
+      cta: "Start 14-Day Trial",
+    },
+    {
+      title: "Enterprise",
+      price: 99,
+      features: [
+        "Unlimited conversions",
+        "Custom component library",
+        "All framework outputs",
+        "1-hour support response time",
+        "Advanced API access",
+        "Team collaboration",
+        "Custom integrations",
+        "Dedicated account manager",
+      ],
+      popular: false,
+      cta: "Contact Sales",
+    },
+  ];
+
+  const codeExample = `import React from 'react';
+
+function Header() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-indigo-50 to-purple-50">
+    <header className="bg-blue-600 text-white p-4">
+      <div className="container mx-auto flex justify-between">
+        <h1 className="text-xl font-bold">My App</h1>
+        <nav>
+          <ul className="flex space-x-4">
+            <li><a href="#" className="hover:underline">Home</a></li>
+            <li><a href="#" className="hover:underline">About</a></li>
+            <li><a href="#" className="hover:underline">Contact</a></li>
+          </ul>
+        </nav>
+      </div>
+    </header>
+  );
+}
+
+export default Header;`;
+
+  return (
+    <div className="min-h-screen bg-gradient-to-b from-indigo-50 to-purple-50" ref={containerRef}>
       {/* Animated Header */}
       <motion.header
         initial={{ y: -100 }}
@@ -165,27 +284,8 @@ export default function Home() {
 
       {/* Hero Section */}
       <div className="relative overflow-hidden">
-        {/* Animated background elements */}
-        <div className="absolute inset-0 overflow-hidden">
-          <motion.div 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 0.5 }}
-            transition={{ delay: 0.5, duration: 1 }}
-            className="absolute top-20 right-20 w-64 h-64 rounded-full bg-purple-300 filter blur-3xl"
-          />
-          <motion.div 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 0.4 }}
-            transition={{ delay: 0.7, duration: 1 }}
-            className="absolute bottom-20 left-20 w-72 h-72 rounded-full bg-blue-300 filter blur-3xl"
-          />
-          <motion.div 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 0.3 }}
-            transition={{ delay: 0.9, duration: 1 }}
-            className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 rounded-full bg-pink-300 filter blur-3xl"
-          />
-        </div>
+        {/* Animated background elements - Using ClientFloatingElements instead */}
+        <ClientFloatingElements />
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 relative z-10">
           <div className="text-center">
@@ -210,7 +310,13 @@ export default function Home() {
             >
               Turn Designs into Code
               <br />
-              in Seconds
+              <motion.span
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.5, duration: 0.8 }}
+              >
+                in Seconds
+              </motion.span>
             </motion.h1>
 
             <motion.p
@@ -310,28 +416,7 @@ export default function Home() {
                           transition={{ delay: 2.5, duration: 0.8 }}
                           className="p-4 h-full overflow-y-auto"
                         >
-                          <pre className="text-xs text-green-400 font-mono">
-                            <code>{`import React from 'react';
-
-function Header() {
-  return (
-    <header className="bg-blue-600 text-white p-4">
-      <div className="container mx-auto flex justify-between">
-        <h1 className="text-xl font-bold">My App</h1>
-        <nav>
-          <ul className="flex space-x-4">
-            <li><a href="#" className="hover:underline">Home</a></li>
-            <li><a href="#" className="hover:underline">About</a></li>
-            <li><a href="#" className="hover:underline">Contact</a></li>
-          </ul>
-        </nav>
-      </div>
-    </header>
-  );
-}
-
-export default Header;`}</code>
-                          </pre>
+                          <AnimatedCodeSnippet code={codeExample} />
                         </motion.div>
                       </>
                     )}
@@ -359,6 +444,7 @@ export default Header;`}</code>
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.1 }}
+                viewport={{ once: true }}
                 className="text-white"
               >
                 <div className="flex justify-center mb-4">
@@ -369,6 +455,7 @@ export default Header;`}</code>
                 <motion.div
                   initial={{ scale: 0.5 }}
                   whileInView={{ scale: 1 }}
+                  viewport={{ once: true }}
                   transition={{ delay: index * 0.1 + 0.2, type: "spring" }}
                 >
                   <p className="text-4xl font-bold mb-1">{stat.value}</p>
@@ -387,6 +474,7 @@ export default Header;`}</code>
             <motion.span
               initial={{ opacity: 0 }}
               whileInView={{ opacity: 1 }}
+              viewport={{ once: true }}
               className="text-sm font-semibold text-purple-600 tracking-wide uppercase"
             >
               Powerful Features
@@ -394,6 +482,7 @@ export default Header;`}</code>
             <motion.h2
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
               className="mt-2 text-4xl font-bold bg-gradient-to-r from-purple-600 to-blue-500 bg-clip-text text-transparent"
             >
               Why Choose Img2Code?
@@ -401,6 +490,7 @@ export default Header;`}</code>
             <motion.p
               initial={{ opacity: 0 }}
               whileInView={{ opacity: 1 }}
+              viewport={{ once: true }}
               transition={{ delay: 0.2 }}
               className="mt-4 text-xl text-gray-500 max-w-3xl mx-auto"
             >
@@ -414,6 +504,7 @@ export default Header;`}</code>
                 key={feature.name}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
                 transition={{ delay: index * 0.1 }}
                 whileHover={{ 
                   scale: 1.03,
@@ -443,18 +534,149 @@ export default Header;`}</code>
         </div>
       </div>
 
+      {/* Testimonials Section */}
+      <div id="testimonials" className="py-24 bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <motion.span
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true }}
+              className="text-sm font-semibold text-purple-600 tracking-wide uppercase"
+            >
+              Testimonials
+            </motion.span>
+            <motion.h2
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="mt-2 text-4xl font-bold bg-gradient-to-r from-purple-600 to-blue-500 bg-clip-text text-transparent"
+            >
+              What Our Users Say
+            </motion.h2>
+            <motion.p
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.2 }}
+              className="mt-4 text-xl text-gray-500 max-w-3xl mx-auto"
+            >
+              Join thousands of satisfied developers who have transformed their workflow
+            </motion.p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {testimonials.map((testimonial, index) => (
+              <Testimonial
+                key={testimonial.author}
+                quote={testimonial.quote}
+                author={testimonial.author}
+                role={testimonial.role}
+                company={testimonial.company}
+                image={testimonial.image}
+                rating={testimonial.rating}
+              />
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Pricing Section */}
+      <div id="pricing" className="py-24 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <motion.span
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true }}
+              className="text-sm font-semibold text-purple-600 tracking-wide uppercase"
+            >
+              Pricing
+            </motion.span>
+            <motion.h2
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="mt-2 text-4xl font-bold bg-gradient-to-r from-purple-600 to-blue-500 bg-clip-text text-transparent"
+            >
+              Choose Your Plan
+            </motion.h2>
+            <motion.p
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.2 }}
+              className="mt-4 text-xl text-gray-500 max-w-3xl mx-auto"
+            >
+              Simple, transparent pricing that scales with your needs
+            </motion.p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {pricingPlans.map((plan) => (
+              <PricingCard
+                key={plan.title}
+                title={plan.title}
+                price={plan.price}
+                features={plan.features}
+                popular={plan.popular}
+                cta={plan.cta}
+              />
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Credit Balance Demo */}
+      <div className="py-24 bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <motion.span
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true }}
+              className="text-sm font-semibold text-purple-600 tracking-wide uppercase"
+            >
+              Credits System
+            </motion.span>
+            <motion.h2
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="mt-2 text-4xl font-bold bg-gradient-to-r from-purple-600 to-blue-500 bg-clip-text text-transparent"
+            >
+              Pay Only For What You Use
+            </motion.h2>
+            <motion.p
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.2 }}
+              className="mt-4 text-xl text-gray-500 max-w-3xl mx-auto mb-12"
+            >
+              Our flexible credit system lets you convert designs as needed
+            </motion.p>
+          </div>
+
+          <div className="max-w-md mx-auto">
+            <HomeCreditBalanceCard balance={75} />
+          </div>
+        </div>
+      </div>
+
       {/* CTA Section */}
-      <div className="relative bg-gradient-to-r from-purple-600 to-blue-500 py-20">
+      <div className="py-20 bg-gradient-to-r from-purple-600 to-blue-500">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <motion.div
-            initial={{ scale: 0.9 }}
-            whileInView={{ scale: 1 }}
-            className="space-y-8"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="max-w-3xl mx-auto"
           >
-            <h2 className="text-4xl font-bold text-white">
-              Ready to Revolutionize Your Workflow?
+            <h2 className="text-3xl sm:text-4xl font-bold text-white mb-6">
+              Ready to Transform Your Design Workflow?
             </h2>
-            <p className="text-xl text-purple-100">
+            <p className="text-xl text-purple-100 mb-10">
               Join thousands of developers saving hours every week
             </p>
             <motion.button
@@ -462,62 +684,14 @@ export default Header;`}</code>
               whileTap={{ scale: 0.95 }}
               className="bg-white text-purple-600 px-8 py-4 rounded-full text-lg font-bold hover:shadow-xl"
             >
-              Start Free Trial
+              Get Started For Free
             </motion.button>
           </motion.div>
         </div>
       </div>
 
       {/* Footer */}
-      <footer className="bg-gray-900 text-white py-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-            <div>
-              <div className="flex items-center space-x-2 mb-6">
-                <span className="text-2xl">✨</span>
-                <span className="text-xl font-bold bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
-                  Img2Code
-                </span>
-              </div>
-              <p className="text-gray-400 mb-6">
-                Transform your designs into production-ready code with AI.
-              </p>
-            </div>
-            <div>
-              <h3 className="text-lg font-semibold mb-4">Product</h3>
-              <ul className="space-y-2">
-                <li><a href="#" className="text-gray-400 hover:text-white">Features</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-white">Pricing</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-white">API</a></li>
-              </ul>
-            </div>
-            <div>
-              <h3 className="text-lg font-semibold mb-4">Resources</h3>
-              <ul className="space-y-2">
-                <li><a href="#" className="text-gray-400 hover:text-white">Documentation</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-white">Tutorials</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-white">Blog</a></li>
-              </ul>
-            </div>
-            <div>
-              <h3 className="text-lg font-semibold mb-4">Company</h3>
-              <ul className="space-y-2">
-                <li><a href="#" className="text-gray-400 hover:text-white">About</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-white">Careers</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-white">Contact</a></li>
-              </ul>
-            </div>
-          </div>
-          <div className="border-t border-gray-800 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center">
-            <p className="text-gray-500 text-sm">© 2025 Img2Code. All rights reserved.</p>
-            <div className="flex space-x-6 mt-4 md:mt-0">
-              <a href="#" className="text-gray-400 hover:text-white">Privacy</a>
-              <a href="#" className="text-gray-400 hover:text-white">Terms</a>
-              <a href="#" className="text-gray-400 hover:text-white">Cookies</a>
-            </div>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }

@@ -21,32 +21,8 @@ IMPORTANT: Your generated code must be free of syntax errors. Pay special attent
 5. All React components must have proper import and export statements
 6. Ensure all variable names are properly defined before use
 7. Double-check all template literals for proper syntax
+8. Return ONLY the code, not explanations or markdown formatting
 `;
-
-// Function to select the best model based on the task complexity
-// const selectBestModel = (description: string, requestedModel: string) => {
-//   // Default to the requested model if specified and valid
-//   if (
-//     requestedModel &&
-//     Constants.AiModel.some((m) => m.modelname === requestedModel)
-//   ) {
-//     return requestedModel;
-//   }
-
-//   // For complex UI with many interactive elements, prefer more capable models
-//   const isComplex =
-//     description.toLowerCase().includes("dashboard") ||
-//     description.toLowerCase().includes("interactive") ||
-//     description.toLowerCase().includes("form") ||
-//     description.toLowerCase().includes("animation");
-
-//   if (isComplex) {
-//     return "anthropic/claude-3.5-sonnet"; // Use Claude for complex UIs
-//   }
-
-//   // Default to Gemini for standard tasks
-//   return "google/gemini-2.0-pro-exp-02-05:free";
-// };
 
 export async function POST(req: NextRequest) {
   try {
@@ -64,7 +40,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Select the best model for the task
-    const modelname = "google/gemini-2.0-pro-exp-02-05:free";
+    const modelname = "google/gemini-2.0-flash-001";
 
     // Combine the main prompt with error prevention instructions and user description
     const des =
@@ -135,54 +111,56 @@ export async function POST(req: NextRequest) {
           ],
         },
       ],
-      // temperature: 0.7, // Balanced between creativity and consistency
-      // max_tokens: 4000, // Ensure we get complete code
-      // frequency_penalty: 0.2, // Slightly reduce repetition
-      // presence_penalty: 0.1, // Slightly encourage new content
+      stream: false, // We'll handle streaming manually
     };
 
-    // // Add retry logic for more reliable results
-    let attempts = 0;
-    const maxAttempts = 3;
-    let response;
-    let errorMessage = "";
+    // Create a new ReadableStream to stream the response
+    const stream = new ReadableStream({
+      async start(controller) {
+        try {
+          const response = await fetch(OPENROUTER_API_URL, {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${API_KEY}`,
+              "HTTP-Referer": SITE_URL,
+              "X-Title": SITE_NAME,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(payload),
+          });
 
-    while (attempts < maxAttempts) {
-      try {
-        response = await fetch(OPENROUTER_API_URL, {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${API_KEY}`,
-            "HTTP-Referer": SITE_URL,
-            "X-Title": SITE_NAME,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(payload),
-        });
+          if (!response.ok) {
+            const errorText = await response.text();
+            controller.error(`API Error: ${errorText}`);
+            return;
+          }
 
-        // If successful, break out of the retry loop
-
-        const data = await response.json();
-
-        return NextResponse.json(data);
-      } catch (error) {
-        attempts++;
-        // Safely handle the unknown error type
-        const fetchError = error as Error;
-        console.error(`Fetch error on attempt ${attempts}:`, fetchError);
-        errorMessage = fetchError.message || "Network error";
-
-        // If we've reached max attempts, break out
-        if (attempts >= maxAttempts) {
-          break;
+          const data = await response.json();
+          
+          // Extract the code content from the API response
+          if (data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content) {
+            let codeContent = data.choices[0].message.content;
+            
+            // Remove markdown code blocks if present
+            codeContent = codeContent.replace(/```javascript|```typescript|```jsx|```tsx|```/g, "").trim();
+            
+            // Stream the code content
+            controller.enqueue(new TextEncoder().encode(codeContent));
+          } else {
+            // If we can't extract the content, return an error message
+            controller.enqueue(new TextEncoder().encode("Error: Unable to extract code from API response"));
+          }
+          
+          controller.close();
+        } catch (error) {
+          console.error("Error in stream:", error);
+          controller.error(error instanceof Error ? error : new Error(String(error)));
         }
+      },
+    });
 
-        // Wait before retrying
-        await new Promise((resolve) =>
-          setTimeout(resolve, 2000 * Math.pow(2, attempts - 1))
-        );
-      }
-    }
+    // Return the stream as the response
+    return new Response(stream);
   } catch (error) {
     console.error("Server error:", error);
     // Safely handle the unknown error type

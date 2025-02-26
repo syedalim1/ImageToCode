@@ -1,4 +1,5 @@
 "use client";
+
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -7,6 +8,7 @@ import {
   SandpackCodeEditor,
   SandpackPreview,
   useActiveCode,
+  SandpackConsole,
 } from "@codesandbox/sandpack-react";
 import {
   Copy,
@@ -17,7 +19,10 @@ import {
   Moon,
   Sun,
   RefreshCw,
+  Terminal,
+  AlertTriangle,
 } from "lucide-react";
+import ClientOnly from "./ClientOnly";
 
 interface EnhancedCodeEditorProps {
   code: string;
@@ -25,31 +30,23 @@ interface EnhancedCodeEditorProps {
   isLoading?: boolean;
 }
 
+interface CodeContent {
+  content: string;
+}
+
 // Custom hook to capture code changes
 function CodeEditorWithCapture({
   setCode,
   readOnly = false,
 }: {
-  setCode: (code: string | { content: string }) => void;
+  setCode: (code: string) => void;
   readOnly?: boolean;
 }) {
   const { code, updateCode } = useActiveCode();
 
-  const handleCodeUpdate = (newCode: string | { content: string }) => {
-    if (typeof newCode === "string") {
-      setCode(newCode);
-    } else if (
-      typeof newCode === "object" &&
-      newCode !== null &&
-      "content" in newCode
-    ) {
-      setCode(newCode.content);
-    }
-  };
-
   // Update the parent component's state when code changes
-  React.useEffect(() => {
-    handleCodeUpdate(code);
+  useEffect(() => {
+    setCode(code);
   }, [code, setCode]);
 
   return (
@@ -64,22 +61,44 @@ function CodeEditorWithCapture({
     />
   );
 }
-interface CodeContent {
-  content: string;
-}
+
+// Function to ensure code is a valid React component
+const ensureValidReactComponent = (code: string): string => {
+  // If code doesn't contain export default or export const App, wrap it
+  if (
+    !code.includes("export default") &&
+    !code.includes("export function") &&
+    !code.includes("export const")
+  ) {
+    // Check if code looks like JSX
+    if (code.includes("<") && code.includes("/>")) {
+      return `import React from 'react';\n\nexport default function App() {\n  return (\n    ${code}\n  );\n}`;
+    } else {
+      // Just return the code as a snippet
+      return `// Code snippet:\n${code}`;
+    }
+  }
+  return code;
+};
+
 const EnhancedCodeEditor: React.FC<EnhancedCodeEditorProps> = ({
   code,
   onCodeChange,
   isLoading = false,
 }) => {
-  const [activeTab, setActiveTab] = useState<"code" | "preview">("preview");
+  const [activeTab, setActiveTab] = useState<"code" | "preview" | "console">(
+    "preview"
+  );
   const [currentCode, setCurrentCode] = useState(code);
+  const [processedCode, setProcessedCode] = useState("");
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [isCopied, setIsCopied] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [hasError, setHasError] = useState(false);
 
   useEffect(() => {
     let processedCode = code;
+    setHasError(false);
 
     // Try to parse the code if it's a JSON string containing AI response
     try {
@@ -110,53 +129,111 @@ const EnhancedCodeEditor: React.FC<EnhancedCodeEditorProps> = ({
     // Remove markdown code blocks if present
     if (typeof processedCode === "string") {
       processedCode = processedCode
-        .replace(/```javascript|```typescript|```typescrpt|```/g, "")
+        .replace(
+          /```javascript|```typescript|```typescrpt|```jsx|```tsx|```/g,
+          ""
+        )
         .trim();
     }
 
     // Set the processed code
     setCurrentCode(processedCode);
+
+    // Ensure the code is a valid React component for the preview
+    try {
+      const validReactCode = ensureValidReactComponent(processedCode);
+      setProcessedCode(validReactCode);
+    } catch (e) {
+      console.error("Error processing code:", e);
+      setHasError(true);
+      setProcessedCode(
+        `// Error: Invalid code format\n// ${
+          e instanceof Error ? e.message : String(e)
+        }`
+      );
+    }
   }, [code]);
 
-  const handleCodeChange = (code: string | CodeContent) => {
-    let codeContent: string;
-
-    if (typeof code === "object" && code !== null && "content" in code) {
-      codeContent = code.content;
-      setCurrentCode(codeContent);
-    } else if (typeof code === "string") {
-      codeContent = code;
-      setCurrentCode(codeContent);
-    } else {
-      // Fallback for unexpected types
-      codeContent = String(code);
-      setCurrentCode(codeContent);
-    }
-
+  const handleCodeChange = (newCode: string) => {
+    setCurrentCode(newCode);
+    
     if (onCodeChange) {
-      onCodeChange(code);
+      // Always pass the code as a string to the parent component
+      onCodeChange(newCode);
     }
   };
 
+  // Clipboard operations should only run on client
   const copyToClipboard = () => {
-    navigator.clipboard.writeText(currentCode);
-    setIsCopied(true);
-    setTimeout(() => setIsCopied(false), 2000);
+    if (typeof navigator !== 'undefined') {
+      navigator.clipboard.writeText(currentCode);
+      setIsCopied(true);
+      setTimeout(() => setIsCopied(false), 2000);
+    }
   };
 
+  // Download operation should only run on client
   const downloadCode = () => {
-    const element = document.createElement("a");
-    const file = new Blob([currentCode], { type: "text/javascript" });
-    element.href = URL.createObjectURL(file);
-    element.download = "App.js";
-    document.body.appendChild(element);
-    element.click();
-    document.body.removeChild(element);
+    if (typeof document !== 'undefined') {
+      const element = document.createElement("a");
+      const file = new Blob([currentCode], { type: "text/javascript" });
+      element.href = URL.createObjectURL(file);
+      element.download = "App.js";
+      document.body.appendChild(element);
+      element.click();
+      document.body.removeChild(element);
+    }
   };
 
   const toggleFullscreen = () => {
     setIsFullscreen(!isFullscreen);
   };
+
+  // Fallback code for when the preview has errors
+  const fallbackCode = `
+// This is a fallback component shown when there are errors in the code
+import React from 'react';
+
+export default function ErrorFallback() {
+  return (
+    <div style={{ 
+      padding: '20px', 
+      color: '#e53e3e', 
+      fontFamily: 'system-ui, sans-serif',
+      textAlign: 'center',
+      height: '100%',
+      display: 'flex',
+      flexDirection: 'column',
+      justifyContent: 'center',
+      alignItems: 'center'
+    }}>
+      <svg 
+        xmlns="http://www.w3.org/2000/svg" 
+        width="64" 
+        height="64" 
+        viewBox="0 0 24 24" 
+        fill="none" 
+        stroke="currentColor" 
+        strokeWidth="2" 
+        strokeLinecap="round" 
+        strokeLinejoin="round"
+        style={{ marginBottom: '16px' }}
+      >
+        <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+        <line x1="12" y1="9" x2="12" y2="13"></line>
+        <line x1="12" y1="17" x2="12.01" y2="17"></line>
+      </svg>
+      <h2 style={{ marginBottom: '8px', fontSize: '24px' }}>Preview Error</h2>
+      <p style={{ marginBottom: '16px', color: '#718096' }}>
+        There was an error rendering this component.
+      </p>
+      <p style={{ fontSize: '14px', color: '#718096' }}>
+        Check the console tab for more details.
+      </p>
+    </div>
+  );
+}
+`;
 
   return (
     <motion.div
@@ -168,7 +245,7 @@ const EnhancedCodeEditor: React.FC<EnhancedCodeEditorProps> = ({
       transition={{ duration: 0.5 }}
     >
       {/* Toolbar */}
-      <div className="bg-gray-100 dark:bg-gray-800 p-3 flex flex-wrap justify-between items-center">
+      <div className="bg-gradient-to-r from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-700 p-3 flex flex-wrap justify-between items-center">
         <div className="flex space-x-2">
           <button
             onClick={() => setActiveTab("code")}
@@ -192,38 +269,53 @@ const EnhancedCodeEditor: React.FC<EnhancedCodeEditorProps> = ({
             <Eye className="h-4 w-4 mr-1.5" />
             Preview
           </button>
+          <button
+            onClick={() => setActiveTab("console")}
+            className={`px-3 py-1.5 rounded-md flex items-center text-sm font-medium transition-all ${
+              activeTab === "console"
+                ? "bg-purple-100 text-purple-700 dark:bg-purple-900 dark:text-purple-300"
+                : "text-gray-600 hover:bg-gray-200 dark:text-gray-300 dark:hover:bg-gray-700"
+            }`}
+          >
+            <Terminal className="h-4 w-4 mr-1.5" />
+            Console
+          </button>
         </div>
 
         <div className="flex space-x-2 mt-2 sm:mt-0">
-          <motion.button
-            onClick={copyToClipboard}
-            className="px-3 py-1.5 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 rounded-md flex items-center text-sm font-medium hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            disabled={isCopied}
-          >
-            {isCopied ? (
-              <>
-                <Check className="h-4 w-4 mr-1.5 text-green-500" />
-                <span className="text-green-500">Copied!</span>
-              </>
-            ) : (
-              <>
-                <Copy className="h-4 w-4 mr-1.5" />
-                <span>Copy</span>
-              </>
-            )}
-          </motion.button>
+          <ClientOnly>
+            <motion.button
+              onClick={copyToClipboard}
+              className="px-3 py-1.5 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 rounded-md flex items-center text-sm font-medium hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              disabled={isCopied}
+            >
+              {isCopied ? (
+                <>
+                  <Check className="h-4 w-4 mr-1.5 text-green-500" />
+                  <span className="text-green-500">Copied!</span>
+                </>
+              ) : (
+                <>
+                  <Copy className="h-4 w-4 mr-1.5" />
+                  <span>Copy</span>
+                </>
+              )}
+            </motion.button>
+          </ClientOnly>
 
-          <motion.button
-            onClick={downloadCode}
-            className="px-3 py-1.5 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 rounded-md flex items-center text-sm font-medium hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-          >
-            <Download className="h-4 w-4 mr-1.5" />
-            <span>Download</span>
-          </motion.button>
+          <ClientOnly>
+            <motion.button
+              onClick={downloadCode}
+              className="px-3 py-1.5 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 rounded-md flex items-center text-sm font-medium hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <Download className="h-4 w-4 mr-1.5" />
+              <span>Download</span>
+            </motion.button>
+          </ClientOnly>
 
           <motion.button
             onClick={() => setIsDarkMode(!isDarkMode)}
@@ -263,98 +355,118 @@ const EnhancedCodeEditor: React.FC<EnhancedCodeEditorProps> = ({
         )}
       </AnimatePresence>
 
-      {/* Sandpack Editor */}
-      <div className="relative">
-        {/* Display error message if code is invalid */}
-        {currentCode && currentCode.trim().startsWith("{") && (
-          <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-4">
-            <div className="flex">
-              <div className="flex-shrink-0">
-                <svg
-                  className="h-5 w-5 text-yellow-400"
-                  viewBox="0 0 20 20"
-                  fill="currentColor"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-              </div>
-              <div className="ml-3">
-                <p className="text-sm text-yellow-700">
-                  The received data appears to be in JSON format instead of
-                  code. Attempting to extract code content.
-                </p>
-              </div>
+      {/* Warning for JSON data */}
+      {currentCode && currentCode.trim().startsWith("{") && (
+        <div className="bg-yellow-50 dark:bg-yellow-900/30 border-l-4 border-yellow-400 p-4">
+          <div className="flex">
+            <div className="flex-shrink-0">
+              <AlertTriangle className="h-5 w-5 text-yellow-400" />
+            </div>
+            <div className="ml-3">
+              <p className="text-sm text-yellow-700 dark:text-yellow-200">
+                The received data appears to be in JSON format instead of code.
+                Attempting to extract code content.
+              </p>
             </div>
           </div>
-        )}
+        </div>
+      )}
 
-        <SandpackProvider
-          options={{
-            externalResources: ["https://cdn.tailwindcss.com"],
-            classes: {
-              "sp-wrapper":
-                "custom-wrapper rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700",
-              "sp-layout": "custom-layout",
-              "sp-tab-button": "custom-tab",
-            },
-          }}
-          customSetup={{
-            dependencies: {
-              "react-markdown": "latest",
-              "lucide-react": "latest",
-            },
-          }}
-          files={{
-            "/App.js": currentCode.startsWith("{")
-              ? "// Error: Invalid code format received\n// Please regenerate the code"
-              : currentCode,
-          }}
-          theme="auto"
-          template="react"
-        >
-          <SandpackLayout
-            style={{
-              width: "100%",
-              height: activeTab === "preview" ? "700px" : "800px",
-              borderRadius: "0",
+      {/* Sandpack Editor - Wrapped in ClientOnly to prevent hydration issues */}
+      <ClientOnly>
+        <div className="relative">
+          <SandpackProvider
+            options={{
+              externalResources: ["https://cdn.tailwindcss.com"],
+              classes: {
+                "sp-wrapper":
+                  "custom-wrapper rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700",
+                "sp-layout": "custom-layout",
+                "sp-tab-button": "custom-tab",
+              },
             }}
+            customSetup={{
+              dependencies: {
+                "react": "^18.0.0",
+                "react-dom": "^18.0.0",
+                "react-markdown": "latest",
+                "lucide-react": "latest",
+              },
+              entry: "/index.js",
+            }}
+            files={{
+              "/App.js": hasError ? fallbackCode : processedCode,
+              "/index.js": `
+import React, { StrictMode } from "react";
+import { createRoot } from "react-dom/client";
+import App from "./App";
+
+const rootElement = document.getElementById("root");
+const root = createRoot(rootElement);
+
+try {
+  root.render(
+    <StrictMode>
+      <App />
+    </StrictMode>
+  );
+} catch (error) {
+  console.error("Error rendering component:", error);
+  root.render(
+    <div style={{ 
+      padding: '20px', 
+      color: 'red', 
+      fontFamily: 'system-ui, sans-serif',
+      textAlign: 'center' 
+    }}>
+      <h2>Error Rendering Component</h2>
+      <p>{error.message}</p>
+    </div>
+  );
+}
+`,
+            }}
+            theme={isDarkMode ? "dark" : "light"}
+            template="react"
           >
-            {activeTab === "code" && (
-              <CodeEditorWithCapture
-                setCode={(newCode) => {
-                  if (typeof newCode === "string") {
-                    handleCodeChange(newCode);
-                  } else if (
-                    typeof newCode === "object" &&
-                    newCode !== null &&
-                    "content" in newCode
-                  ) {
-                    handleCodeChange(newCode.content);
-                  }
-                }}
-                readOnly={false}
-              />
-            )}
-            {activeTab === "preview" && (
-              <SandpackPreview
-                style={{
-                  height: "100%",
-                  minWidth: "100%",
-                  display: "flex",
-                  flexDirection: "column",
-                  overflow: "auto",
-                }}
-                showNavigator
-                showRefreshButton
-              />
-            )}
-          </SandpackLayout>
-        </SandpackProvider>
-      </div>
+            <SandpackLayout
+              style={{
+                width: "100%",
+                height: activeTab === "preview" ? "700px" : "800px",
+                borderRadius: "0",
+              }}
+            >
+              {activeTab === "code" && (
+                <CodeEditorWithCapture
+                  setCode={handleCodeChange}
+                  readOnly={false}
+                />
+              )}
+              {activeTab === "preview" && (
+                <SandpackPreview
+                  style={{
+                    height: "100%",
+                    minWidth: "100%",
+                    display: "flex",
+                    flexDirection: "column",
+                    overflow: "auto",
+                  }}
+                  showNavigator
+                  showRefreshButton
+                />
+              )}
+              {activeTab === "console" && (
+                <SandpackConsole
+                  style={{
+                    height: "100%",
+                    minWidth: "100%",
+                  }}
+                />
+              )}
+            </SandpackLayout>
+          </SandpackProvider>
+        </div>
+      </ClientOnly>
     </motion.div>
   );
 };

@@ -107,7 +107,7 @@ export default {
       );
     };
 
-    const Dashboard = () => {
+    const App = () => {
       const [darkMode, setDarkMode] = useState(false);
       const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
       
@@ -168,7 +168,7 @@ export default {
       );
     };
 
-    export default Dashboard;
+    export default App;
     \`\`\`
   `,
 
@@ -178,5 +178,5 @@ export default {
       icon: "/google.png",
       modelname: "google/gemini-2.0-pro-exp-02-05:free",
     },
-  ]
-}
+  ],
+};
