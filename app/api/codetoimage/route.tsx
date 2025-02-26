@@ -21,16 +21,21 @@ export async function POST(req: NextRequest) {
     console.log("🔹 Incoming Request Data:", body);
     let result;
 
+    // Ensure code is properly formatted as a JSON object with content property
+    const formattedCode = typeof code === 'string' 
+      ? { content: code } 
+      : (code || { content: '' });
+
     result = await db
       .insert(imagetocodeTable)
       .values({
         uid: uid,
-        description: description,
+        description: description || '',
         imageUrl: imageUrl,
         model: model,
-        code: code ,
+        code: formattedCode,
         createdAt: email,
-        options: options
+        options: options || {}
       })
       .returning();
 
@@ -70,14 +75,23 @@ export async function PUT(req: NextRequest) {
       );
     }
 
+    // Ensure code is properly formatted as a JSON object with content property
+    const formattedCode = typeof code === 'string' 
+      ? { content: code } 
+      : (code || { content: '' });
+
+    const updateData: any = {
+      code: formattedCode
+    };
+
+    // Only include fields that are provided
+    if (imageUrl) updateData.imageUrl = imageUrl;
+    if (description) updateData.description = description;
+    if (createdAt) updateData.createdAt = createdAt;
+
     const result = await db
       .update(imagetocodeTable)
-      .set({
-        code: code,
-        imageUrl: imageUrl,
-        description: description,
-        createdAt: createdAt,
-      })
+      .set(updateData)
       .where(eq(imagetocodeTable.uid, uid))
       .returning();
 
@@ -130,7 +144,15 @@ export async function GET(req: NextRequest) {
 
     console.log("✅ Database Query Result:", result[0]);
 
-    return NextResponse.json(result[0]);
+    // Ensure the response has a consistent format for the code field
+    const record = result[0];
+    
+    // If code is null or undefined, provide a default empty object
+    if (!record.code) {
+      record.code = { content: '' };
+    }
+
+    return NextResponse.json(record);
   } catch (error: any) {
     console.error("❌ Server Error:", error);
     return NextResponse.json(

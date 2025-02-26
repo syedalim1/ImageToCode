@@ -19,3 +19,10 @@ export const imagetocodeTable = pgTable("imagetocode", {
   createdAt: varchar({ length: 255 }).notNull(),
   options: json().default({}),
 });
+
+export const submissions = pgTable("submissions", {
+  id: integer().primaryKey().generatedAlwaysAsIdentity(),
+  uid: varchar({ length: 255 }).notNull(),
+  description: varchar({ length: 255 }),
+  email: varchar({ length: 255 }),
+});
