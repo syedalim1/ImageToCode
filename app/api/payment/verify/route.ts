@@ -19,13 +19,17 @@ export async function POST(req: Request) {
 
     if (generatedSignature === razorpay_signature) {
       // Payment verification successful
-      // Add 100 credits for ₹10 payment
+      // Add 10 credits for ₹10 payment (1 page = 10 credits)
       const updateRes = await fetch("/api/user/update-credits", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "x-user-email": req.headers.get("x-user-email") || "",
         },
-        body: JSON.stringify({ credits: 100 }),
+        body: JSON.stringify({ 
+          credits: 10,
+          userEmail: req.headers.get("x-user-email") || "",
+        }),
       });
 
       if (updateRes.ok) {

@@ -1,5 +1,8 @@
 import Constants from "@/data/Constants";
 import { NextRequest, NextResponse } from "next/server";
+import { db } from "@/configs/db";
+import { usersTable } from "@/configs/schema";
+import { eq } from "drizzle-orm";
 
 const API_KEY = process.env.OPENROUTER_API_KEY;
 const OPENROUTER_API_URL = process.env.OPENROUTER_API_URL || "https://openrouter.ai/api/v1/chat/completions";
@@ -8,17 +11,44 @@ const SITE_NAME = process.env.SITE_NAME || "My Local App";
 
 export async function POST(req: NextRequest) {
   try {
-    const { description, imageUrl, model, options } = await req.json();
+    const { description, imageUrl, model, options, userEmail } = await req.json();
     const modelname = "google/gemini-2.0-pro-exp-02-05:free";
     //future main ai this "anthropic/claude-3.5-sonnet
     const des = Constants.PROMPT + description + "\n\n" + options;
     // Validate required fields
-    if (!description || !imageUrl) {
+    if (!description || !imageUrl || !userEmail) {
       return NextResponse.json(
-        { error: "Missing required fields: description or imageUrl" },
+        { error: "Missing required fields: description, imageUrl, or userEmail" },
         { status: 400 }
       );
     }
+
+    // Check if user has enough credits
+    const user = await db.select().from(usersTable).where(eq(usersTable.email, userEmail));
+    
+    if (user.length === 0) {
+      return NextResponse.json(
+        { error: "User not found" },
+        { status: 404 }
+      );
+    }
+
+    const currentCredits = user[0]?.credits ?? 0;
+    
+    if (currentCredits < 10) {
+      return NextResponse.json(
+        { error: "Insufficient credits. You need at least 10 credits to generate a page." },
+        { status: 403 }
+      );
+    }
+
+    // Deduct 10 credits for generating a page
+    await db
+      .update(usersTable)
+      .set({
+        credits: currentCredits - 10,
+      })
+      .where(eq(usersTable.email, userEmail));
 
     // Verify API key exists
     if (!API_KEY) {

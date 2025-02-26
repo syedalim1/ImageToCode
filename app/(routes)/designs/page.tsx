@@ -114,6 +114,10 @@ function DesignsPage() {
 
   // Filter and sort designs
   const filteredAndSortedDesigns = designs
+    // First ensure there are no duplicate UIDs
+    .filter((design, index, self) => 
+      index === self.findIndex((d) => d.uid === design.uid)
+    )
     .filter(design => {
       // Apply search filter
       const matchesSearch = !searchTerm || 
