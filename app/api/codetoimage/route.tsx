@@ -34,7 +34,8 @@ export async function POST(req: NextRequest) {
         imageUrl: imageUrl,
         model: model,
         code: formattedCode,
-        createdAt: email,
+        email: email,
+        createdAt: new Date().toISOString(),
         options: options || {}
       })
       .returning();
@@ -66,7 +67,7 @@ export async function PUT(req: NextRequest) {
     const { searchParams } = new URL(req.url);
     const uid = searchParams.get("uid");
     const body = await req.json();
-    const { code, imageUrl, description, createdAt } = body;
+    const { code, imageUrl, description, createdAt, email } = body;
 
     if (!uid) {
       return NextResponse.json(
@@ -88,6 +89,7 @@ export async function PUT(req: NextRequest) {
     if (imageUrl) updateData.imageUrl = imageUrl;
     if (description) updateData.description = description;
     if (createdAt) updateData.createdAt = createdAt;
+    if (email) updateData.email = email;
 
     const result = await db
       .update(imagetocodeTable)

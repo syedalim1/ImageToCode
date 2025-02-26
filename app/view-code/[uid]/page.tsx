@@ -69,6 +69,7 @@ function Page() {
   const [success, setSuccess] = useState<string>("");
   const [editMode, setEditMode] = useState(false);
   const [editedCode, setEditedCode] = useState("");
+  const [activeTab, setActiveTab] = useState<"preview" | "code">("preview");
 
   useEffect(() => {
     if (uid) {
@@ -112,7 +113,9 @@ function Page() {
         console.log("📝 Set response from code.content");
       } else {
         console.log("⚠️ No code content found in the database");
-        setError("No code content found for this design. Please use the Generate button to create code.");
+        setError(
+          "No code content found for this design. Please use the Generate button to create code."
+        );
       }
     } catch (error) {
       console.error("❌ Error fetching record:", error);
@@ -143,6 +146,7 @@ function Page() {
           imageUrl: record.imageUrl,
           model: record.model,
           options: record.options,
+          userEmail: user?.primaryEmailAddress?.emailAddress || "",
         }),
       });
 
@@ -406,47 +410,61 @@ function Page() {
                 </button>
               </div>
               <div className="relative">
-                <SandpackProvider
-                  options={{
-                    externalResources: ["https://cdn.tailwindcss.com"],
-                    classes: {
-                      "sp-wrapper": "custom-wrapper",
-                      "sp-layout": "custom-layout",
-                      "sp-tab-button": "custom-tab",
-                    },
-                  }}
-                  customSetup={{
-                    dependencies: {
-                      "react-markdown": "latest",
-                      "lucide-react": "latest",
-                    },
-                  }}
-                  files={{
-                    "/App.js": response,
-                  }}
-                  theme="light"
-                  template="react"
-                >
-                  <SandpackLayout style={{ width: "100%", height: "700px" }}>
-                    <SandpackCodeEditor
+                <div className="p-6">
+                  <SandpackProvider
+                    options={{
+                      externalResources: ["https://cdn.tailwindcss.com"],
+                      classes: {
+                        "sp-wrapper":
+                          "custom-wrapper rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700",
+                        "sp-layout": "custom-layout",
+                        "sp-tab-button": "custom-tab",
+                      },
+                    }}
+                    customSetup={{
+                      dependencies: {
+                        "react-markdown": "latest",
+                        "lucide-react": "latest",
+                      },
+                    }}
+                    files={{
+                      "/App.js": response,
+                    }}
+                    theme="auto"
+                    template="react"
+                  >
+                    <SandpackLayout
                       style={{
-                        minWidth: "100%",
-                        height: "500px",
+                        width: "100%",
+                        height: activeTab === "preview" ? "700px" : "800px",
+                        borderRadius: "0.5rem",
                       }}
-                      showLineNumbers
-                      showTabs
-                    />
-                    <SandpackPreview
-                      style={{
-                        minWidth: "90%",
-                        height: "700px",
-                        display: "flex",
-                        flexDirection: "column",
-                        overflow: "auto",
-                      }}
-                    />
-                  </SandpackLayout>
-                </SandpackProvider>
+                    >
+                      {activeTab === "code" && (
+                        <SandpackCodeEditor
+                          style={{
+                            height: "100%",
+                            minWidth: "100%",
+                          }}
+                          showLineNumbers
+                          showTabs
+                          readOnly
+                        />
+                      )}
+                      {activeTab === "preview" && (
+                        <SandpackPreview
+                          style={{
+                            height: "100%",
+                            minWidth: "100%",
+                            display: "flex",
+                            flexDirection: "column",
+                            overflow: "auto",
+                          }}
+                        />
+                      )}
+                    </SandpackLayout>
+                  </SandpackProvider>
+                </div>
                 <div className="absolute top-0 right-0 p-2 bg-yellow-100 text-yellow-800 text-xs rounded-bl-md">
                   Note: Click "Save Code to Database" after making changes
                 </div>
@@ -479,7 +497,8 @@ function Page() {
                     No Code Available
                   </p>
                   <p className="text-yellow-700 dark:text-yellow-300 text-sm">
-                    This design doesn't have any code associated with it yet. Generate code to get started.
+                    This design doesn't have any code associated with it yet.
+                    Generate code to get started.
                   </p>
                 </div>
               </div>

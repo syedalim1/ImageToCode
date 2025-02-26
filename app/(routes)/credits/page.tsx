@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import axios from "axios";
 import { useAuthContext } from "@/context/AuthContext";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
@@ -44,7 +45,7 @@ export default function CreditsPage() {
       credits: 10,
       price: 1000, // ₹10
       popular: false,
-      features: ["Generate 1 pages", "Basic support", "Valid for 30 days"],
+
       color: "from-blue-500 to-blue-600",
     },
     {
@@ -55,12 +56,7 @@ export default function CreditsPage() {
       originalPrice: 3000,
       discount: 17,
       popular: true,
-      features: [
-        "Generate 3 pages",
-        "Priority support",
-        "Valid for 60 days",
-        "Access to all models",
-      ],
+
       color: "from-purple-500 to-purple-600",
     },
     {
@@ -71,13 +67,7 @@ export default function CreditsPage() {
       originalPrice: 7500,
       discount: 33,
       popular: false,
-      features: [
-        "Generate 7 pages",
-        "Premium support",
-        "Valid for 90 days",
-        "Access to all models",
-        "Early access to new features",
-      ],
+
       color: "from-pink-500 to-pink-600",
     },
     {
@@ -88,14 +78,7 @@ export default function CreditsPage() {
       originalPrice: 15000,
       discount: 33,
       popular: false,
-      features: [
-        "Generate 20 pages",
-        "Dedicated support",
-        "Valid for 180 days",
-        "Access to all models",
-        "Early access to new features",
-        "Custom branding options",
-      ],
+
       color: "from-amber-500 to-amber-600",
     },
   ];
@@ -335,7 +318,7 @@ export default function CreditsPage() {
                   Purchase additional credits to continue creating amazing
                   designs with our AI.
                 </p>
-                <div className="flex gap-3">
+                <div className="flex gap-3 flex-wrap">
                   <Button
                     onClick={() =>
                       document
@@ -354,6 +337,23 @@ export default function CreditsPage() {
                   >
                     <Clock className="mr-2 h-4 w-4" />
                     View History
+                  </Button>
+                  <Button
+                    variant="outline"
+                    onClick={async () => {
+                      try {
+                        const response = await axios.post('/api/user/reset-credits');
+                        alert(`Success: ${response.data.updatedCount} users updated to have 100 credits.`);
+                        window.location.reload(); // Refresh the page to update the credit display
+                      } catch (error) {
+                        console.error('Error resetting credits:', error);
+                        alert('Failed to reset credits. Please try again.');
+                      }
+                    }}
+                    className="border-gray-300"
+                  >
+                    <RefreshCw className="mr-2 h-4 w-4" />
+                    Reset Credits
                   </Button>
                 </div>
               </div>
@@ -479,15 +479,6 @@ export default function CreditsPage() {
                         {pkg.credits} Credits
                       </span>
                     </div>
-
-                    <ul className="space-y-3 mb-6">
-                      {pkg.features.map((feature, i) => (
-                        <li key={i} className="flex items-start">
-                          <CheckCircle className="h-5 w-5 text-green-500 mr-2 mt-0.5 flex-shrink-0" />
-                          <span className="text-gray-600">{feature}</span>
-                        </li>
-                      ))}
-                    </ul>
 
                     <Button
                       onClick={() => handlePayment(pkg)}

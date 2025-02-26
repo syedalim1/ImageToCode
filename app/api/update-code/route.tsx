@@ -28,7 +28,7 @@ export async function PUT(req: NextRequest) {
       .update(imagetocodeTable)
       .set({
         code: formattedCode, // Update the code field with properly formatted object
-        ...(email ? { createdAt: email } : {}) // Only update email if provided
+        ...(email ? { email: email } : {}) // Only update email if provided
       })
       .where(eq(imagetocodeTable.uid, uid)) // Filter by uid
       .returning(); // Return the updated record

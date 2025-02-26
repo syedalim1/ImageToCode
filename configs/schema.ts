@@ -6,7 +6,7 @@ export const usersTable = pgTable("users", {
   id: integer().primaryKey().generatedAlwaysAsIdentity(),
   name: varchar({ length: 255 }).notNull(),
   email: varchar({ length: 255 }).notNull().unique(),
-  credits: integer().default(0),
+  credits: integer().default(100),
 });
 
 export const imagetocodeTable = pgTable("imagetocode", {
@@ -14,8 +14,9 @@ export const imagetocodeTable = pgTable("imagetocode", {
   uid: varchar({ length: 255 }).notNull(),
   model: varchar({ length: 255 }).notNull(),
   imageUrl: varchar({ length: 255 }).notNull(),
-  code: json('code').notNull(),
+  code: json("code").notNull(),
   description: varchar({ length: 255 }),
+  email: varchar({ length: 255 }),
   createdAt: varchar({ length: 255 }).notNull(),
   options: json().default({}),
 });
