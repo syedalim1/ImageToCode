@@ -3,7 +3,6 @@ import Authentication from "./_components/Authentication";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import { useEffect } from "react";
-import ProfileAvatar from "./_components/ProfileAvatar";
 import {
   SparklesIcon,
   BoltIcon,
@@ -51,7 +50,7 @@ export default function Home() {
   ];
 
   return (
-    <Authentication>
+    
       <div className="min-h-screen bg-gradient-to-b from-indigo-50 to-purple-50">
         {/* Animated Header */}
         <motion.header
@@ -216,6 +215,6 @@ export default function Home() {
           </div>
         </div>
       </div>
-    </Authentication>
+    
   );
 }
