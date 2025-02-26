@@ -2,7 +2,8 @@ import Constants from "@/data/Constants";
 import { NextRequest, NextResponse } from "next/server";
 
 const API_KEY = process.env.OPENROUTER_API_KEY;
-const SITE_URL = process.env.SITE_URL || "http://localhost:3000";
+const OPENROUTER_API_URL = process.env.OPENROUTER_API_URL || "https://openrouter.ai/api/v1/chat/completions";
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
 const SITE_NAME = process.env.SITE_NAME || "My Local App";
 
 export async function POST(req: NextRequest) {
@@ -50,7 +51,7 @@ export async function POST(req: NextRequest) {
     };
 
     const response = await fetch(
-      "https://openrouter.ai/api/v1/chat/completions",
+      OPENROUTER_API_URL,
       {
         method: "POST",
         headers: {

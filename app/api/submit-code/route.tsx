@@ -4,7 +4,7 @@ import { submissions } from "@/configs/schema";
 
 export async function POST(req: NextRequest) {
   try {
-    const { uid, code, email } = await req.json();
+    const { uid, description, email } = await req.json();
 
     // Basic validation
     if (!uid || !description) {
@@ -17,7 +17,7 @@ export async function POST(req: NextRequest) {
     // Insert the submission into the database
     await db.insert(submissions).values({
       uid: uid,
-      code: code,
+      description: description,
       email: email,
     });
 

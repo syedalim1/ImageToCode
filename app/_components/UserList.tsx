@@ -8,7 +8,9 @@ interface User {
 }
 
 async function fetchUsers(): Promise<User[]> {
-  const response = await fetch("/api/admin/users");
+  // Use absolute URL with the NEXT_PUBLIC_SITE_URL environment variable or fallback to relative URL for client-side
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || '';
+  const response = await fetch(`${baseUrl}/api/admin/users`);
   if (!response.ok) {
     throw new Error("Failed to fetch users");
   }
