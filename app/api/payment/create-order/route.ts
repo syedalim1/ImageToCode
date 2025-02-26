@@ -1,5 +1,6 @@
 import Razorpay from "razorpay";
 import { NextResponse } from "next/server";
+import { v4 as uuid } from 'uuid';
 
 const razorpay = new Razorpay({
   key_id: process.env.RAZORPAY_KEY_ID!,
@@ -13,7 +14,8 @@ export async function POST(req: Request) {
     const options = {
       amount: amount, // amount in smallest currency unit
       currency: "INR",
-      receipt: `receipt_${Date.now()}`,
+
+      receipt: `receipt_${uuid()}`,
     };
 
     const order = await razorpay.orders.create(options);

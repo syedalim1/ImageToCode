@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   SignedIn,
   SignedOut,
@@ -9,10 +9,16 @@ import {
 } from "@clerk/nextjs";
 
 function Authentication() {
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
   return (
     <div>
       <SignedIn>
-        <UserButton />
+        {isClient ? <UserButton /> : null}
       </SignedIn>
       <SignedOut>
         <div className="flex gap-5">

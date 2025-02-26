@@ -74,7 +74,7 @@ function DesignsPage() {
               imageUrl: "https://placehold.co/600x400/ff5271/ffffff?text=Sample+Design+2",
               code: { content: "<div>Sample code</div>" },
               description: "Sample Dashboard",
-              createdAt: new Date(Date.now() - 86400000).toISOString(), // 1 day ago
+              createdAt: "2025-02-25T00:00:00.000Z", // 1 day ago
               options: {},
             },
             {
@@ -84,7 +84,7 @@ function DesignsPage() {
               imageUrl: "https://placehold.co/600x400/52ff71/ffffff?text=Sample+Design+3",
               code: { content: "<div>Sample code</div>" },
               description: "Sample Product Page",
-              createdAt: new Date(Date.now() - 172800000).toISOString(), // 2 days ago
+              createdAt: "2025-02-24T00:00:00.000Z", // 2 days ago
               options: {},
             },
           ];
