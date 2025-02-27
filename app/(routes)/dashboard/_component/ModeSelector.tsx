@@ -12,7 +12,7 @@ const ModeSelector: React.FC<ModeSelectorProps> = ({
   preview,
 }) => {
   return (
-    <div className="h-full">
+    <div className="">
       <div className="mb-6">
         <h2 className="text-xl font-bold mb-2 text-gray-800">
           Select Mode
@@ -33,7 +33,7 @@ const ModeSelector: React.FC<ModeSelectorProps> = ({
             />
             <label htmlFor="normal">Normal Mode (10 Credits)</label>
           </label>
-          <label className="flex items-center gap-2">
+          <label className="flex items-center gap-2 ">
             <input
               type="radio"
               id="export"

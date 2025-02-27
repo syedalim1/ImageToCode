@@ -27,8 +27,12 @@ const ImageUpload: React.FC = () => {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [selectedMode, setSelectedMode] = useState("normal"); // Default to normal mode
-  const [selectedOptions, setSelectedOptions] = useState<string[]>(["responsive"]);
-  const [activeTab, setActiveTab] = useState<"upload" | "options" | "description">("upload");
+  const [selectedOptions, setSelectedOptions] = useState<string[]>([
+    "responsive",
+  ]);
+  const [activeTab, setActiveTab] = useState<
+    "upload" | "options" | "description"
+  >("upload");
   const [showSuccessIndicator, setShowSuccessIndicator] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -182,7 +186,7 @@ const ImageUpload: React.FC = () => {
       {/* Progress Steps */}
       <div className="overflow-x-auto pb-2 -mx-4 sm:mx-0">
         <div className="min-w-[600px] sm:min-w-0 px-4 sm:px-0">
-          <ProgressSteps 
+          <ProgressSteps
             activeTab={activeTab}
             setActiveTab={setActiveTab}
             selectedFile={selectedFile}
@@ -193,39 +197,19 @@ const ImageUpload: React.FC = () => {
 
       {/* Main Content Area */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 lg:gap-8 mt-4 sm:mt-6">
-        {/* Left Panel - Changes based on active tab */}
+        {/* Left Panel - Image Upload */}
         <div className="p-4 sm:p-6 md:p-8 border-2 border-dashed rounded-xl bg-gradient-to-br from-purple-50 to-blue-50 relative">
-          {activeTab === "upload" && (
-            <ImageDropzone
-              selectedFile={selectedFile}
-              setSelectedFile={setSelectedFile}
-              preview={preview}
-              setPreview={setPreview}
-              error={error}
-              setError={setError}
-              setShowSuccessIndicator={setShowSuccessIndicator}
-              setActiveTab={setActiveTab}
-            />
-          )}
-
-          {activeTab === "options" && (
-            <ModeSelector
-              selectedMode={selectedMode}
-              setSelectedMode={setSelectedMode}
-              preview={preview}
-            />
-          )}
-
-          {activeTab === "description" && (
-            <DescriptionInput
-              userDescription={userDescription}
-              setUserDescription={setUserDescription}
-              isUploading={isUploading}
-              preview={preview}
-            />
-          )}
+          <ImageDropzone
+            selectedFile={selectedFile}
+            setSelectedFile={setSelectedFile}
+            preview={preview}
+            setPreview={setPreview}
+            error={error}
+            setError={setError}
+            setShowSuccessIndicator={setShowSuccessIndicator}
+            setActiveTab={setActiveTab}
+          />
         </div>
-
         {/* Right Panel - Features and Options */}
         <div className="space-y-4 sm:space-y-6">
           {/* Language Selector */}
@@ -233,17 +217,29 @@ const ImageUpload: React.FC = () => {
             selectedLanguage={selectedLanguage}
             setSelectedLanguage={setSelectedLanguage}
           />
-
           {/* React Features */}
           <ReactFeatureOptions
             selectedOptions={selectedOptions}
             toggleOption={toggleOption}
           />
-
+          <ModeSelector
+            selectedMode={selectedMode}
+            setSelectedMode={setSelectedMode}
+            preview={preview}
+          />{" "}
+          {/* Description Input - Show when activeTab is "description" */}{" "}
+          <DescriptionInput
+            userDescription={userDescription}
+            setUserDescription={setUserDescription}
+            isUploading={isUploading}
+            preview={preview}
+          />{" "}
+         
+          {/* Progress Indicator - Always visible */}{" "}
           <ProgressIndicator
             isUploading={isUploading}
             uploadProgress={uploadProgress}
-          />
+          />{" "}
         </div>
       </div>
 

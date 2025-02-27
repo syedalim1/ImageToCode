@@ -97,7 +97,7 @@ const CreditPackages: React.FC<CreditPackagesProps> = ({
       popular: false,
       color: "from-blue-500 to-blue-600",
       features: [
-        "10 image-to-code conversions",
+        "1 image-to-code conversions",
         "Standard support",
         "Basic components",
       ],
@@ -106,13 +106,13 @@ const CreditPackages: React.FC<CreditPackagesProps> = ({
       id: "standard",
       name: "Standard",
       credits: 30,
-      price: 6000, // ₹60
+      price: 5000, // ₹60
       originalPrice: 3000,
       discount: 17,
       popular: true,
       color: "from-purple-500 to-purple-600",
       features: [
-        "30 image-to-code conversions",
+        "3 image-to-code conversions",
         "Priority support",
         "Advanced components",
         "Code customization",
@@ -122,7 +122,7 @@ const CreditPackages: React.FC<CreditPackagesProps> = ({
       id: "premium",
       name: "Premium",
       credits: 70,
-      price: 14000, // ₹140
+      price: 140, // ₹140
       originalPrice: 7500,
       discount: 33,
       popular: false,

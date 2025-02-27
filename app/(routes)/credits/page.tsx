@@ -17,6 +17,7 @@ const transactions = [
     amount: 1000,
     credits: 10,
     status: "completed",
+    createdAt: "2025-02-20T10:30:00Z",
   },
   {
     id: "txn_123457",
@@ -24,6 +25,7 @@ const transactions = [
     amount: 2500,
     credits: 30,
     status: "completed",
+    createdAt: "2025-02-15T14:20:00Z",
   },
   {
     id: "txn_123458",
@@ -31,12 +33,15 @@ const transactions = [
     amount: 5000,
     credits: 75,
     status: "completed",
+    createdAt: "2025-02-10T09:15:00Z",
   },
 ];
 
 export default function CreditsPage() {
   const { credits } = useAuthContext();
-  const [activeTab, setActiveTab] = useState<"packages" | "history" | "explainer">("packages");
+  const [activeTab, setActiveTab] = useState<
+    "packages" | "history" | "explainer"
+  >("packages");
 
   const handlePaymentSuccess = useCallback(() => {
     // Refresh the page to update the credit display
@@ -54,22 +59,22 @@ export default function CreditsPage() {
   // Animation variants
   const tabVariants = {
     hidden: { opacity: 0, y: 20 },
-    visible: { 
-      opacity: 1, 
+    visible: {
+      opacity: 1,
       y: 0,
       transition: {
         type: "spring",
         stiffness: 300,
-        damping: 20
-      }
+        damping: 20,
+      },
     },
-    exit: { 
-      opacity: 0, 
+    exit: {
+      opacity: 0,
       y: -20,
       transition: {
-        duration: 0.2
-      }
-    }
+        duration: 0.2,
+      },
+    },
   };
 
   return (
@@ -188,7 +193,7 @@ export default function CreditsPage() {
               <CreditPackages onPaymentSuccess={handlePaymentSuccess} />
             </motion.div>
           )}
-          
+
           {activeTab === "history" && (
             <motion.div
               key="history"
@@ -203,7 +208,7 @@ export default function CreditsPage() {
               />
             </motion.div>
           )}
-          
+
           {activeTab === "explainer" && (
             <motion.div
               key="explainer"

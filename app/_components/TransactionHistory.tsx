@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Clock,
@@ -15,93 +15,65 @@ import {
   CreditCard,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useAuthContext } from "@/context/AuthContext";
+
+interface Transaction {
+  id: string;
+  date: string;
+  amount: number;
+  credits: number;
+  status: string;
+  paymentId?: string;
+  createdAt: string;
+}
 
 interface TransactionHistoryProps {
+  transactions: Transaction[];
   onBuyCredits: () => void;
 }
 
 const TransactionHistory: React.FC<TransactionHistoryProps> = ({
+  transactions,
   onBuyCredits,
 }) => {
-  interface Transaction {
-    id: number;
-    userId: number;
-    credits: number;
-    amount: number;
-    paymentId: string;
-    orderId: string;
-    signature: string;
-    createdAt: string;
-  }
-  const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
   const [expandedTransaction, setExpandedTransaction] = useState<string | null>(
     null
   );
   const [isFilterOpen, setIsFilterOpen] = useState(false);
-  const { user } = useAuthContext();
 
-  useEffect(() => {
-    const fetchTransactions = async () => {
-      if (!user?.email) return;
-      try {
-        const res = await fetch("/api/user/transactions", {
-          headers: {
-            "x-user-email": user.email,
-          },
-        });
-        const data = await res.json();
-        setTransactions(data);
-      } catch (error) {
-        console.error("Error fetching transactions:", error);
-      }
-    };
-    fetchTransactions();
-  }, [user?.email]);
-
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
+  // Helper functions
+  const formatDate = (date: string) => {
+    return new Date(date).toLocaleDateString();
   };
 
-  const formatPrice = (price: number) => {
-    return `₹${(price / 100).toFixed(2)}`;
+  const formatPrice = (amount: number) => {
+    return new Intl.NumberFormat("en-IN", {
+      style: "currency",
+      currency: "INR",
+    }).format(amount);
   };
 
-  // Filter and sort transactions
+  const toggleTransactionDetails = (id: string) => {
+    setExpandedTransaction(expandedTransaction === id ? null : id);
+  };
+
+  // Filter transactions based on search query
   const filteredTransactions = transactions
     .filter(
       (transaction) =>
         transaction.paymentId
-          .toLowerCase()
+          ?.toLowerCase()
           .includes(searchQuery.toLowerCase()) ||
-        formatDate(transaction.createdAt)
+        formatDate(transaction.date)
           .toLowerCase()
           .includes(searchQuery.toLowerCase())
     )
     .sort((a, b) => {
-      const dateA = new Date(a.createdAt).getTime();
-      const dateB = new Date(b.createdAt).getTime();
+      const dateA = new Date(a.date).getTime();
+      const dateB = new Date(b.date).getTime();
       return sortDirection === "asc" ? dateA - dateB : dateB - dateA;
     });
-
-  const toggleSort = () => {
-    setSortDirection(sortDirection === "asc" ? "desc" : "asc");
-  };
-
-  const toggleTransactionDetails = (id: number) => {
-    setExpandedTransaction(
-      expandedTransaction === String(id) ? null : String(id)
-    );
-  };
 
   // Animation variants
   const containerVariants = {
@@ -109,14 +81,17 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({
     visible: {
       opacity: 1,
       transition: {
-        staggerChildren: 0.05,
+        staggerChildren: 0.1,
       },
     },
   };
 
   const itemVariants = {
-    hidden: { opacity: 0, y: 10 },
-    visible: { opacity: 1, y: 0 },
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+    },
   };
 
   return (
@@ -246,7 +221,9 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({
                 <motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
-                  onClick={toggleSort}
+                  onClick={() =>
+                    setSortDirection(sortDirection === "asc" ? "desc" : "asc")
+                  }
                   className="flex items-center px-3 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors duration-200"
                 >
                   <Calendar className="h-4 w-4 mr-1" />
@@ -378,14 +355,14 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({
                       <motion.tr
                         variants={itemVariants}
                         className={`border-b border-gray-100 hover:bg-blue-50 cursor-pointer transition-colors duration-150 ${
-                          expandedTransaction === transaction.id.toString()
+                          expandedTransaction === transaction.id
                             ? "bg-blue-50"
                             : ""
                         }`}
                         onClick={() => toggleTransactionDetails(transaction.id)}
                       >
                         <td className="py-4 px-4 text-sm text-gray-600">
-                          {formatDate(transaction.createdAt)}
+                          {formatDate(transaction.date)}
                         </td>
                         <td className="py-4 px-4 text-sm text-gray-600 font-mono">
                           {transaction.paymentId}
@@ -417,7 +394,7 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({
 
                       {/* Expanded transaction details */}
                       <AnimatePresence>
-                        {expandedTransaction === transaction.id.toString() && (
+                        {expandedTransaction === transaction.id && (
                           <motion.tr
                             initial={{ opacity: 0, height: 0 }}
                             animate={{ opacity: 1, height: "auto" }}

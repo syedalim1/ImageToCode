@@ -14,7 +14,7 @@ const DescriptionInput: React.FC<DescriptionInputProps> = ({
   preview,
 }) => {
   return (
-    <div className="h-full">
+    <div className="">
       <h2 className="text-xl font-bold mb-2 text-gray-800">
         Describe Your Design
       </h2>
