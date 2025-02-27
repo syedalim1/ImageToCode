@@ -2,10 +2,12 @@
 
 import { useState, useCallback } from "react";
 import { useAuthContext } from "@/context/AuthContext";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import CreditBalanceCard from "@/app/_components/CreditBalanceCard";
 import CreditPackages from "@/app/_components/CreditPackages";
 import TransactionHistory from "@/app/_components/TransactionHistory";
+import CreditSystemExplainer from "@/app/_components/CreditSystemExplainer";
+import { Zap, Clock, Info } from "lucide-react";
 
 // Sample transaction history
 const transactions = [
@@ -34,7 +36,7 @@ const transactions = [
 
 export default function CreditsPage() {
   const { credits } = useAuthContext();
-  const [activeTab, setActiveTab] = useState<"packages" | "history">("packages");
+  const [activeTab, setActiveTab] = useState<"packages" | "history" | "explainer">("packages");
 
   const handlePaymentSuccess = useCallback(() => {
     // Refresh the page to update the credit display
@@ -47,6 +49,27 @@ export default function CreditsPage() {
 
   const handleBuyCredits = () => {
     setActiveTab("packages");
+  };
+
+  // Animation variants
+  const tabVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { 
+      opacity: 1, 
+      y: 0,
+      transition: {
+        type: "spring",
+        stiffness: 300,
+        damping: 20
+      }
+    },
+    exit: { 
+      opacity: 0, 
+      y: -20,
+      transition: {
+        duration: 0.2
+      }
+    }
   };
 
   return (
@@ -111,37 +134,88 @@ export default function CreditsPage() {
         {/* Tabs */}
         <div className="flex justify-center mb-8">
           <div className="bg-white rounded-full p-1 shadow-md inline-flex">
-            <button
+            <motion.button
               onClick={() => setActiveTab("packages")}
-              className={`px-6 py-2 rounded-full text-sm font-medium transition-all ${
+              className={`px-6 py-2 rounded-full text-sm font-medium transition-all flex items-center ${
                 activeTab === "packages"
                   ? "bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-md"
                   : "text-gray-600 hover:text-gray-900"
               }`}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
             >
+              <Zap className="h-4 w-4 mr-1" />
               Credit Packages
-            </button>
-            <button
+            </motion.button>
+            <motion.button
               onClick={() => setActiveTab("history")}
-              className={`px-6 py-2 rounded-full text-sm font-medium transition-all ${
+              className={`px-6 py-2 rounded-full text-sm font-medium transition-all flex items-center ${
                 activeTab === "history"
                   ? "bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-md"
                   : "text-gray-600 hover:text-gray-900"
               }`}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
             >
+              <Clock className="h-4 w-4 mr-1" />
               Transaction History
-            </button>
+            </motion.button>
+            <motion.button
+              onClick={() => setActiveTab("explainer")}
+              className={`px-6 py-2 rounded-full text-sm font-medium transition-all flex items-center ${
+                activeTab === "explainer"
+                  ? "bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-md"
+                  : "text-gray-600 hover:text-gray-900"
+              }`}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <Info className="h-4 w-4 mr-1" />
+              How Credits Work
+            </motion.button>
           </div>
         </div>
 
-        {activeTab === "packages" ? (
-          <CreditPackages onPaymentSuccess={handlePaymentSuccess} />
-        ) : (
-          <TransactionHistory
-            transactions={transactions}
-            onBuyCredits={handleBuyCredits}
-          />
-        )}
+        <AnimatePresence mode="wait">
+          {activeTab === "packages" && (
+            <motion.div
+              key="packages"
+              variants={tabVariants}
+              initial="hidden"
+              animate="visible"
+              exit="exit"
+            >
+              <CreditPackages onPaymentSuccess={handlePaymentSuccess} />
+            </motion.div>
+          )}
+          
+          {activeTab === "history" && (
+            <motion.div
+              key="history"
+              variants={tabVariants}
+              initial="hidden"
+              animate="visible"
+              exit="exit"
+            >
+              <TransactionHistory
+                transactions={transactions}
+                onBuyCredits={handleBuyCredits}
+              />
+            </motion.div>
+          )}
+          
+          {activeTab === "explainer" && (
+            <motion.div
+              key="explainer"
+              variants={tabVariants}
+              initial="hidden"
+              animate="visible"
+              exit="exit"
+            >
+              <CreditSystemExplainer />
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </div>
   );

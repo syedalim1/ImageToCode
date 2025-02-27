@@ -179,4 +179,14 @@ export default {
       modelname: "google/gemini-2.0-pro-exp-02-05:free",
     },
   ],
+  CREDIT_COSTS: {
+    NORMAL_MODE: 10,
+    EXPERT_MODE: 40,
+    PRICING_PLANS: [
+      { price: 20, credits: 10 },
+      { price: 50, credits: 30, originalPrice: 60},
+      { price: 140, credits: 90, originalPrice: 180},
+      { price: 400, credits: 250, originalPrice: 500  },
+    ],
+  },
 };

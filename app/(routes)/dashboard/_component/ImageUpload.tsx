@@ -173,22 +173,26 @@ const ImageUpload: React.FC = () => {
   };
 
   return (
-    <div className="mt-6 max-w-6xl mx-auto">
+    <div className="mt-4 sm:mt-6 w-full max-w-6xl mx-auto">
       {/* Header */}
       <HeaderSection />
 
       {/* Progress Steps */}
-      <ProgressSteps 
-        activeTab={activeTab}
-        setActiveTab={setActiveTab}
-        selectedFile={selectedFile}
-        selectedOptions={selectedOptions}
-      />
+      <div className="overflow-x-auto pb-2 -mx-4 sm:mx-0">
+        <div className="min-w-[600px] sm:min-w-0 px-4 sm:px-0">
+          <ProgressSteps 
+            activeTab={activeTab}
+            setActiveTab={setActiveTab}
+            selectedFile={selectedFile}
+            selectedOptions={selectedOptions}
+          />
+        </div>
+      </div>
 
       {/* Main Content Area */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 lg:gap-8 mt-4 sm:mt-6">
         {/* Left Panel - Changes based on active tab */}
-        <div className="p-8 border-2 border-dashed rounded-xl bg-gradient-to-br from-purple-50 to-blue-50 relative">
+        <div className="p-4 sm:p-6 md:p-8 border-2 border-dashed rounded-xl bg-gradient-to-br from-purple-50 to-blue-50 relative">
           {activeTab === "upload" && (
             <ImageDropzone
               selectedFile={selectedFile}
@@ -221,7 +225,7 @@ const ImageUpload: React.FC = () => {
         </div>
 
         {/* Right Panel - Features and Options */}
-        <div className="space-y-6">
+        <div className="space-y-4 sm:space-y-6">
           {/* React Features */}
           <ReactFeatureOptions
             selectedOptions={selectedOptions}
@@ -236,13 +240,15 @@ const ImageUpload: React.FC = () => {
       </div>
 
       {/* Action Button */}
-      <ActionButton
-        activeTab={activeTab}
-        isUploading={isUploading}
-        canProceed={canProceed()}
-        handleUpload={handleUpload}
-        goToNextStep={goToNextStep}
-      />
+      <div className="mt-6 sm:mt-8">
+        <ActionButton
+          activeTab={activeTab}
+          isUploading={isUploading}
+          canProceed={canProceed()}
+          handleUpload={handleUpload}
+          goToNextStep={goToNextStep}
+        />
+      </div>
     </div>
   );
 };

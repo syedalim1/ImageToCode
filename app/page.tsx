@@ -12,12 +12,7 @@ import {
   ArrowRightIcon,
   CheckCircleIcon,
 } from "@heroicons/react/24/outline";
-import {
-  SignInButton,
-  SignedIn,
-  SignedOut,
-  UserButton,
-} from "@clerk/nextjs";
+import { SignInButton, SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
 import Link from "next/link";
 
 // Import components
@@ -27,6 +22,7 @@ import PricingCard from "./_components/PricingCard";
 import ClientFloatingElements from "./_components/ClientFloatingElements"; // Updated import
 import HomeCreditBalanceCard from "./_components/HomeCreditBalanceCard";
 import Footer from "./_components/Footer";
+import Constants from "@/data/Constants";
 
 export default function Home() {
   const [animateHero, setAnimateHero] = useState(false);
@@ -46,12 +42,12 @@ export default function Home() {
   useEffect(() => {
     // Start hero animation after page load
     const timer = setTimeout(() => setAnimateHero(true), 500);
-    
+
     // Auto-rotate testimonials
     const testimonialTimer = setInterval(() => {
       setCurrentTestimonial((prev) => (prev + 1) % testimonials.length);
     }, 5000);
-    
+
     return () => {
       clearTimeout(timer);
       clearInterval(testimonialTimer);
@@ -112,7 +108,8 @@ export default function Home() {
 
   const testimonials = [
     {
-      quote: "This tool has completely transformed our design-to-development workflow. We've cut our frontend development time by 70%!",
+      quote:
+        "This tool has completely transformed our design-to-development workflow. We've cut our frontend development time by 70%!",
       author: "Sarah Johnson",
       role: "CTO",
       company: "TechFlow Inc.",
@@ -120,7 +117,8 @@ export default function Home() {
       rating: 5,
     },
     {
-      quote: "As a solo developer, Img2Code feels like having an entire frontend team at my fingertips. The code quality is outstanding.",
+      quote:
+        "As a solo developer, Img2Code feels like having an entire frontend team at my fingertips. The code quality is outstanding.",
       author: "Michael Chen",
       role: "Indie Developer",
       company: "PixelPerfect Apps",
@@ -128,7 +126,8 @@ export default function Home() {
       rating: 5,
     },
     {
-      quote: "We've integrated Img2Code into our CI/CD pipeline and it's been a game-changer for our rapid prototyping process.",
+      quote:
+        "We've integrated Img2Code into our CI/CD pipeline and it's been a game-changer for our rapid prototyping process.",
       author: "Jessica Williams",
       role: "Lead Engineer",
       company: "Innovate Solutions",
@@ -137,50 +136,32 @@ export default function Home() {
     },
   ];
 
-  const pricingPlans = [
-    {
-      title: "Starter",
-      price: 0,
-      features: [
-        "10 image-to-code conversions/month",
-        "Basic component library",
-        "HTML & CSS output",
-        "24-hour support response time",
-      ],
-      popular: false,
-      cta: "Start Free",
-    },
-    {
-      title: "Professional",
-      price: 29,
-      features: [
-        "100 image-to-code conversions/month",
-        "Advanced component library",
-        "React, Vue & Angular output",
-        "4-hour support response time",
-        "API access",
-        "Team collaboration",
-      ],
-      popular: true,
-      cta: "Start 14-Day Trial",
-    },
-    {
-      title: "Enterprise",
-      price: 99,
-      features: [
-        "Unlimited conversions",
-        "Custom component library",
-        "All framework outputs",
-        "1-hour support response time",
-        "Advanced API access",
-        "Team collaboration",
-        "Custom integrations",
-        "Dedicated account manager",
-      ],
-      popular: false,
-      cta: "Contact Sales",
-    },
-  ];
+  const pricingPlans = Constants.CREDIT_COSTS.PRICING_PLANS.map(
+    (plan, index) => ({
+      title:
+        index === 0
+          ? "Basic"
+          : index === 1
+          ? "Standard"
+          : index === 2
+          ? "Premium"
+          : "Enterprise",
+      price: plan.price,
+      originalPrice: plan.originalPrice || "",
+      credits: `${plan.credits} Credits`,
+      features: [`${plan.credits / 10} image-to-code conversions/month`],
+      popular: index === 1,
+      cta: "Buy Now",
+      save:
+        index === 1
+          ? "SAVE 17%"
+          : index === 2
+          ? "SAVE 33%"
+          : index === 3
+          ? "SAVE 33%"
+          : undefined,
+    })
+  );
 
   const codeExample = `import React from 'react';
 
@@ -204,83 +185,11 @@ function Header() {
 export default Header;`;
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-indigo-50 to-purple-50" ref={containerRef}>
-      {/* Animated Header */}
-      <motion.header
-        initial={{ y: -100 }}
-        animate={{ y: 0 }}
-        className="sticky top-0 z-50 backdrop-blur-md bg-white/80 border-b border-gray-200"
-      >
-        <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <motion.div
-              whileHover={{ scale: 1.05 }}
-              className="flex items-center space-x-2"
-            >
-              <motion.div
-                initial={{ rotate: -10 }}
-                animate={{ rotate: 0 }}
-                transition={{ duration: 0.5 }}
-              >
-                <span className="text-3xl mr-2">✨</span>
-              </motion.div>
-              <span className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-blue-500 bg-clip-text text-transparent">
-                Img2Code
-              </span>
-            </motion.div>
+    <div
+      className="min-h-screen bg-gradient-to-b from-indigo-50 to-purple-50"
+      ref={containerRef}
+    >
 
-            <div className="hidden md:flex items-center space-x-8">
-              <motion.a 
-                whileHover={{ scale: 1.05 }}
-                className="text-gray-600 hover:text-purple-600 transition-colors"
-                href="#features"
-              >
-                Features
-              </motion.a>
-              <motion.a 
-                whileHover={{ scale: 1.05 }}
-                className="text-gray-600 hover:text-purple-600 transition-colors"
-                href="#testimonials"
-              >
-                Testimonials
-              </motion.a>
-              <motion.a 
-                whileHover={{ scale: 1.05 }}
-                className="text-gray-600 hover:text-purple-600 transition-colors"
-                href="#pricing"
-              >
-                Pricing
-              </motion.a>
-            </div>
-
-            <div className="flex items-center space-x-4">
-              <SignedOut>
-                <SignInButton>
-                  <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    className="bg-gradient-to-r from-purple-600 to-blue-500 text-white px-6 py-2 rounded-full hover:shadow-lg transition-all"
-                  >
-                    Get Started
-                  </motion.button>
-                </SignInButton>
-              </SignedOut>
-              <SignedIn>
-                <Link href="/dashboard">
-                  <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    className="bg-gradient-to-r from-purple-600 to-blue-500 text-white px-4 py-2 rounded-full hover:shadow-lg transition-all mr-2"
-                  >
-                    Dashboard
-                  </motion.button>
-                </Link>
-                <UserButton />
-              </SignedIn>
-            </div>
-          </div>
-        </nav>
-      </motion.header>
 
       {/* Hero Section */}
       <div className="relative overflow-hidden">
@@ -344,7 +253,7 @@ export default Header;`;
                 Start Converting Now
                 <SparklesIcon className="h-5 w-5 ml-2" />
               </motion.a>
-              
+
               <motion.a
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
@@ -352,8 +261,16 @@ export default Header;`;
                 className="bg-white text-purple-600 border-2 border-purple-200 px-8 py-4 rounded-full text-lg font-semibold hover:shadow-xl flex items-center justify-center"
               >
                 Watch Demo
-                <svg className="h-5 w-5 ml-2" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" />
+                <svg
+                  className="h-5 w-5 ml-2"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z"
+                    clipRule="evenodd"
+                  />
                 </svg>
               </motion.a>
             </motion.div>
@@ -375,12 +292,15 @@ export default Header;`;
               <div className="bg-gray-900 p-8 h-96 flex items-center justify-center relative">
                 {/* Split view animation */}
                 <div className="absolute inset-0 flex">
-                  <motion.div 
+                  <motion.div
                     initial={{ width: "100%" }}
                     animate={{ width: animateHero ? "50%" : "100%" }}
                     transition={{ delay: 1.5, duration: 1.5 }}
                     className="h-full bg-cover bg-center border-r border-gray-700"
-                    style={{ backgroundImage: "url('https://placehold.co/600x400/5271ff/ffffff?text=UI+Design')" }}
+                    style={{
+                      backgroundImage:
+                        "url('https://placehold.co/600x400/5271ff/ffffff?text=UI+Design')",
+                    }}
                   >
                     {animateHero && (
                       <motion.div
@@ -393,8 +313,8 @@ export default Header;`;
                       </motion.div>
                     )}
                   </motion.div>
-                  
-                  <motion.div 
+
+                  <motion.div
                     initial={{ width: "0%" }}
                     animate={{ width: animateHero ? "50%" : "0%" }}
                     transition={{ delay: 1.5, duration: 1.5 }}
@@ -422,7 +342,7 @@ export default Header;`;
                     )}
                   </motion.div>
                 </div>
-                
+
                 {!animateHero && (
                   <div className="animate-pulse text-gray-600 z-10">
                     [AI Processing Demo]
@@ -494,7 +414,8 @@ export default Header;`;
               transition={{ delay: 0.2 }}
               className="mt-4 text-xl text-gray-500 max-w-3xl mx-auto"
             >
-              Our platform offers everything you need to streamline your design-to-code workflow
+              Our platform offers everything you need to streamline your
+              design-to-code workflow
             </motion.p>
           </div>
 
@@ -506,9 +427,10 @@ export default Header;`;
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.1 }}
-                whileHover={{ 
+                whileHover={{
                   scale: 1.03,
-                  boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)"
+                  boxShadow:
+                    "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
                 }}
                 className={`p-8 rounded-2xl ${feature.color} transition-all duration-300 border border-gray-100`}
               >
@@ -519,11 +441,11 @@ export default Header;`;
                   {feature.emoji} {feature.name}
                 </h3>
                 <p className="text-gray-600">{feature.description}</p>
-                <motion.div 
-                  className="mt-6"
-                  whileHover={{ x: 5 }}
-                >
-                  <a href="#" className="text-purple-600 font-medium flex items-center">
+                <motion.div className="mt-6" whileHover={{ x: 5 }}>
+                  <a
+                    href="#"
+                    className="text-purple-600 font-medium flex items-center"
+                  >
                     Learn more
                     <ArrowRightIcon className="h-4 w-4 ml-1" />
                   </a>
@@ -535,7 +457,7 @@ export default Header;`;
       </div>
 
       {/* Testimonials Section */}
-      <div id="testimonials" className="py-24 bg-gray-50">
+      {/* <div id="testimonials" className="py-24 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <motion.span
@@ -561,7 +483,8 @@ export default Header;`;
               transition={{ delay: 0.2 }}
               className="mt-4 text-xl text-gray-500 max-w-3xl mx-auto"
             >
-              Join thousands of satisfied developers who have transformed their workflow
+              Join thousands of satisfied developers who have transformed their
+              workflow
             </motion.p>
           </div>
 
@@ -579,7 +502,7 @@ export default Header;`;
             ))}
           </div>
         </div>
-      </div>
+      </div> */}
 
       {/* Pricing Section */}
       <div id="pricing" className="py-24 bg-white">
@@ -618,9 +541,12 @@ export default Header;`;
                 key={plan.title}
                 title={plan.title}
                 price={plan.price}
+                originalPrice={plan.originalPrice}
+                credits={plan.credits}
                 features={plan.features}
                 popular={plan.popular}
                 cta={plan.cta}
+                save={plan.save}
               />
             ))}
           </div>
@@ -628,7 +554,7 @@ export default Header;`;
       </div>
 
       {/* Credit Balance Demo */}
-      <div className="py-24 bg-gray-50">
+      {/* <div className="py-24 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <motion.span
@@ -662,8 +588,8 @@ export default Header;`;
             <HomeCreditBalanceCard balance={75} />
           </div>
         </div>
-      </div>
-
+      </div> */}
+    
       {/* CTA Section */}
       <div className="py-20 bg-gradient-to-r from-purple-600 to-blue-500">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
@@ -692,6 +618,7 @@ export default Header;`;
 
       {/* Footer */}
       <Footer />
+      {/* Credit System Explanation */}
     </div>
   );
 }

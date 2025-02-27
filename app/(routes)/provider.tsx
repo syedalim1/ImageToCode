@@ -2,10 +2,8 @@
 import React, { useEffect } from "react";
 import { useAuthContext } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
-import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import axios from "axios";
-import AppHeader from "../_components/AppHeader";
-import { AppSidebar } from "../_components/AppSidebar";
+import { motion } from "framer-motion";
 
 function DashboardProvider({
   children,
@@ -30,14 +28,14 @@ function DashboardProvider({
   };
 
   return (
-    <SidebarProvider>
-      <AppSidebar />
-      <main className="w-full">
-        <AppHeader />
-        {/* <SidebarTrigger /> */}
-        <div className="p-10">{children}</div>
-      </main>
-    </SidebarProvider>
+    <motion.div 
+      className="w-full max-w-full overflow-x-hidden"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.3 }}
+    >
+      {children}
+    </motion.div>
   );
 }
 
