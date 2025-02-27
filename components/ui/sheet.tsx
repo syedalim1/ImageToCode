@@ -56,22 +56,56 @@ interface SheetContentProps
 const SheetContent = React.forwardRef<
   React.ElementRef<typeof SheetPrimitive.Content>,
   SheetContentProps
->(({ side = "right", className, children, ...props }, ref) => (
-  <SheetPortal>
-    <SheetOverlay />
-    <SheetPrimitive.Content
-      ref={ref}
-      className={cn(sheetVariants({ side }), className)}
-      {...props}
-    >
-      <SheetPrimitive.Close className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-secondary">
-        <X className="h-4 w-4" />
-        <span className="sr-only">Close</span>
-      </SheetPrimitive.Close>
-      {children}
-    </SheetPrimitive.Content>
-  </SheetPortal>
-))
+>(({ side = "right", className, children, ...props }, ref) => {
+  // Check if children contains a SheetTitle component
+  const hasSheetTitle = React.Children.toArray(children).some(
+    (child) => {
+      if (React.isValidElement(child)) {
+        // Check if the child is a SheetTitle
+        if (child.type === SheetTitle) {
+          return true;
+        }
+        
+        // Check if the child is a SheetHeader that contains a SheetTitle
+        if (child.type === SheetHeader && child.props) {
+          // Check if children property exists in props
+          const headerChildren = (child.props as { children?: React.ReactNode }).children;
+          if (headerChildren) {
+            return React.Children.toArray(headerChildren).some(
+              (headerChild) => 
+                React.isValidElement(headerChild) && 
+                headerChild.type === SheetTitle
+            );
+          }
+        }
+      }
+      return false;
+    }
+  );
+
+  return (
+    <SheetPortal>
+      <SheetOverlay />
+      <SheetPrimitive.Content
+        ref={ref}
+        className={cn(sheetVariants({ side }), className)}
+        {...props}
+      >
+        {/* Add a visually hidden title for accessibility if no title is provided */}
+        {!hasSheetTitle && (
+          <SheetPrimitive.Title className="sr-only">
+            Sheet Dialog
+          </SheetPrimitive.Title>
+        )}
+        <SheetPrimitive.Close className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-secondary">
+          <X className="h-4 w-4" />
+          <span className="sr-only">Close</span>
+        </SheetPrimitive.Close>
+        {children}
+      </SheetPrimitive.Content>
+    </SheetPortal>
+  );
+})
 SheetContent.displayName = SheetPrimitive.Content.displayName
 
 const SheetHeader = ({

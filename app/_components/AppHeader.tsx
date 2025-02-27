@@ -4,8 +4,18 @@ import { SidebarTrigger, useSidebar } from "@/components/ui/sidebar";
 import React, { useState, useEffect } from "react";
 import Authentication from "./Authentication";
 import { motion, AnimatePresence } from "framer-motion";
-import { Search, Bell, Menu, X, Sparkles, Zap } from "lucide-react";
+import {
+  Search,
+  Bell,
+  X,
+  Sparkles,
+  Zap,
+  Home,
+  Paintbrush,
+  CircleDollarSign,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 function AppHeader() {
   const [scrolled, setScrolled] = useState(false);
@@ -15,9 +25,8 @@ function AppHeader() {
   const [showSparkles, setShowSparkles] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
 
-  // Check if sidebar context exists
-  const sidebarContext = React.useContext(React.createContext(null));
-  const hasSidebar = sidebarContext !== null;
+  // Get sidebar context
+  const sidebar = useSidebar();
 
   // Handle responsive behavior
   useEffect(() => {
@@ -78,19 +87,11 @@ function AppHeader() {
       <div className="flex items-center justify-between w-full px-4 py-3 relative">
         {/* Left section with menu and logo on mobile */}
         <div className="flex items-center space-x-3">
-          {/* Menu button that works with or without sidebar context */}
-          {hasSidebar ? (
+          {/* Menu button for sidebar toggle */}
+          {isMobile && (
             <SidebarTrigger className="h-9 w-9 text-gray-700 hover:bg-gray-100 hover:text-gray-900" />
-          ) : (
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-9 w-9 text-gray-700 hover:bg-gray-100 hover:text-gray-900"
-            >
-              <Menu className="h-5 w-5" />
-              <span className="sr-only">Menu</span>
-            </Button>
           )}
+          {/* <SidebarTrigger className="h-9 w-9 text-gray-700 hover:bg-gray-100 hover:text-gray-900" /> */}
 
           {/* Logo on mobile */}
           {isMobile && (
@@ -101,7 +102,7 @@ function AppHeader() {
             >
               <div className="text-lg font-bold bg-gradient-to-r from-purple-600 via-indigo-600 to-blue-500 bg-clip-text text-transparent flex items-center">
                 <Zap className="h-4 w-4 mr-1 text-indigo-600" />
-                Img2Code
+                CodeNovaTech
               </div>
             </motion.div>
           )}
@@ -122,7 +123,7 @@ function AppHeader() {
           <div className="relative">
             <div className="text-xl font-bold bg-gradient-to-r from-purple-600 via-indigo-600 to-blue-500 bg-clip-text text-transparent flex items-center">
               <Zap className="h-5 w-5 mr-1.5 text-indigo-600" />
-              Img2Code
+              CodeNovaTech
             </div>
 
             {/* Sparkle effects */}
@@ -251,6 +252,37 @@ function AppHeader() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Mobile Navigation Menu - only visible on mobile */}
+      {!isMobile && (
+        <div className="px-4 pb-3 border-t border-gray-200">
+          <div className="flex justify-between items-center py-2">
+            <Link
+              href="/dashboard"
+              className="flex items-center px-3 py-2 rounded-lg hover:bg-gray-100 transition-colors"
+            >
+              <Home className="h-5 w-5 text-indigo-600 mr-2" />
+              <span className="font-medium text-gray-700">Dashboard</span>
+            </Link>
+
+            <Link
+              href="/designs"
+              className="flex items-center px-3 py-2 rounded-lg hover:bg-gray-100 transition-colors"
+            >
+              <Paintbrush className="h-5 w-5 text-purple-600 mr-2" />
+              <span className="font-medium text-gray-700">Designs</span>
+            </Link>
+
+            <Link
+              href="/credits"
+              className="flex items-center px-3 py-2 rounded-lg hover:bg-gray-100 transition-colors"
+            >
+              <CircleDollarSign className="h-5 w-5 text-amber-600 mr-2" />
+              <span className="font-medium text-gray-700">Credits</span>
+            </Link>
+          </div>
+        </div>
+      )}
 
       {/* Animated border at bottom */}
       <motion.div

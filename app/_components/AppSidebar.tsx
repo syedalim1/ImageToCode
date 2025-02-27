@@ -9,6 +9,7 @@ import {
   SidebarGroupContent,
   SidebarHeader,
   SidebarMenu,
+  useSidebar,
 } from "@/components/ui/sidebar";
 import {
   CircleDollarSign,
@@ -54,9 +55,12 @@ const items = [
 export function AppSidebar() {
   const path = usePathname();
   const [hoveredItem, setHoveredItem] = useState<number | null>(null);
-  const [isExpanded, setIsExpanded] = useState(true);
   const [showSparkles, setShowSparkles] = useState(false);
   const [creditBalance, setCreditBalance] = useState(75);
+  
+  // Get sidebar state from context
+  const { state, isMobile } = useSidebar();
+  const isExpanded = state === "expanded";
   
   // Periodically show sparkle effects on logo
   useEffect(() => {
@@ -158,7 +162,7 @@ export function AppSidebar() {
           >
             <div className="text-2xl font-bold bg-gradient-to-r from-purple-600 via-indigo-600 to-blue-500 bg-clip-text text-transparent flex items-center justify-center">
               <Code className="h-6 w-6 mr-2 text-indigo-600" />
-              Img2Code
+              CodeNovaTech
             </div>
             
             {/* Sparkle effects */}
@@ -193,7 +197,7 @@ export function AppSidebar() {
             transition={{ delay: 0.3 }}
             className="text-sm text-gray-500 text-center mt-1 font-medium"
           >
-            Build Awesome
+            Image To Code Generator
           </motion.h2>
         </div>
         
@@ -357,7 +361,7 @@ export function AppSidebar() {
           transition={{ delay: 0.9 }}
           className="p-4 text-gray-400 text-xs text-center"
         >
-          <p>© 2025 Img2Code</p>
+          <p>© 2025 CodeNovaTech</p>
           <p className="mt-1">Created by Syed Ali M</p>
         </motion.div>
       </SidebarFooter>
