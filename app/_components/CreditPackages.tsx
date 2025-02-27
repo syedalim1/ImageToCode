@@ -1,9 +1,19 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { useAuthContext } from "@/context/AuthContext";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { Zap, DollarSign, RefreshCw, Gift, Sparkles, CheckCircle, ArrowRight } from "lucide-react";
+import {
+  Zap,
+  DollarSign,
+  RefreshCw,
+  Gift,
+  Sparkles,
+  CheckCircle,
+  ArrowRight,
+} from "lucide-react";
+import Head from "next/head";
 
 declare global {
   interface Window {
@@ -33,20 +43,39 @@ interface CreditPackagesProps {
   onPaymentSuccess: () => void;
 }
 
-const CreditPackages: React.FC<CreditPackagesProps> = ({ onPaymentSuccess }) => {
+const CreditPackages: React.FC<CreditPackagesProps> = ({
+  onPaymentSuccess,
+}) => {
+  const { user } = useAuthContext();
   const [loading, setLoading] = useState(false);
   const [selectedPackage, setSelectedPackage] = useState<string | null>(null);
   const [showSparkles, setShowSparkles] = useState(false);
-  const [highlightedPackage, setHighlightedPackage] = useState<string | null>(null);
+  const [highlightedPackage, setHighlightedPackage] = useState<string | null>(
+    null
+  );
+
+  useEffect(() => {
+    // Load Razorpay script dynamically
+    const script = document.createElement("script");
+    script.src = "https://checkout.razorpay.com/v1/checkout.js";
+    script.async = true;
+    document.head.appendChild(script);
+
+    return () => {
+      // Cleanup: Remove the script when the component unmounts
+      document.head.removeChild(script);
+    };
+  }, []);
 
   // Periodically show sparkle effects
   useEffect(() => {
     const interval = setInterval(() => {
       // Randomly highlight a package
-      const packages = creditPackages.map(pkg => pkg.id);
-      const randomPackage = packages[Math.floor(Math.random() * packages.length)];
+      const packages = creditPackages.map((pkg) => pkg.id);
+      const randomPackage =
+        packages[Math.floor(Math.random() * packages.length)];
       setHighlightedPackage(randomPackage);
-      
+
       // Show sparkles
       setShowSparkles(true);
       setTimeout(() => {
@@ -54,7 +83,7 @@ const CreditPackages: React.FC<CreditPackagesProps> = ({ onPaymentSuccess }) => 
         setHighlightedPackage(null);
       }, 2000);
     }, 8000);
-    
+
     return () => clearInterval(interval);
   }, []);
 
@@ -70,8 +99,8 @@ const CreditPackages: React.FC<CreditPackagesProps> = ({ onPaymentSuccess }) => 
       features: [
         "10 image-to-code conversions",
         "Standard support",
-        "Basic components"
-      ]
+        "Basic components",
+      ],
     },
     {
       id: "standard",
@@ -86,8 +115,8 @@ const CreditPackages: React.FC<CreditPackagesProps> = ({ onPaymentSuccess }) => 
         "30 image-to-code conversions",
         "Priority support",
         "Advanced components",
-        "Code customization"
-      ]
+        "Code customization",
+      ],
     },
     {
       id: "premium",
@@ -103,8 +132,8 @@ const CreditPackages: React.FC<CreditPackagesProps> = ({ onPaymentSuccess }) => 
         "Premium support",
         "All components",
         "Code customization",
-        "Export options"
-      ]
+        "Export options",
+      ],
     },
     {
       id: "enterprise",
@@ -121,8 +150,8 @@ const CreditPackages: React.FC<CreditPackagesProps> = ({ onPaymentSuccess }) => 
         "All premium features",
         "Team collaboration",
         "API access",
-        "Custom branding"
-      ]
+        "Custom branding",
+      ],
     },
   ];
 
@@ -142,7 +171,7 @@ const CreditPackages: React.FC<CreditPackagesProps> = ({ onPaymentSuccess }) => 
 
       const options = {
         key: process.env.NEXT_PUBLIC_RAZORPAY_KEY,
-        amount: order.amount,
+        amount: pkg.price,
         currency: "INR",
         name: "Img2Code",
         description: `${pkg.name} Credits Package`,
@@ -158,6 +187,7 @@ const CreditPackages: React.FC<CreditPackagesProps> = ({ onPaymentSuccess }) => 
               ...response,
               packageId: pkg.id,
               credits: pkg.credits,
+              userEmail: user?.email,
             }),
           });
 
@@ -180,8 +210,14 @@ const CreditPackages: React.FC<CreditPackagesProps> = ({ onPaymentSuccess }) => 
         },
       };
 
-      const rzp = new window.Razorpay(options);
-      rzp.open();
+      // Initialize Razorpay after the script has loaded
+      if (window.Razorpay) {
+        const rzp = new window.Razorpay(options);
+        rzp.open();
+      } else {
+        console.error("Razorpay SDK failed to load");
+        alert("Payment failed: Razorpay SDK not loaded");
+      }
     } catch (error) {
       console.error(error);
       alert("Payment failed");
@@ -198,17 +234,17 @@ const CreditPackages: React.FC<CreditPackagesProps> = ({ onPaymentSuccess }) => 
   // Animation variants
   const containerVariants = {
     hidden: { opacity: 0 },
-    visible: { 
+    visible: {
       opacity: 1,
-      transition: { 
-        staggerChildren: 0.1
-      }
-    }
+      transition: {
+        staggerChildren: 0.1,
+      },
+    },
   };
-  
+
   const itemVariants = {
     hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0 }
+    visible: { opacity: 1, y: 0 },
   };
 
   return (
@@ -225,14 +261,24 @@ const CreditPackages: React.FC<CreditPackagesProps> = ({ onPaymentSuccess }) => 
         <div className="absolute inset-0 opacity-10">
           <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
             <defs>
-              <pattern id="offerGrid" width="30" height="30" patternUnits="userSpaceOnUse">
-                <path d="M 30 0 L 0 0 0 30" fill="none" stroke="white" strokeWidth="0.5" />
+              <pattern
+                id="offerGrid"
+                width="30"
+                height="30"
+                patternUnits="userSpaceOnUse"
+              >
+                <path
+                  d="M 30 0 L 0 0 0 30"
+                  fill="none"
+                  stroke="white"
+                  strokeWidth="0.5"
+                />
               </pattern>
             </defs>
             <rect width="100%" height="100%" fill="url(#offerGrid)" />
           </svg>
         </div>
-        
+
         <div className="absolute top-0 right-0">
           <svg
             width="150"
@@ -243,7 +289,7 @@ const CreditPackages: React.FC<CreditPackagesProps> = ({ onPaymentSuccess }) => 
             <path d="M0 0L150 150V0H0Z" fill="currentColor" />
           </svg>
         </div>
-        
+
         {/* Animated particles */}
         <AnimatePresence>
           {showSparkles && (
@@ -257,10 +303,10 @@ const CreditPackages: React.FC<CreditPackagesProps> = ({ onPaymentSuccess }) => 
                     left: `${Math.random() * 100}%`,
                   }}
                   initial={{ opacity: 0, scale: 0 }}
-                  animate={{ 
+                  animate={{
                     opacity: [0, 1, 0],
                     scale: [0, 1, 0],
-                    y: [0, -20]
+                    y: [0, -20],
                   }}
                   transition={{
                     duration: 1.5,
@@ -273,26 +319,26 @@ const CreditPackages: React.FC<CreditPackagesProps> = ({ onPaymentSuccess }) => 
             </>
           )}
         </AnimatePresence>
-        
+
         <div className="flex flex-col md:flex-row items-center justify-between relative z-10">
           <div className="flex items-center mb-4 md:mb-0">
-            <motion.div 
+            <motion.div
               className="mr-4 bg-white/20 p-3 rounded-full"
               whileHover={{ rotate: 15 }}
-              animate={{ 
+              animate={{
                 scale: [1, 1.1, 1],
-                rotate: [0, 5, 0, -5, 0]
+                rotate: [0, 5, 0, -5, 0],
               }}
               transition={{
                 duration: 2,
                 repeat: Infinity,
-                repeatDelay: 3
+                repeatDelay: 3,
               }}
             >
               <Gift className="h-10 w-10 text-white drop-shadow-lg" />
             </motion.div>
             <div>
-              <motion.h3 
+              <motion.h3
                 className="text-2xl font-bold mb-1"
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -323,24 +369,24 @@ const CreditPackages: React.FC<CreditPackagesProps> = ({ onPaymentSuccess }) => 
             </Button>
           </motion.div>
         </div>
-        
+
         {/* Animated highlight bar */}
-        <motion.div 
+        <motion.div
           className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-yellow-200 via-white to-yellow-200"
           animate={{
             opacity: [0.3, 1, 0.3],
-            scaleX: [0.9, 1, 0.9]
+            scaleX: [0.9, 1, 0.9],
           }}
           transition={{
             duration: 2,
             repeat: Infinity,
-            repeatType: "reverse"
+            repeatType: "reverse",
           }}
         />
       </motion.div>
 
       {/* Credit Packages */}
-      <motion.div 
+      <motion.div
         className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
         variants={containerVariants}
         initial="hidden"
@@ -350,15 +396,19 @@ const CreditPackages: React.FC<CreditPackagesProps> = ({ onPaymentSuccess }) => 
           <motion.div
             key={pkg.id}
             variants={itemVariants}
-            whileHover={{ 
+            whileHover={{
               y: -10,
               boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)",
-              scale: 1.02
+              scale: 1.02,
             }}
-            animate={highlightedPackage === pkg.id ? {
-              y: [-5, -15, -5],
-              boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.35)",
-            } : {}}
+            animate={
+              highlightedPackage === pkg.id
+                ? {
+                    y: [-5, -15, -5],
+                    boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.35)",
+                  }
+                : {}
+            }
             className={`bg-white rounded-xl shadow-lg overflow-hidden relative ${
               pkg.popular ? "ring-2 ring-purple-500" : ""
             }`}
@@ -376,10 +426,10 @@ const CreditPackages: React.FC<CreditPackagesProps> = ({ onPaymentSuccess }) => 
                         left: `${Math.random() * 100}%`,
                       }}
                       initial={{ opacity: 0, scale: 0 }}
-                      animate={{ 
+                      animate={{
                         opacity: [0, 1, 0],
                         scale: [0, 1, 0],
-                        y: [0, -20]
+                        y: [0, -20],
                       }}
                       exit={{ opacity: 0, scale: 0 }}
                       transition={{
@@ -393,9 +443,9 @@ const CreditPackages: React.FC<CreditPackagesProps> = ({ onPaymentSuccess }) => 
                 </>
               )}
             </AnimatePresence>
-            
+
             {pkg.popular && (
-              <motion.div 
+              <motion.div
                 className="absolute top-0 right-0 z-10"
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
@@ -409,7 +459,7 @@ const CreditPackages: React.FC<CreditPackagesProps> = ({ onPaymentSuccess }) => 
             )}
 
             {pkg.discount && (
-              <motion.div 
+              <motion.div
                 className="absolute top-0 left-0 z-10"
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
@@ -430,17 +480,35 @@ const CreditPackages: React.FC<CreditPackagesProps> = ({ onPaymentSuccess }) => 
             >
               {/* Animated background pattern */}
               <div className="absolute inset-0 opacity-10">
-                <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+                <svg
+                  width="100%"
+                  height="100%"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
                   <defs>
-                    <pattern id={`grid-${pkg.id}`} width="20" height="20" patternUnits="userSpaceOnUse">
-                      <path d="M 20 0 L 0 0 0 20" fill="none" stroke="white" strokeWidth="0.5" />
+                    <pattern
+                      id={`grid-${pkg.id}`}
+                      width="20"
+                      height="20"
+                      patternUnits="userSpaceOnUse"
+                    >
+                      <path
+                        d="M 20 0 L 0 0 0 20"
+                        fill="none"
+                        stroke="white"
+                        strokeWidth="0.5"
+                      />
                     </pattern>
                   </defs>
-                  <rect width="100%" height="100%" fill={`url(#grid-${pkg.id})`} />
+                  <rect
+                    width="100%"
+                    height="100%"
+                    fill={`url(#grid-${pkg.id})`}
+                  />
                 </svg>
               </div>
-              
-              <motion.h3 
+
+              <motion.h3
                 className="text-xl font-bold mb-1 relative z-10"
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -448,17 +516,21 @@ const CreditPackages: React.FC<CreditPackagesProps> = ({ onPaymentSuccess }) => 
               >
                 {pkg.name}
               </motion.h3>
-              <motion.div 
+              <motion.div
                 className="flex items-baseline relative z-10"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.4 + index * 0.1 }}
               >
-                <motion.span 
+                <motion.span
                   className="text-3xl font-bold"
-                  animate={highlightedPackage === pkg.id ? { 
-                    scale: [1, 1.1, 1] 
-                  } : {}}
+                  animate={
+                    highlightedPackage === pkg.id
+                      ? {
+                          scale: [1, 1.1, 1],
+                        }
+                      : {}
+                  }
                   transition={{ duration: 0.5 }}
                 >
                   {formatPrice(pkg.price)}
@@ -469,34 +541,34 @@ const CreditPackages: React.FC<CreditPackagesProps> = ({ onPaymentSuccess }) => 
                   </span>
                 )}
               </motion.div>
-              
+
               {/* Animated shine effect */}
               <motion.div
                 className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
                 animate={{
-                  x: ['-100%', '200%'],
+                  x: ["-100%", "200%"],
                 }}
                 transition={{
                   repeat: Infinity,
                   repeatDelay: 5,
                   duration: 1.5,
                   ease: "easeInOut",
-                  delay: index * 0.5
+                  delay: index * 0.5,
                 }}
               />
             </motion.div>
 
             <div className="p-6">
-              <motion.div 
+              <motion.div
                 className="flex items-center mb-4"
                 initial={{ opacity: 0, x: -10 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.5 + index * 0.1 }}
               >
                 <motion.div
-                  animate={{ 
+                  animate={{
                     rotate: [0, 5, 0, -5, 0],
-                    scale: [1, 1.1, 1]
+                    scale: [1, 1.1, 1],
                   }}
                   transition={{
                     duration: 1.5,
@@ -510,21 +582,23 @@ const CreditPackages: React.FC<CreditPackagesProps> = ({ onPaymentSuccess }) => 
                   {pkg.credits} Credits
                 </span>
               </motion.div>
-              
+
               {/* Features list */}
-              <motion.ul 
+              <motion.ul
                 className="mb-6 space-y-2"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.6 + index * 0.1 }}
               >
                 {pkg.features?.map((feature, featureIndex) => (
-                  <motion.li 
+                  <motion.li
                     key={featureIndex}
                     className="flex items-start text-gray-600"
                     initial={{ opacity: 0, x: -10 }}
                     animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.6 + index * 0.1 + featureIndex * 0.05 }}
+                    transition={{
+                      delay: 0.6 + index * 0.1 + featureIndex * 0.05,
+                    }}
                     whileHover={{ x: 3 }}
                   >
                     <CheckCircle className="h-4 w-4 text-green-500 mr-2 mt-0.5 flex-shrink-0" />
