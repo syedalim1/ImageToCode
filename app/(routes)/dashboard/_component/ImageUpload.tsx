@@ -14,6 +14,7 @@ import DescriptionInput from "./DescriptionInput";
 import ReactFeatureOptions from "./ReactFeatureOptions";
 import ProgressIndicator from "./ProgressIndicator";
 import ActionButton from "./ActionButton";
+import LanguageSelector from "./LanguageSelector";
 
 const ImageUpload: React.FC = () => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -31,6 +32,7 @@ const ImageUpload: React.FC = () => {
   const [showSuccessIndicator, setShowSuccessIndicator] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
+  const [selectedLanguage, setSelectedLanguage] = useState("react-tailwind");
 
   // Simulated progress for better UX
   useEffect(() => {
@@ -226,6 +228,12 @@ const ImageUpload: React.FC = () => {
 
         {/* Right Panel - Features and Options */}
         <div className="space-y-4 sm:space-y-6">
+          {/* Language Selector */}
+          <LanguageSelector
+            selectedLanguage={selectedLanguage}
+            setSelectedLanguage={setSelectedLanguage}
+          />
+
           {/* React Features */}
           <ReactFeatureOptions
             selectedOptions={selectedOptions}
