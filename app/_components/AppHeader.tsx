@@ -299,25 +299,7 @@ function AppHeader() {
                     activeTab === item.id
                       ? "text-white bg-gradient-to-r " + item.color
                       : "text-gray-700 hover:text-gray-900 hover:bg-gray-100/80"
-                  }`}
-                  onClick={() => setActiveTab(item.id)}
-                >
-                  <item.icon className="w-4 h-4 mr-1.5" />
-                  {item.label}
-                </Link>
-                {hoveredNavItem === item.id && (
-                  <motion.div
-                    className="absolute -bottom-1 left-0 right-0 h-0.5 bg-gradient-to-r from-indigo-500 to-purple-500"
-                    layoutId="navIndicator"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    transition={{ duration: 0.2 }}
-                  />
-                )}
-              </motion.div>
-            ))}
-          </nav>
+        kk          </nav>
 
           {/* Right section with actions */}
           <div className="flex items-center space-x-2">
