@@ -2,7 +2,6 @@
 
 import dynamic from 'next/dynamic';
 import { AuthContextProvider } from "@/context/AuthContext";
-import { SidebarProvider } from "@/components/ui/sidebar";
 import { motion, LazyMotion, domAnimation } from "framer-motion";
 import { Suspense, useEffect, useState } from "react";
 import { ErrorBoundary, FallbackProps } from 'react-error-boundary';
@@ -11,11 +10,6 @@ import { ErrorBoundary, FallbackProps } from 'react-error-boundary';
 const AppHeader = dynamic(() => import("./_components/AppHeader"), {
   ssr: false,
   loading: () => <div className="h-16 bg-white/80 backdrop-blur-sm border-b" />
-});
-
-const AppSidebar = dynamic(() => 
-  import("./_components/AppSidebar").then(mod => mod.AppSidebar), {
-  ssr: false
 });
 
 // Error fallback component
@@ -51,46 +45,41 @@ function Provider({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <ErrorBoundary FallbackComponent={ErrorFallback}>
       <AuthContextProvider>
-        <SidebarProvider defaultOpen={true}>
-          <LazyMotion features={domAnimation}>
-            <div className="flex min-h-screen max-h-screen w-full overflow-hidden">
-           
-              
+        <LazyMotion features={domAnimation}>
+          <div className="flex min-h-screen max-h-screen w-full overflow-hidden">
+            {/* Main content area */}
+            <div className="flex flex-col flex-1 w-full overflow-hidden">
+              {/* Header */}
+              <Suspense fallback={<div className="h-16 bg-white/80 backdrop-blur-sm border-b" />}>
+                <AppHeader />
+              </Suspense>
 
-              {/* Main content area */}
-              <div className="flex flex-col flex-1 w-full overflow-hidden">
-                {/* Header */}
-                <Suspense fallback={<div className="h-16 bg-white/80 backdrop-blur-sm border-b" />}>
-                  <AppHeader />
+              {/* Main content with scrolling */}
+              <motion.main
+                className="flex-1 overflow-auto pb-20 md:pb-10 w-full"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ 
+                  duration: 0.3,
+                  ease: "easeOut"
+                }}
+                style={{ 
+                  willChange: "opacity, transform",
+                  transform: "translate3d(0,0,0)",
+                  backfaceVisibility: "hidden"
+                }}
+              >
+                <Suspense fallback={
+                  <div className="flex items-center justify-center min-h-[200px]">
+                    <div className="animate-pulse">Loading...</div>
+                  </div>
+                }>
+                  {children}
                 </Suspense>
-
-                {/* Main content with scrolling */}
-                <motion.main
-                  className="flex-1 overflow-auto pb-20 md:pb-10 w-full"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ 
-                    duration: 0.3,
-                    ease: "easeOut"
-                  }}
-                  style={{ 
-                    willChange: "opacity, transform",
-                    transform: "translate3d(0,0,0)",
-                    backfaceVisibility: "hidden"
-                  }}
-                >
-                  <Suspense fallback={
-                    <div className="flex items-center justify-center min-h-[200px]">
-                      <div className="animate-pulse">Loading...</div>
-                    </div>
-                  }>
-                    {children}
-                  </Suspense>
-                </motion.main>
-              </div>
+              </motion.main>
             </div>
-          </LazyMotion>
-        </SidebarProvider>
+          </div>
+        </LazyMotion>
       </AuthContextProvider>
     </ErrorBoundary>
   );
