@@ -4,6 +4,7 @@ import { SparklesIcon } from "@heroicons/react/24/outline";
 import ClientFloatingElements from "./ClientFloatingElements";
 import AnimatedCodeSnippet from "./AnimatedCodeSnippet";
 import { useEffect, useRef, useState } from "react";
+import ClientOnly from "../view-code/_components/ClientOnly";
 
 const containerRef = useRef<HTMLDivElement>(null);
 
@@ -367,7 +368,9 @@ export default function HeroSection() {
                         transition={{ delay: 2.5, duration: 0.8 }}
                         className="p-4 h-full overflow-y-auto"
                       >
-                        <AnimatedCodeSnippet code={codeExample} />
+                        <ClientOnly>
+                          <AnimatedCodeSnippet code={codeExample} />
+                        </ClientOnly>
                       </motion.div>
                     </>
                   )}
