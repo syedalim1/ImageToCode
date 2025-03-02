@@ -10,21 +10,6 @@ const AnimatedCodeSnippet = dynamic(() => import("./AnimatedCodeSnippet"), {
   ssr: false,
 });
 
-const containerRef = useRef<HTMLDivElement>(null);
-
-const [currentTestimonial, setCurrentTestimonial] = useState(0);
-const [animateHero, setAnimateHero] = useState(false);
-const { scrollYProgress } = useScroll({
-  target: containerRef,
-  offset: ["start start", "end end"],
-});
-
-// Parallax effect values
-const y1 = useTransform(scrollYProgress, [0, 1], [0, -200]);
-const y2 = useTransform(scrollYProgress, [0, 1], [0, -100]);
-const y3 = useTransform(scrollYProgress, [0, 1], [0, -300]);
-const opacity = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
-
 const testimonials = [
   {
     quote:
@@ -54,6 +39,7 @@ const testimonials = [
     rating: 4,
   },
 ];
+
 const codeExample = `import React from 'react';
 
 function Header() {
@@ -74,20 +60,6 @@ function Header() {
 }
 
 export default Header;`;
-useEffect(() => {
-  // Start hero animation after page load
-  const timer = setTimeout(() => setAnimateHero(true), 500);
-
-  // Auto-rotate testimonials
-  const testimonialTimer = setInterval(() => {
-    setCurrentTestimonial((prev) => (prev + 1) % testimonials.length);
-  }, 5000);
-
-  return () => {
-    clearTimeout(timer);
-    clearInterval(testimonialTimer);
-  };
-}, []);
 
 // Abstract shapes component for enhanced background visuals
 const AbstractShapes = () => {
@@ -145,11 +117,38 @@ const AbstractShapes = () => {
 };
 
 export default function HeroSection() {
+  const containerRef = useRef<HTMLDivElement>(null);
   const [isAnimating, setIsAnimating] = useState(false);
+  const [currentTestimonial, setCurrentTestimonial] = useState(0);
+  const [animateHero, setAnimateHero] = useState(false);
+  
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ["start start", "end end"],
+  });
+
+  // Parallax effect values
+  const y1 = useTransform(scrollYProgress, [0, 1], [0, -200]);
+  const y2 = useTransform(scrollYProgress, [0, 1], [0, -100]);
+  const y3 = useTransform(scrollYProgress, [0, 1], [0, -300]);
+  const opacity = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
 
   useEffect(() => {
+    // Start hero animation after page load
+    const timer = setTimeout(() => setAnimateHero(true), 500);
+
+    // Auto-rotate testimonials
+    const testimonialTimer = setInterval(() => {
+      setCurrentTestimonial((prev) => (prev + 1) % testimonials.length);
+    }, 5000);
+
     // Begin animation after component mounts
     setIsAnimating(true);
+
+    return () => {
+      clearTimeout(timer);
+      clearInterval(testimonialTimer);
+    };
   }, []);
 
   return (
