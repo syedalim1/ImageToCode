@@ -20,6 +20,11 @@ import {
   Rocket,
   Heart,
   PenTool,
+  Image,
+  Code,
+  Cpu,
+  Layers,
+  Wand2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
@@ -31,6 +36,7 @@ function AppHeader() {
   const [activeTab, setActiveTab] = useState("dashboard");
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [hoverEffect, setHoverEffect] = useState(false);
+  const [hoveredNavItem, setHoveredNavItem] = useState<string | null>(null);
 
   // Get sidebar context
   const sidebar = useSidebar();
@@ -55,7 +61,6 @@ function AppHeader() {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
-
 
   // More frequent and vibrant sparkle effects
   useEffect(() => {
@@ -124,7 +129,14 @@ function AppHeader() {
     },
   };
 
-  // Rainbow gradient colors for animated background
+  const navItems = [
+    { id: 'home', label: 'Home', icon: Home, color: 'from-blue-500 to-cyan-500' },
+    { id: 'features', label: 'Features', icon: Wand2, color: 'from-purple-500 to-pink-500' },
+    { id: 'pricing', label: 'Pricing', icon: CircleDollarSign, color: 'from-amber-500 to-orange-500' },
+    { id: 'examples', label: 'Examples', icon: Layers, color: 'from-emerald-500 to-teal-500' },
+  ];
+
+  // Enhanced rainbow gradient for animated background
   const rainbowGradient = scrolled
     ? "bg-gradient-to-r from-indigo-100 via-purple-100 to-pink-100 backdrop-blur-lg"
     : "bg-gradient-to-r from-blue-50 via-indigo-50 to-purple-50";
@@ -138,8 +150,22 @@ function AppHeader() {
         scrolled ? "shadow-lg" : "shadow-md"
       }`}
     >
-      {/* Decorative elements - top rainbow line */}
-      <div className="h-1.5 w-full bg-gradient-to-r from-pink-500 via-yellow-500 via-green-500 via-blue-500 to-purple-500"></div>
+      {/* Decorative elements - top rainbow line with animation */}
+      <div className="h-1.5 w-full bg-gradient-to-r from-pink-500 via-yellow-500 via-green-500 via-blue-500 to-purple-500 relative overflow-hidden">
+        <motion.div 
+          className="absolute inset-0 bg-white opacity-30"
+          animate={{
+            x: ['0%', '100%'],
+          }}
+          transition={{
+            duration: 3,
+            repeat: Infinity,
+            repeatType: 'reverse',
+            ease: 'easeInOut'
+          }}
+        />
+      </div>
+
       <div className="flex items-center justify-between w-full px-4 py-3 relative">
         {/* Left section with menu and logo on mobile */}
         <div className="flex items-center space-x-3">
@@ -153,318 +179,135 @@ function AppHeader() {
             </motion.div>
           )}
 
-          {/* Enhanced Logo on mobile with stronger glow effect */}
-          {isMobile && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="relative"
-            >
-              <div className="text-lg font-bold bg-gradient-to-r from-pink-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent flex items-center">
-                <motion.div variants={zapAnimation} animate="pulse">
-                  <Rocket className="h-5 w-5 mr-1.5 text-purple-600 drop-shadow-md" />
-                </motion.div>
-                CodeNovaTech
-              </div>
-              <div className="absolute -inset-1 bg-purple-400/30 rounded-full blur-xl -z-10"></div>
-              <div className="absolute -inset-3 bg-blue-400/20 rounded-full blur-2xl -z-10 animate-pulse"></div>
-            </motion.div>
-          )}
+          {/* Enhanced Logo with stronger glow effect */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="relative"
+          >
+            <div className="text-xl font-bold bg-gradient-to-r from-pink-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent flex items-center">
+              <motion.div variants={zapAnimation} animate="pulse">
+                <Image className="h-6 w-6 mr-1.5 text-purple-600 drop-shadow-md" />
+              </motion.div>
+              <span className="hidden sm:inline">ImageToCode</span>
+              <span className="sm:hidden">I2C</span>
+            </div>
+            <div className="absolute -inset-1 bg-purple-400/30 rounded-full blur-xl -z-10"></div>
+            <div className="absolute -inset-3 bg-blue-400/20 rounded-full blur-2xl -z-10 animate-pulse"></div>
+          </motion.div>
         </div>
 
-        {/* Enhanced Center logo with 3D effect - visible on larger screens */}
-        <motion.div
-          className="absolute left-1/2 transform -translate-x-1/2 hidden md:block"
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{
-            type: "spring",
-            stiffness: 300,
-            damping: 20,
-            delay: 0.2,
-          }}
-          onMouseEnter={() => setHoverEffect(true)}
-          onMouseLeave={() => setHoverEffect(false)}
-        >
-          <div className="relative">
-            <div className="text-2xl font-bold bg-gradient-to-r from-pink-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent flex items-center drop-shadow-sm">
-              <motion.div variants={zapAnimation} animate="pulse">
-                <Rocket className="h-7 w-7 mr-2 text-indigo-600 drop-shadow-lg" />
-              </motion.div>
-              CodeNovaTech
+        {/* Center navigation - visible on larger screens */}
+        <nav className="hidden md:flex items-center justify-center space-x-1 absolute left-1/2 transform -translate-x-1/2">
+          <AnimatePresence>
+            {navItems.map((item) => (
               <motion.div
-                variants={floatAnimation}
-                animate="float"
-                className="ml-2"
+                key={item.id}
+                className="relative"
+                onMouseEnter={() => setHoveredNavItem(item.id)}
+                onMouseLeave={() => setHoveredNavItem(null)}
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3 }}
               >
-                <Crown className="h-5 w-5 text-amber-500" />
+                <Link href={`#${item.id}`}>
+                  <motion.div
+                    className={`px-4 py-2 rounded-full mx-1 font-medium flex items-center relative z-10 ${
+                      activeTab === item.id ? 'text-white' : 'text-gray-700 hover:text-gray-900'
+                    }`}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    <item.icon className={`h-4 w-4 mr-1.5 ${hoveredNavItem === item.id ? 'text-white' : ''}`} />
+                    <span>{item.label}</span>
+                    
+                    {/* Background gradient that appears on hover */}
+                    {hoveredNavItem === item.id && (
+                      <motion.div
+                        className={`absolute inset-0 rounded-full bg-gradient-to-r ${item.color} -z-10`}
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 0.2 }}
+                      />
+                    )}
+                  </motion.div>
+                </Link>
+                
+                {/* Animated indicator for active tab */}
+                {activeTab === item.id && (
+                  <motion.div
+                    className="absolute bottom-0 left-0 right-0 h-0.5 bg-indigo-600 rounded-full"
+                    layoutId="activeTab"
+                    transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+                  />
+                )}
               </motion.div>
-            </div>
+            ))}
+          </AnimatePresence>
+        </nav>
 
-            {/* Multiple layered glow effects behind logo */}
-            <div className="absolute -inset-2 bg-indigo-400/30 rounded-full blur-xl -z-10"></div>
-            <div className="absolute -inset-3 bg-purple-400/20 rounded-full blur-2xl -z-20 animate-pulse"></div>
-            <div className="absolute -inset-4 bg-pink-400/10 rounded-full blur-3xl -z-30"></div>
-
-            {/* Enhanced sparkle effects with more animation */}
-            <AnimatePresence>
-              {(showSparkles || hoverEffect) && (
-                <>
-                  {[...Array(10)].map((_, i) => (
-                    <motion.div
-                      key={`header-sparkle-${i}`}
-                      className="absolute"
-                      style={{
-                        top: `${Math.random() * 150 - 75}%`,
-                        left: `${Math.random() * 150 - 25}%`,
-                        zIndex: 20,
-                      }}
-                      initial={{ opacity: 0, scale: 0 }}
-                      animate={{
-                        opacity: [0, 1, 0],
-                        scale: [0, Math.random() * 0.5 + 0.7, 0],
-                        rotate: [0, Math.random() * 90 - 45],
-                      }}
-                      transition={{
-                        duration: Math.random() * 1 + 1,
-                        delay: i * 0.1,
-                        times: [0, 0.5, 1],
-                      }}
-                      exit={{ opacity: 0, scale: 0 }}
-                    >
-                      {i % 5 === 0 ? (
-                        <Star className="h-4 w-4 text-yellow-400" />
-                      ) : i % 5 === 1 ? (
-                        <Sparkles className="h-4 w-4 text-purple-400" />
-                      ) : i % 5 === 2 ? (
-                        <Heart className="h-4 w-4 text-pink-400" />
-                      ) : i % 5 === 3 ? (
-                        <Flame className="h-4 w-4 text-orange-400" />
-                      ) : (
-                        <Gift className="h-4 w-4 text-green-400" />
-                      )}
-                    </motion.div>
-                  ))}
-                </>
-              )}
-            </AnimatePresence>
-          </div>
-        </motion.div>
-
-        {/* Right section with enhanced animated buttons */}
-        <div className="flex items-center space-x-3 sm:space-x-4">
-          {/* Heart/favorite button */}
+        {/* Right section with authentication */}
+        <div className="flex items-center space-x-2">
+          {/* Action buttons */}
           <motion.div
-            className="relative"
-            whileHover={{ scale: 1.1, y: -2 }}
-            whileTap={{ scale: 0.9 }}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="hidden sm:flex"
           >
             <Button
-              variant="ghost"
-              size="icon"
-              className="h-10 w-10 rounded-full bg-gradient-to-r from-pink-100 to-rose-100 text-pink-700 hover:text-pink-900 transition-all duration-300"
-            >
-              <Heart className="h-5 w-5" />
-              <div className="absolute inset-0 bg-pink-400/10 rounded-full animate-ping opacity-75"></div>
-            </Button>
-          </motion.div>
-
-          {/* Save button with enhanced animation */}
-          <motion.div
-            className="relative"
-            whileHover={{ scale: 1.1, y: -2 }}
-            whileTap={{ scale: 0.9 }}
-            animate={saveSuccess ? "success" : ""}
-            variants={saveAnimation}
-          >
-            <Button
-              variant="ghost"
-              size="icon"
-              className={`h-10 w-10 rounded-full transition-all duration-300 ${
-                saveSuccess
-                  ? "bg-gradient-to-r from-green-100 to-emerald-100 text-green-700"
-                  : "bg-gradient-to-r from-cyan-100 to-blue-100 text-blue-700 hover:text-blue-900"
-              }`}
+              size="sm"
+              className="bg-gradient-to-r from-emerald-500 to-teal-500 text-white border-0 shadow-md hover:shadow-lg hover:from-emerald-600 hover:to-teal-600 transition-all duration-300 mr-2"
               onClick={handleSave}
             >
-              <Save className="h-5 w-5" />
-              {saveSuccess && (
-                <motion.div
-                  className="absolute inset-0 bg-green-400/20 rounded-full"
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1.5, opacity: [1, 0] }}
-                  transition={{ duration: 0.7 }}
-                />
-              )}
+              <motion.div
+                variants={saveAnimation}
+                animate={saveSuccess ? "success" : ""}
+                className="flex items-center"
+              >
+                <Save className="h-4 w-4 mr-1.5" />
+                <span className="hidden sm:inline">Try Now</span>
+              </motion.div>
             </Button>
           </motion.div>
 
-          {/* Bookmarks button with glow */}
-          <motion.div
-            className="relative"
-            whileHover={{ scale: 1.1, y: -2 }}
-            whileTap={{ scale: 0.9 }}
-          >
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-10 w-10 rounded-full bg-gradient-to-r from-amber-100 to-orange-100 text-amber-700 hover:text-amber-900 transition-all duration-300"
-            >
-              <Bookmark className="h-5 w-5" />
-              <div className="absolute inset-0 bg-amber-400/10 rounded-full"></div>
-            </Button>
-          </motion.div>
-
-          {/* Enhanced Authentication component */}
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.3 }}
-            whileHover={{ scale: 1.05 }}
-          >
-            <Authentication />
-          </motion.div>
+          {/* Authentication component */}
+          <Authentication />
         </div>
       </div>
-
-      {/* Enhanced Navigation Menu with active states and more colorful gradients */}
-      {!isMobile && (
-        <div className="px-4 pb-3 border-t border-blue-100">
-          <div className="flex justify-between items-center py-2 max-w-3xl mx-auto">
-            <Link
-              href="/dashboard"
-              className={`flex items-center px-4 py-2 rounded-lg transition-all duration-300 relative ${
-                activeTab === "dashboard"
-                  ? "bg-gradient-to-r from-indigo-200 to-blue-200 text-indigo-800 font-medium shadow-sm"
-                  : "hover:bg-blue-50 text-gray-700 hover:scale-105"
-              }`}
-              onClick={() => setActiveTab("dashboard")}
-            >
+      
+      {/* Mobile navigation menu */}
+      <AnimatePresence>
+        {isMobile && (
+          <motion.div 
+            className="flex overflow-x-auto scrollbar-hide py-2 px-4 space-x-2 bg-white/80 backdrop-blur-sm border-t border-gray-100"
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.3 }}
+          >
+            {navItems.map((item) => (
               <motion.div
-                variants={pulseAnimation}
-                animate={activeTab === "dashboard" ? "pulse" : ""}
+                key={item.id}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="flex-shrink-0"
               >
-                <Home
-                  className={`h-5 w-5 mr-2 ${
-                    activeTab === "dashboard"
-                      ? "text-indigo-600"
-                      : "text-blue-500"
-                  }`}
-                />
+                <Link href={`#${item.id}`}>
+                  <div className={`px-3 py-1.5 rounded-full text-sm font-medium flex items-center ${
+                    activeTab === item.id 
+                      ? `bg-gradient-to-r ${item.color} text-white` 
+                      : 'bg-gray-100 text-gray-700'
+                  }`}>
+                    <item.icon className="h-3.5 w-3.5 mr-1.5" />
+                    <span>{item.label}</span>
+                  </div>
+                </Link>
               </motion.div>
-              <span className="font-medium">Dashboard</span>
-              {activeTab === "dashboard" && (
-                <motion.div
-                  className="absolute inset-0 border-2 border-indigo-400/30 rounded-lg"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  layoutId="activeTab"
-                />
-              )}
-            </Link>
-
-            <Link
-              href="/designs"
-              className={`flex items-center px-4 py-2 rounded-lg transition-all duration-300 relative ${
-                activeTab === "designs"
-                  ? "bg-gradient-to-r from-purple-200 to-fuchsia-200 text-purple-800 font-medium shadow-sm"
-                  : "hover:bg-purple-50 text-gray-700 hover:scale-105"
-              }`}
-              onClick={() => setActiveTab("designs")}
-            >
-              <motion.div
-                variants={pulseAnimation}
-                animate={activeTab === "designs" ? "pulse" : ""}
-              >
-                <PenTool
-                  className={`h-5 w-5 mr-2 ${
-                    activeTab === "designs"
-                      ? "text-purple-600"
-                      : "text-purple-500"
-                  }`}
-                />
-              </motion.div>
-              <span className="font-medium">Designs</span>
-              {activeTab === "designs" && (
-                <motion.div
-                  className="absolute inset-0 border-2 border-purple-400/30 rounded-lg"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  layoutId="activeTab"
-                />
-              )}
-            </Link>
-
-            <Link
-              href="/credits"
-              className={`flex items-center px-4 py-2 rounded-lg transition-all duration-300 relative ${
-                activeTab === "credits"
-                  ? "bg-gradient-to-r from-amber-200 to-yellow-200 text-amber-800 font-medium shadow-sm"
-                  : "hover:bg-amber-50 text-gray-700 hover:scale-105"
-              }`}
-              onClick={() => setActiveTab("credits")}
-            >
-              <motion.div
-                variants={pulseAnimation}
-                animate={activeTab === "credits" ? "pulse" : ""}
-              >
-                <CircleDollarSign
-                  className={`h-5 w-5 mr-2 ${
-                    activeTab === "credits"
-                      ? "text-amber-600"
-                      : "text-amber-500"
-                  }`}
-                />
-              </motion.div>
-              <span className="font-medium">Credits</span>
-              {activeTab === "credits" && (
-                <motion.div
-                  className="absolute inset-0 border-2 border-amber-400/30 rounded-lg"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  layoutId="activeTab"
-                />
-              )}
-            </Link>
-          </div>
-        </div>
-      )}
-      {/* Enhanced animated border with multi-layered rainbow gradient effect */}
-      <div className="relative h-2">
-        <motion.div
-          className="h-full bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500"
-          initial={{ scaleX: 0, opacity: 0 }}
-          animate={{
-            scaleX: 1,
-            opacity: scrolled ? 1 : 0.8,
-          }}
-          transition={{ delay: 0.2 }}
-        />
-        <motion.div
-          className="absolute bottom-0 left-0 right-0 h-full bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 blur-sm"
-          initial={{ scaleX: 0, opacity: 0 }}
-          animate={{
-            scaleX: 1,
-            opacity: scrolled ? 0.5 : 0.3,
-          }}
-          transition={{ delay: 0.3 }}
-        />
-
-        {/* Moving light effect on the border */}
-        <motion.div
-          className="absolute bottom-0 h-full w-20 bg-white blur-md"
-          initial={{ left: "-10%", opacity: 0.5 }}
-          animate={{
-            left: ["0%", "100%"],
-            opacity: [0, 0.7, 0],
-          }}
-          transition={{
-            repeat: Infinity,
-            duration: 3,
-            ease: "easeInOut",
-          }}
-        />
-      </div>
+            ))}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </motion.header>
   );
 }
