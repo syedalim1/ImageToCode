@@ -4,15 +4,16 @@ import { db } from "@/configs/db";
 import { usersTable } from "@/configs/schema";
 
 export async function POST(req: NextRequest) {
-  const { userEmail, userName } = await req.json();
+  const { userEmail, userName, phoneNumber, country } = await req.json();
 
-  // try {
   const result = await db
     .select({
       id: usersTable.id,
       name: usersTable.name,
       email: usersTable.email,
       credits: usersTable.credits,
+      phoneNumber: usersTable.phoneNumber,
+      country: usersTable.country,
     })
     .from(usersTable)
     .where(eq(usersTable.email, userEmail));
@@ -24,13 +25,16 @@ export async function POST(req: NextRequest) {
         name: userName,
         email: userEmail,
         credits: 0,
-        // @ts-ignore
+        phoneNumber,
+        country,
       })
       .returning({
         id: usersTable.id,
         name: usersTable.name,
         email: usersTable.email,
         credits: usersTable.credits,
+        phoneNumber: usersTable.phoneNumber,
+        country: usersTable.country,
       });
 
     return NextResponse.json(insertResult[0]);
@@ -39,22 +43,27 @@ export async function POST(req: NextRequest) {
 }
 
 export async function GET(req: NextRequest) {
- const searchParams = req.nextUrl.searchParams;
+  const searchParams = req.nextUrl.searchParams;
   const userEmail = searchParams.get("email");
   if (!userEmail) {
     return NextResponse.json({ error: "Email is required" }, { status: 400 });
   }
 
   try {
-    const result: any = await db.execute(
-      `SELECT credits FROM users WHERE email = '${userEmail}'`
-    );
+    const result: any = await db
+      .select({
+        credits: usersTable.credits,
+        phoneNumber: usersTable.phoneNumber,
+        country: usersTable.country
+      })
+      .from(usersTable)
+      .where(eq(usersTable.email, userEmail));
 
     if (result?.rows?.length === 0) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    return NextResponse.json({ credits: result.rows[0].credits });
+    return NextResponse.json(result[0]);
   } catch (error: any) {
     console.error("Database error:", error);
     return NextResponse.json(

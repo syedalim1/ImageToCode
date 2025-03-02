@@ -78,13 +78,18 @@ function AppHeader() {
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as Element;
-      if (sidebarOpen && target && !target.closest('.mobile-sidebar') && !target.closest('.menu-button')) {
+      if (
+        sidebarOpen &&
+        target &&
+        !target.closest(".mobile-sidebar") &&
+        !target.closest(".menu-button")
+      ) {
         setSidebarOpen(false);
       }
     };
 
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [sidebarOpen]);
 
   // Handle save functionality
@@ -181,19 +186,37 @@ function AppHeader() {
   };
 
   const navItems = [
-    { id: 'home', label: 'Home', icon: Home, color: 'from-blue-500 to-cyan-500' },
-    { id: 'features', label: 'Features', icon: Wand2, color: 'from-purple-500 to-pink-500' },
-    { id: 'pricing', label: 'Pricing', icon: CircleDollarSign, color: 'from-amber-500 to-orange-500' },
-    { id: 'examples', label: 'Examples', icon: Layers, color: 'from-emerald-500 to-teal-500' },
+    {
+      id: "dashboard",
+      label: "Home",
+      icon: Home,
+      color: "from-blue-500 to-cyan-500",
+    },
+
+    {
+      id: "credits",
+      label: "Pricing",
+      icon: CircleDollarSign,
+      color: "from-amber-500 to-orange-500",
+    },
   ];
 
   // Additional items for mobile sidebar
   const sidebarItems = [
     ...navItems,
-    { id: 'projects', label: 'My Projects', icon: PenTool, color: 'from-cyan-500 to-blue-500' },
-    { id: 'saved', label: 'Saved Items', icon: Bookmark, color: 'from-rose-500 to-red-500' },
-    { id: 'premium', label: 'Go Premium', icon: Crown, color: 'from-yellow-400 to-yellow-600' },
-    { id: 'settings', label: 'Settings', icon: Settings, color: 'from-gray-600 to-gray-800' },
+    {
+      id: "designs",
+      label: "My Projects",
+      icon: PenTool,
+      color: "from-cyan-500 to-blue-500",
+    },
+
+    {
+      id: "profile",
+      label: "Settings",
+      icon: Settings,
+      color: "from-gray-600 to-gray-800",
+    },
   ];
 
   // Enhanced rainbow gradient for animated background
@@ -213,16 +236,16 @@ function AppHeader() {
       >
         {/* Decorative elements - top rainbow line with animation */}
         <div className="h-1.5 w-full bg-gradient-to-r from-pink-500 via-yellow-500 via-green-500 via-blue-500 to-purple-500 relative overflow-hidden">
-          <motion.div 
+          <motion.div
             className="absolute inset-0 bg-white opacity-30"
             animate={{
-              x: ['0%', '100%'],
+              x: ["0%", "100%"],
             }}
             transition={{
               duration: 3,
               repeat: Infinity,
-              repeatType: 'reverse',
-              ease: 'easeInOut'
+              repeatType: "reverse",
+              ease: "easeInOut",
             }}
           />
         </div>
@@ -271,7 +294,7 @@ function AppHeader() {
                 whileTap={{ scale: 0.98 }}
               >
                 <Link
-                  href={`#${item.id}`}
+                  href={`/${item.id}`}
                   className={`flex items-center px-3 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${
                     activeTab === item.id
                       ? "text-white bg-gradient-to-r " + item.color
@@ -298,26 +321,6 @@ function AppHeader() {
 
           {/* Right section with actions */}
           <div className="flex items-center space-x-2">
-            {/* Notifications */}
-            {/* <motion.div
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="relative"
-            >
-              <Button
-                size="sm"
-                variant="ghost"
-                className="rounded-full w-10 h-10 p-0 flex items-center justify-center"
-              >
-                <Bell className="w-5 h-5 text-gray-700" />
-                {notificationCount > 0 && (
-                  <span className="absolute top-0 right-0 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                    {notificationCount}
-                  </span>
-                )}
-              </Button>
-            </motion.div> */}
-
             {/* Save button with success animation */}
             <motion.div
               whileHover={{ scale: 1.05 }}
@@ -379,7 +382,9 @@ function AppHeader() {
                 <div className="flex items-center justify-between p-4 border-b border-purple-700">
                   <div className="flex items-center">
                     <Image className="h-6 w-6 mr-2 text-white" />
-                    <span className="text-xl font-bold text-white">ImageToCode</span>
+                    <span className="text-xl font-bold text-white">
+                      ImageToCode
+                    </span>
                   </div>
                   <motion.button
                     whileHover={{ scale: 1.1 }}
@@ -411,11 +416,12 @@ function AppHeader() {
                       whileTap={{ scale: 0.98 }}
                     >
                       <Link
-                        href={`#${item.id}`}
+                        href={`/${item.id}`}
                         className={`flex items-center justify-between px-4 py-3 mx-2 rounded-lg text-sm font-medium 
-                          ${activeTab === item.id
-                            ? `bg-gradient-to-r ${item.color} text-white`
-                            : "text-white hover:bg-white/10"
+                          ${
+                            activeTab === item.id
+                              ? `bg-gradient-to-r ${item.color} text-white`
+                              : "text-white hover:bg-white/10"
                           }`}
                         onClick={() => {
                           setActiveTab(item.id);
@@ -432,37 +438,6 @@ function AppHeader() {
                       </Link>
                     </motion.div>
                   ))}
-                </div>
-
-                {/* Pro upgrade banner */}
-                <div className="p-4 mt-auto">
-                  <motion.div
-                    whileHover={{ scale: 1.02 }}
-                    className="p-4 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 relative overflow-hidden"
-                  >
-                    <motion.div
-                      className="absolute -right-6 -top-6 w-20 h-20 bg-yellow-300 rounded-full opacity-20"
-                      animate={{
-                        scale: [1, 1.2, 1],
-                      }}
-                      transition={{
-                        duration: 3,
-                        repeat: Infinity,
-                        repeatType: "reverse",
-                      }}
-                    />
-                    <div className="relative z-10">
-                      <div className="flex items-center space-x-2 mb-2">
-                        <Crown className="h-5 w-5 text-white" />
-                        <p className="font-bold text-white">Upgrade to Pro</p>
-                      </div>
-                      <p className="text-white/80 text-sm mb-3">Get unlimited exports and premium features!</p>
-                      <Button size="sm" className="w-full bg-white text-orange-600 hover:bg-white/90">
-                        <Rocket className="h-4 w-4 mr-1" />
-                        Upgrade Now
-                      </Button>
-                    </div>
-                  </motion.div>
                 </div>
               </div>
             </motion.div>
