@@ -39,7 +39,7 @@ function AppHeader() {
   const [isMobile, setIsMobile] = useState(false);
   const [activeTab, setActiveTab] = useState("dashboard");
   const [saveSuccess, setSaveSuccess] = useState(false);
-  const [hoveredNavItem, setHoveredNavItem] = useState(null);
+  const [hoveredNavItem, setHoveredNavItem] = useState<string | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [notificationCount, setNotificationCount] = useState(3);
 
@@ -76,8 +76,9 @@ function AppHeader() {
 
   // Close sidebar when clicking outside on mobile
   useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (sidebarOpen && !event.target.closest('.mobile-sidebar') && !event.target.closest('.menu-button')) {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as Element;
+      if (sidebarOpen && target && !target.closest('.mobile-sidebar') && !target.closest('.menu-button')) {
         setSidebarOpen(false);
       }
     };
