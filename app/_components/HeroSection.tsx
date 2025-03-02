@@ -2,9 +2,13 @@
 import { motion, useScroll, useTransform } from "framer-motion";
 import { SparklesIcon } from "@heroicons/react/24/outline";
 import ClientFloatingElements from "./ClientFloatingElements";
-import AnimatedCodeSnippet from "./AnimatedCodeSnippet";
+import dynamic from "next/dynamic";
 import { useEffect, useRef, useState } from "react";
 import ClientOnly from "../view-code/_components/ClientOnly";
+
+const AnimatedCodeSnippet = dynamic(() => import("./AnimatedCodeSnippet"), {
+  ssr: false,
+});
 
 const containerRef = useRef<HTMLDivElement>(null);
 
@@ -368,9 +372,7 @@ export default function HeroSection() {
                         transition={{ delay: 2.5, duration: 0.8 }}
                         className="p-4 h-full overflow-y-auto"
                       >
-                        <ClientOnly>
-                          <AnimatedCodeSnippet code={codeExample} />
-                        </ClientOnly>
+                        <AnimatedCodeSnippet code={codeExample} />
                       </motion.div>
                     </>
                   )}
