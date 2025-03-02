@@ -37,6 +37,30 @@ const ImageUpload: React.FC = () => {
   const [uploadProgress, setUploadProgress] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
   const [selectedLanguage, setSelectedLanguage] = useState("react-tailwind");
+  const [screenSize, setScreenSize] = useState<
+    "xs" | "sm" | "md" | "lg" | "xl"
+  >("lg");
+
+  // Handle screen size detection for better responsive behavior
+  useEffect(() => {
+    const handleResize = () => {
+      const width = window.innerWidth;
+      if (width < 640) setScreenSize("xs");
+      else if (width < 768) setScreenSize("sm");
+      else if (width < 1024) setScreenSize("md");
+      else if (width < 1280) setScreenSize("lg");
+      else setScreenSize("xl");
+    };
+
+    // Set initial size
+    handleResize();
+
+    // Add event listener
+    window.addEventListener("resize", handleResize);
+
+    // Clean up
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   // Simulated progress for better UX
   useEffect(() => {
@@ -178,13 +202,26 @@ const ImageUpload: React.FC = () => {
     else if (activeTab === "description") handleUpload();
   };
 
+  // Function to scroll to appropriate section when tab changes
+  useEffect(() => {
+    if (containerRef.current) {
+      containerRef.current.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    }
+  }, [activeTab]);
+
   return (
-    <div className="mt-4 sm:mt-6 w-full max-w-6xl mx-auto">
-      {/* Header */}
+    <div
+      className="w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8"
+      ref={containerRef}
+    >
+      {/* Header with responsive spacing */}
       <HeaderSection />
 
-      {/* Progress Steps */}
-      <div className="overflow-x-auto pb-2 -mx-4 sm:mx-0">
+      {/* Progress Steps with horizontal scrolling for small screens */}
+      <div className="overflow-x-auto pb-2 -mx-4 sm:mx-0 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
         <div className="min-w-[600px] sm:min-w-0 px-4 sm:px-0">
           <ProgressSteps
             activeTab={activeTab}
@@ -195,10 +232,10 @@ const ImageUpload: React.FC = () => {
         </div>
       </div>
 
-      {/* Main Content Area */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 lg:gap-8 mt-4 sm:mt-6">
-        {/* Left Panel - Image Upload */}
-        <div className="p-4 sm:p-6 md:p-8 border-2 border-dashed rounded-xl bg-gradient-to-br from-purple-50 to-blue-50 relative">
+      {/* Main Content Area with improved responsive layout */}
+      <div className="flex flex-col gap-4 sm:gap-6 lg:gap-8 mt-4 sm:mt-6">
+        {/* Image Upload Area - Responsive border and padding */}
+        <div className="p-3 sm:p-4 md:p-6 lg:p-8 border-2 border-dashed rounded-xl bg-gradient-to-br from-purple-50 to-blue-50 relative">
           <ImageDropzone
             selectedFile={selectedFile}
             setSelectedFile={setSelectedFile}
@@ -210,49 +247,89 @@ const ImageUpload: React.FC = () => {
             setActiveTab={setActiveTab}
           />
         </div>
-        {/* Right Panel - Features and Options */}
-        <div className="space-y-4 sm:space-y-6">
-          {/* Language Selector */}
-          <LanguageSelector
-            selectedLanguage={selectedLanguage}
-            setSelectedLanguage={setSelectedLanguage}
-          />
-          {/* React Features */}
-          <ReactFeatureOptions
-            selectedOptions={selectedOptions}
-            toggleOption={toggleOption}
-          />
-          <ModeSelector
-            selectedMode={selectedMode}
-            setSelectedMode={setSelectedMode}
-            preview={preview}
-          />{" "}
-          {/* Description Input - Show when activeTab is "description" */}{" "}
+
+        {/* Options Area - Responsive grid layout */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+          {/* Left Column */}
+          <div className="space-y-4">
+            {/* Language Selector */}
+            <div className="bg-white p-4 rounded-lg  shadow-sm border border-gray-100">
+              <LanguageSelector
+                selectedLanguage={selectedLanguage}
+                setSelectedLanguage={setSelectedLanguage}
+              />
+            </div>
+          </div>
+
+          {/* Right Column */}
+          <div className="space-y-4">
+            {/* Mode Selector */}
+            <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-100">
+              <ModeSelector
+                selectedMode={selectedMode}
+                setSelectedMode={setSelectedMode}
+                preview={preview}
+              />
+            </div>
+            {/* React Features */}
+            <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-100">
+              <ReactFeatureOptions
+                selectedOptions={selectedOptions}
+                toggleOption={toggleOption}
+              />
+            </div>
+          </div>
+        </div>
+        {/* Description Input - Always visible and full width */}
+        <div className="bg-white p-4 sm:p-6 rounded-lg shadow-sm border border-gray-100 w-full">
+          <h3 className="text-lg font-semibold mb-3 text-gray-800">
+            Describe Your Requirements
+          </h3>
           <DescriptionInput
             userDescription={userDescription}
             setUserDescription={setUserDescription}
             isUploading={isUploading}
             preview={preview}
-          />{" "}
-         
-          {/* Progress Indicator - Always visible */}{" "}
-          <ProgressIndicator
-            isUploading={isUploading}
-            uploadProgress={uploadProgress}
-          />{" "}
+          />
+        </div>
+      </div>
+      {/* Progress Indicator */}
+      <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-100">
+        <ProgressIndicator
+          isUploading={isUploading}
+          uploadProgress={uploadProgress}
+        />
+      </div>
+      {/* Action Button - Fixed width on mobile, auto on larger screens */}
+      <div className="mt-6 sm:mt-8 flex justify-center">
+        <div className="w-full sm:w-auto">
+          <ActionButton
+            activeTab={activeTab}
+            isUploading={isUploading || loading}
+            canProceed={canProceed()}
+            handleUpload={handleUpload}
+            goToNextStep={goToNextStep}
+          />
         </div>
       </div>
 
-      {/* Action Button */}
-      <div className="mt-6 sm:mt-8">
-        <ActionButton
-          activeTab={activeTab}
-          isUploading={isUploading}
-          canProceed={canProceed()}
-          handleUpload={handleUpload}
-          goToNextStep={goToNextStep}
-        />
-      </div>
+      {/* Loading overlay - covers entire screen when processing */}
+      {loading && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full mx-4">
+            <div className="flex flex-col items-center text-center">
+              <div className="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mb-4"></div>
+              <h3 className="text-lg font-semibold mb-2">
+                Generating Your Code
+              </h3>
+              <p className="text-gray-600">
+                This may take a moment as we analyze your image and create
+                beautiful React components...
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

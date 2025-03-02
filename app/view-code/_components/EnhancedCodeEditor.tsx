@@ -152,16 +152,14 @@ const EnhancedCodeEditor: React.FC<EnhancedCodeEditorProps> = ({
         }`
       );
     }
-  }, [code]);
+  }, []);
 
   const handleCodeChange = (newCode: string) => {
     setCurrentCode(newCode);
-    
     if (onCodeChange) {
-      // Always pass the code as a string to the parent component
       onCodeChange(newCode);
     }
-  };
+};
 
   // Clipboard operations should only run on client
   const copyToClipboard = () => {

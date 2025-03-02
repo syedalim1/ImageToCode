@@ -97,60 +97,50 @@ const CreditPackages: React.FC<CreditPackagesProps> = ({
       popular: false,
       color: "from-blue-500 to-blue-600",
       features: [
-        "1 image-to-code conversions",
-        "Standard support",
-        "Basic components",
+        "1 image-to-code conversions/month",
+       
       ],
     },
     {
       id: "standard",
       name: "Standard",
       credits: 30,
-      price: 5000, // ₹60
-      originalPrice: 3000,
+      price: 5000, // ₹50
+      originalPrice: 6000, // ₹60
       discount: 17,
       popular: true,
       color: "from-purple-500 to-purple-600",
       features: [
-        "3 image-to-code conversions",
-        "Priority support",
-        "Advanced components",
-        "Code customization",
+        "3 image-to-code conversions/month",
+        
       ],
     },
     {
       id: "premium",
       name: "Premium",
-      credits: 70,
-      price: 140, // ₹140
-      originalPrice: 7500,
+      credits: 90,
+      price: 14000, // ₹140
+      originalPrice: 18000, // ₹180
       discount: 33,
       popular: false,
       color: "from-pink-500 to-pink-600",
       features: [
-        "70 image-to-code conversions",
-        "Premium support",
-        "All components",
-        "Code customization",
-        "Export options",
+        "9 image-to-code conversions/month",
+       
       ],
     },
     {
       id: "enterprise",
       name: "Enterprise",
-      credits: 200,
+      credits: 250,
       price: 40000, // ₹400
-      originalPrice: 15000,
+      originalPrice: 50000, // ₹500
       discount: 33,
       popular: false,
       color: "from-amber-500 to-amber-600",
       features: [
-        "200 image-to-code conversions",
-        "24/7 dedicated support",
-        "All premium features",
-        "Team collaboration",
-        "API access",
-        "Custom branding",
+        "25 image-to-code conversions/month",
+        
       ],
     },
   ];

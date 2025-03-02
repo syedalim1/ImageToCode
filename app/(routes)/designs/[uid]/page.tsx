@@ -86,7 +86,10 @@ export default function Page() {
         {/* Header with breadcrumbs */}
         <div className="mb-8">
           <nav className="flex items-center text-sm font-medium text-gray-500 dark:text-gray-400">
-            <Link href="/" className="hover:text-blue-600 dark:hover:text-blue-400">
+            <Link
+              href="/"
+              className="hover:text-blue-600 dark:hover:text-blue-400"
+            >
               Home
             </Link>
             <svg
@@ -100,7 +103,10 @@ export default function Page() {
                 clipRule="evenodd"
               />
             </svg>
-            <Link href="/designs" className="hover:text-blue-600 dark:hover:text-blue-400">
+            <Link
+              href="/designs"
+              className="hover:text-blue-600 dark:hover:text-blue-400"
+            >
               Designs
             </Link>
             <svg
@@ -140,7 +146,7 @@ export default function Page() {
                   strokeLinecap="round"
                   strokeLinejoin="round"
                   strokeWidth={2}
-                  d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                  d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77-1.333.192 3, 1.732 3z"
                 />
               </svg>
             </div>
@@ -158,11 +164,33 @@ export default function Page() {
         ) : design ? (
           <div className="bg-white dark:bg-gray-800 rounded-xl shadow-xl overflow-hidden">
             {/* Design header */}
-            <div className="bg-gradient-to-r from-blue-600 to-purple-600 p-6 text-white">
-              <h1 className="text-3xl font-bold mb-2">
+            <div className="relative bg-gradient-to-br from-blue-600 to-purple-600 p-6 text-white rounded-t-xl overflow-hidden">
+              {/* Subtle background animation */}
+              <div className="absolute inset-0 opacity-20">
+                <svg
+                  viewBox="0 0 100 100"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path d="M0 0h100v100H0z" fill="url(#gradient)" />
+                  <defs>
+                    <linearGradient
+                      id="gradient"
+                      x1="0%"
+                      y1="0%"
+                      x2="100%"
+                      y2="100%"
+                    >
+                      <stop offset="0%" stopColor="rgba(255, 255, 255, 0.1)" />
+                      <stop offset="100%" stopColor="rgba(255, 255, 255, 0)" />
+                    </linearGradient>
+                  </defs>
+                </svg>
+              </div>
+              <h1 className="text-3xl font-bold mb-2 relative z-10">
                 {design.description || "Untitled Design"}
               </h1>
-              <div className="flex flex-wrap gap-4 text-sm">
+              <div className="flex flex-wrap gap-4 text-sm relative z-10">
                 <div className="flex items-center">
                   <svg
                     className="w-5 h-5 mr-1"
@@ -272,7 +300,8 @@ export default function Page() {
                 options={{
                   externalResources: ["https://cdn.tailwindcss.com"],
                   classes: {
-                    "sp-wrapper": "custom-wrapper rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700",
+                    "sp-wrapper":
+                      "custom-wrapper rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700",
                     "sp-layout": "custom-layout",
                     "sp-tab-button": "custom-tab",
                   },
@@ -351,7 +380,7 @@ export default function Page() {
                   strokeLinecap="round"
                   strokeLinejoin="round"
                   strokeWidth={2}
-                  d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                  d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77-1.333.192 3 1.732 3z"
                 />
               </svg>
             </div>
