@@ -3,7 +3,7 @@ import { motion, useScroll, useTransform } from "framer-motion";
 import { SparklesIcon } from "@heroicons/react/24/outline";
 import ClientFloatingElements from "./ClientFloatingElements";
 import dynamic from "next/dynamic";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, memo } from "react";
 import ClientOnly from "../view-code/_components/ClientOnly";
 
 const AnimatedCodeSnippet = dynamic(() => import("./AnimatedCodeSnippet"), {
@@ -62,15 +62,18 @@ function Header() {
 export default Header;`;
 
 // Abstract shapes component for enhanced background visuals
-const AbstractShapes = () => {
+const AbstractShapes = memo(() => {
   return (
     <div className="absolute inset-0 overflow-hidden pointer-events-none">
       {/* Larger gradient circle */}
-      <div className="absolute -top-64 -right-64 w-96 h-96 bg-gradient-to-r from-pink-500/30 to-purple-500/30 rounded-full blur-3xl" />
+      <div 
+        className="absolute transform -translate-x-64 -translate-y-64 w-96 h-96 bg-gradient-to-r from-pink-500/30 to-purple-500/30 rounded-full blur-3xl"
+        style={{ willChange: 'transform' }}
+      />
 
       {/* Small decorative elements */}
       <motion.div
-        className="absolute top-32 left-16 w-16 h-16 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-lg rotate-12 opacity-40"
+        className="absolute transform translate-x-32 translate-y-16 w-16 h-16 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-lg rotate-12 opacity-40"
         animate={{
           y: [0, -15, 0],
           rotate: [12, 45, 12],
@@ -79,6 +82,10 @@ const AbstractShapes = () => {
           duration: 8,
           repeat: Infinity,
           ease: "easeInOut",
+        }}
+        style={{ 
+          willChange: 'transform',
+          transform: 'translate3d(0,0,0)'
         }}
       />
 
@@ -92,6 +99,10 @@ const AbstractShapes = () => {
           repeat: Infinity,
           ease: "easeInOut",
         }}
+        style={{ 
+          willChange: 'transform',
+          transform: 'translate3d(0,0,0)'
+        }}
       />
 
       {/* Code symbols background */}
@@ -100,6 +111,7 @@ const AbstractShapes = () => {
         initial={{ opacity: 0 }}
         animate={{ opacity: 0.2 }}
         transition={{ delay: 1, duration: 2 }}
+        style={{ transform: 'translate3d(0,0,0)' }}
       >
         {"{"}
       </motion.div>
@@ -109,12 +121,15 @@ const AbstractShapes = () => {
         initial={{ opacity: 0 }}
         animate={{ opacity: 0.2 }}
         transition={{ delay: 1.5, duration: 2 }}
+        style={{ transform: 'translate3d(0,0,0)' }}
       >
         {"}"}
       </motion.div>
     </div>
   );
-};
+});
+
+AbstractShapes.displayName = 'AbstractShapes';
 
 export default function HeroSection() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -127,32 +142,48 @@ export default function HeroSection() {
     offset: ["start start", "end end"],
   });
 
-  // Parallax effect values
+  // Parallax effect values with optimized performance
   const y1 = useTransform(scrollYProgress, [0, 1], [0, -200]);
   const y2 = useTransform(scrollYProgress, [0, 1], [0, -100]);
   const y3 = useTransform(scrollYProgress, [0, 1], [0, -300]);
   const opacity = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
 
   useEffect(() => {
-    // Start hero animation after page load
-    const timer = setTimeout(() => setAnimateHero(true), 500);
+    let animationFrameId: number;
+    
+    // Start hero animation using requestAnimationFrame
+    const startAnimation = () => {
+      setAnimateHero(true);
+    };
+    
+    animationFrameId = requestAnimationFrame(startAnimation);
 
-    // Auto-rotate testimonials
+    // Auto-rotate testimonials with optimized interval
     const testimonialTimer = setInterval(() => {
-      setCurrentTestimonial((prev) => (prev + 1) % testimonials.length);
+      requestAnimationFrame(() => {
+        setCurrentTestimonial((prev) => (prev + 1) % testimonials.length);
+      });
     }, 5000);
 
     // Begin animation after component mounts
     setIsAnimating(true);
 
     return () => {
-      clearTimeout(timer);
+      cancelAnimationFrame(animationFrameId);
       clearInterval(testimonialTimer);
     };
   }, []);
 
   return (
-    <div className="relative overflow-hidden bg-gradient-to-b from-gray-50 to-white dark:from-gray-900 dark:to-gray-800 min-h-screen">
+    <div 
+      className="relative overflow-hidden bg-gradient-to-b from-gray-50 to-white dark:from-gray-900 dark:to-gray-800 min-h-screen"
+      ref={containerRef}
+      style={{ 
+        willChange: 'transform',
+        transform: 'translate3d(0,0,0)',
+        backfaceVisibility: 'hidden'
+      }}
+    >
       {/* Enhanced animated background elements */}
       <ClientFloatingElements />
       <AbstractShapes />
@@ -160,7 +191,10 @@ export default function HeroSection() {
       {/* Grid pattern overlay */}
       <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 relative z-10">
+      <div 
+        className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 relative z-10"
+        style={{ transform: 'translate3d(0,0,0)' }}
+      >
         <div className="text-center">
           {/* Enhanced badge with animated glow */}
           <motion.div
@@ -168,6 +202,7 @@ export default function HeroSection() {
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.5 }}
             className="inline-block mb-6"
+            style={{ willChange: 'transform' }}
           >
             <span className="inline-flex items-center px-4 py-1.5 rounded-full text-sm font-medium bg-gradient-to-r from-purple-100 to-blue-100 text-purple-800 dark:from-purple-900 dark:to-blue-900 dark:text-purple-200 shadow-lg">
               <span className="animate-ping absolute inline-flex h-3 w-3 rounded-full bg-purple-400 opacity-75"></span>
@@ -183,6 +218,7 @@ export default function HeroSection() {
                   ],
                 }}
                 transition={{ duration: 2, repeat: Infinity }}
+                style={{ willChange: 'transform' }}
               ></motion.span>
             </span>
           </motion.div>
@@ -193,6 +229,7 @@ export default function HeroSection() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
             className="text-5xl md:text-7xl font-extrabold bg-gradient-to-r from-purple-600 via-pink-500 to-blue-500 bg-clip-text text-transparent mb-8 leading-tight tracking-tight"
+            style={{ willChange: 'transform' }}
           >
             Turn Designs into Code
             <br />
@@ -201,6 +238,7 @@ export default function HeroSection() {
               animate={{ opacity: 1 }}
               transition={{ delay: 0.5, duration: 0.8 }}
               className="relative"
+              style={{ willChange: 'transform' }}
             >
               in Seconds
               <motion.span
@@ -208,6 +246,7 @@ export default function HeroSection() {
                 initial={{ opacity: 0, scale: 0, rotate: -20 }}
                 animate={{ opacity: 1, scale: 1, rotate: 0 }}
                 transition={{ delay: 1.3, duration: 0.5, type: "spring" }}
+                style={{ willChange: 'transform' }}
               >
                 ✨
               </motion.span>
@@ -220,12 +259,14 @@ export default function HeroSection() {
             animate={{ opacity: 1 }}
             transition={{ delay: 0.3 }}
             className="relative mb-12 mx-auto"
+            style={{ willChange: 'transform' }}
           >
             <motion.span
               className="absolute inset-0 bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-900/10 dark:to-blue-900/10 rounded-xl -z-10"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.4, duration: 0.6 }}
+              style={{ willChange: 'transform' }}
             ></motion.span>
             <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto px-6 py-4">
               Transform your visual designs into clean, production-ready code
@@ -240,6 +281,7 @@ export default function HeroSection() {
             animate={{ scale: 1, opacity: 1 }}
             transition={{ delay: 0.5, duration: 0.5 }}
             className="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-6"
+            style={{ willChange: 'transform' }}
           >
             <motion.a
               whileHover={{
@@ -249,6 +291,7 @@ export default function HeroSection() {
               whileTap={{ scale: 0.95 }}
               href="/dashboard"
               className="bg-gradient-to-r from-purple-600 via-violet-600 to-blue-600 text-white px-8 py-4 rounded-xl text-lg font-semibold shadow-xl flex items-center justify-center group relative overflow-hidden"
+              style={{ willChange: 'transform' }}
             >
               <span className="relative z-10">Start Converting Now</span>
               <SparklesIcon className="h-5 w-5 ml-2 relative z-10" />
@@ -257,6 +300,7 @@ export default function HeroSection() {
                 initial={{ x: "100%" }}
                 whileHover={{ x: 0 }}
                 transition={{ duration: 0.4 }}
+                style={{ willChange: 'transform' }}
               ></motion.span>
             </motion.a>
 
@@ -268,6 +312,7 @@ export default function HeroSection() {
               whileTap={{ scale: 0.95 }}
               href="#demo"
               className="bg-white dark:bg-gray-800 text-purple-600 dark:text-purple-400 border-2 border-purple-200 dark:border-purple-800 px-8 py-4 rounded-xl text-lg font-semibold shadow-lg flex items-center justify-center group"
+              style={{ willChange: 'transform' }}
             >
               Watch Demo
               <svg
@@ -290,6 +335,7 @@ export default function HeroSection() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.7, duration: 0.8 }}
             className="mt-24 rounded-3xl shadow-2xl overflow-hidden border-8 border-white dark:border-gray-700 mx-auto max-w-5xl relative"
+            style={{ willChange: 'transform' }}
           >
             {/* Mac-style window controls */}
             <div className="bg-gradient-to-r from-purple-600 to-blue-600 p-4 flex items-center">
@@ -314,6 +360,8 @@ export default function HeroSection() {
                   style={{
                     backgroundImage:
                       "url('https://placehold.co/600x400/5271ff/ffffff?text=UI+Design')",
+                    willChange: 'transform',
+                    transform: 'translate3d(0,0,0)'
                   }}
                 >
                   {animateHero && (
@@ -323,6 +371,7 @@ export default function HeroSection() {
                         animate={{ opacity: 1 }}
                         transition={{ delay: 2, duration: 0.5 }}
                         className="absolute top-2 left-2 bg-black/70 backdrop-blur-sm text-white text-xs px-2 py-1 rounded-md flex items-center"
+                        style={{ willChange: 'transform' }}
                       >
                         <span className="w-2 h-2 bg-green-400 rounded-full mr-2"></span>
                         Design Input
@@ -342,6 +391,7 @@ export default function HeroSection() {
                           repeat: 1,
                         }}
                         className="absolute left-0 right-0 h-1 bg-gradient-to-r from-blue-400 to-purple-400 shadow-lg"
+                        style={{ willChange: 'transform' }}
                       ></motion.div>
                     </>
                   )}
@@ -352,6 +402,7 @@ export default function HeroSection() {
                   animate={{ width: animateHero ? "50%" : "0%" }}
                   transition={{ delay: 1.5, duration: 1.5, ease: "easeInOut" }}
                   className="h-full bg-gray-900 overflow-hidden relative"
+                  style={{ willChange: 'transform' }}
                 >
                   {animateHero && (
                     <>
@@ -360,6 +411,7 @@ export default function HeroSection() {
                         animate={{ opacity: 1 }}
                         transition={{ delay: 2, duration: 0.5 }}
                         className="absolute top-2 right-2 bg-black/70 backdrop-blur-sm text-white text-xs px-2 py-1 rounded-md flex items-center"
+                        style={{ willChange: 'transform' }}
                       >
                         <span className="w-2 h-2 bg-purple-400 rounded-full mr-2"></span>
                         Generated Code
@@ -370,6 +422,7 @@ export default function HeroSection() {
                         animate={{ opacity: 1 }}
                         transition={{ delay: 2.5, duration: 0.8 }}
                         className="p-4 h-full overflow-y-auto"
+                        style={{ willChange: 'transform' }}
                       >
                         <AnimatedCodeSnippet code={codeExample} />
                       </motion.div>
@@ -416,6 +469,7 @@ export default function HeroSection() {
                         repeat: Infinity,
                         repeatType: "reverse",
                       }}
+                      style={{ willChange: 'transform' }}
                     ></motion.div>
                   </div>
                 </div>
@@ -428,6 +482,7 @@ export default function HeroSection() {
               animate={{ opacity: 1 }}
               transition={{ delay: 3, duration: 1 }}
               className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 flex space-x-2"
+              style={{ willChange: 'transform' }}
             >
               {["React", "Tailwind", "Vue", "Angular"].map((tech, i) => (
                 <motion.div
@@ -436,6 +491,7 @@ export default function HeroSection() {
                   animate={{ y: 0, opacity: 1 }}
                   transition={{ delay: 3 + i * 0.1 }}
                   className="bg-white dark:bg-gray-800 px-3 py-1 rounded-full text-xs font-medium shadow-lg text-gray-700 dark:text-gray-200 border border-gray-200 dark:border-gray-700"
+                  style={{ willChange: 'transform' }}
                 >
                   {tech}
                 </motion.div>

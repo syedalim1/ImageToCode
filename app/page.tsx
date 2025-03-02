@@ -20,12 +20,10 @@ import PricingSection from "./_components/PricingSection.tsx";
 import CTASection from "./_components/CTASection.tsx";
 
 export default function Home() {
-  const containerRef = useRef<HTMLDivElement>(null);
 
   return (
     <div
       className="min-h-screen bg-gradient-to-b from-indigo-50 to-purple-50"
-      ref={containerRef}
     >
       <HeroSection />
 
