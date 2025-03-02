@@ -28,11 +28,7 @@ export const ProductPreview = () => {
 const ProductPreviewContent = () => {
   return (
     <div className="absolute inset-0 flex items-center justify-center">
-      <div className="relative w-full max-w-4xl mx-auto h-full flex items-center justify-center">
-        <MainProductDisplay />
-        <BackgroundElements />
-        <DecorativeElements />
-      </div>
+      <div className="relative w-full max-w-4xl mx-auto h-full flex items-center justify-center"></div>
     </div>
   );
-}; 
+};

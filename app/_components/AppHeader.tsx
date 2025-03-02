@@ -3,7 +3,7 @@
 import { SidebarTrigger, useSidebar } from "@/components/ui/sidebar";
 import React, { useState, useEffect } from "react";
 import Authentication from "./Authentication";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, Variant, Variants } from "framer-motion";
 import {
   X,
   Sparkles,
@@ -56,6 +56,7 @@ function AppHeader() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+
   // More frequent and vibrant sparkle effects
   useEffect(() => {
     const interval = setInterval(() => {
@@ -74,20 +75,20 @@ function AppHeader() {
   };
 
   // Animation variants
-  const pulseAnimation = {
+  const pulseAnimation: Variants = {
     pulse: {
-      scale: [1, 1.2],
+      scale: [1, 1.2, 1],
       transition: {
         duration: 1,
         repeat: Infinity,
-        repeatType: "reverse",
+        repeatType: "loop",
       },
     },
   };
 
-  const zapAnimation = {
+  const zapAnimation: Variants = {
     pulse: {
-      scale: [1, 1.2],
+      scale: [1, 1.2, 1],
       rotate: [0, 10, -5, 0],
       filter: [
         "drop-shadow(0 0 2px #4f46e5)",
@@ -97,12 +98,12 @@ function AppHeader() {
       transition: {
         duration: 3,
         repeat: Infinity,
-        repeatType: "reverse",
+        repeatType: "loop",
       },
     },
   };
 
-  const saveAnimation = {
+  const saveAnimation: Variants = {
     success: {
       scale: [1, 1.2, 1],
       rotate: [0, 15, 0],
@@ -112,13 +113,13 @@ function AppHeader() {
     },
   };
 
-  const floatAnimation = {
+  const floatAnimation: Variants = {
     float: {
       y: [0, -8, 0],
       transition: {
         duration: 3,
         repeat: Infinity,
-        repeatType: "reverse",
+        repeatType: "loop",
       },
     },
   };
@@ -139,7 +140,6 @@ function AppHeader() {
     >
       {/* Decorative elements - top rainbow line */}
       <div className="h-1.5 w-full bg-gradient-to-r from-pink-500 via-yellow-500 via-green-500 via-blue-500 to-purple-500"></div>
-
       <div className="flex items-center justify-between w-full px-4 py-3 relative">
         {/* Left section with menu and logo on mobile */}
         <div className="flex items-center space-x-3">
@@ -258,8 +258,6 @@ function AppHeader() {
             className="relative"
             whileHover={{ scale: 1.1, y: -2 }}
             whileTap={{ scale: 0.9 }}
-            variants={pulseAnimation}
-            animate="pulse"
           >
             <Button
               variant="ghost"
@@ -335,7 +333,7 @@ function AppHeader() {
           <div className="flex justify-between items-center py-2 max-w-3xl mx-auto">
             <Link
               href="/dashboard"
-              className={`flex items-center px-4 py-2 rounded-lg transition-all duration-300 ${
+              className={`flex items-center px-4 py-2 rounded-lg transition-all duration-300 relative ${
                 activeTab === "dashboard"
                   ? "bg-gradient-to-r from-indigo-200 to-blue-200 text-indigo-800 font-medium shadow-sm"
                   : "hover:bg-blue-50 text-gray-700 hover:scale-105"
@@ -343,7 +341,7 @@ function AppHeader() {
               onClick={() => setActiveTab("dashboard")}
             >
               <motion.div
-                variants={activeTab === "dashboard" ? pulseAnimation : {}}
+                variants={pulseAnimation}
                 animate={activeTab === "dashboard" ? "pulse" : ""}
               >
                 <Home
@@ -367,7 +365,7 @@ function AppHeader() {
 
             <Link
               href="/designs"
-              className={`flex items-center px-4 py-2 rounded-lg transition-all duration-300 ${
+              className={`flex items-center px-4 py-2 rounded-lg transition-all duration-300 relative ${
                 activeTab === "designs"
                   ? "bg-gradient-to-r from-purple-200 to-fuchsia-200 text-purple-800 font-medium shadow-sm"
                   : "hover:bg-purple-50 text-gray-700 hover:scale-105"
@@ -375,7 +373,7 @@ function AppHeader() {
               onClick={() => setActiveTab("designs")}
             >
               <motion.div
-                variants={activeTab === "designs" ? pulseAnimation : {}}
+                variants={pulseAnimation}
                 animate={activeTab === "designs" ? "pulse" : ""}
               >
                 <PenTool
@@ -399,7 +397,7 @@ function AppHeader() {
 
             <Link
               href="/credits"
-              className={`flex items-center px-4 py-2 rounded-lg transition-all duration-300 ${
+              className={`flex items-center px-4 py-2 rounded-lg transition-all duration-300 relative ${
                 activeTab === "credits"
                   ? "bg-gradient-to-r from-amber-200 to-yellow-200 text-amber-800 font-medium shadow-sm"
                   : "hover:bg-amber-50 text-gray-700 hover:scale-105"
@@ -407,7 +405,7 @@ function AppHeader() {
               onClick={() => setActiveTab("credits")}
             >
               <motion.div
-                variants={activeTab === "credits" ? pulseAnimation : {}}
+                variants={pulseAnimation}
                 animate={activeTab === "credits" ? "pulse" : ""}
               >
                 <CircleDollarSign
@@ -431,11 +429,10 @@ function AppHeader() {
           </div>
         </div>
       )}
-
       {/* Enhanced animated border with multi-layered rainbow gradient effect */}
       <div className="relative h-2">
         <motion.div
-          className="h-full "
+          className="h-full bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500"
           initial={{ scaleX: 0, opacity: 0 }}
           animate={{
             scaleX: 1,

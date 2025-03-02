@@ -13,7 +13,6 @@ import {
   CheckCircle,
   ArrowRight,
 } from "lucide-react";
-import Head from "next/head";
 
 declare global {
   interface Window {

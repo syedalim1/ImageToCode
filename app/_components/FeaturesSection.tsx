@@ -92,10 +92,9 @@ const floatingAnimation = {
   transition: {
     duration: 3,
     repeat: Infinity,
-    repeatType: "reverse",
+    ease: "easeInOut",
   },
 };
-
 export default function FeaturesSection() {
   return (
     <div id="features" className="py-24 relative overflow-hidden bg-white">

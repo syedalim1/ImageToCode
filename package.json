@@ -53,6 +53,7 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@types/react-toastify": "^4.0.2",
     "@vercel/postgres": "^0.10.0",
     "dotenv": "^16.4.7",
     "drizzle-kit": "^0.30.4",

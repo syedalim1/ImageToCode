@@ -120,7 +120,7 @@ const DescriptionInput: React.FC<DescriptionInputProps> = ({
               key={suggestion}
               onClick={() =>
                 setUserDescription(
-                  (prevDesc) => prevDesc + (prevDesc ? " " : "") + suggestion
+                  userDescription + (userDescription ? " " : "") + suggestion
                 )
               }
               className="px-3 py-1 bg-white bg-opacity-70 hover:bg-indigo-100 text-indigo-700 text-sm rounded-full border border-indigo-200 transition-colors"
