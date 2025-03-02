@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Authentication from "./Authentication";
-import { motion, AnimatePresence, Variants } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   X,
   Sparkles,
@@ -42,6 +42,7 @@ function AppHeader() {
   const [hoveredNavItem, setHoveredNavItem] = useState<string | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [notificationCount, setNotificationCount] = useState(3);
+  const [showConfetti, setShowConfetti] = useState(false);
 
   // Handle responsive behavior
   useEffect(() => {
@@ -74,15 +75,25 @@ function AppHeader() {
     return () => clearInterval(interval);
   }, []);
 
+  // Periodic confetti effect
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setShowConfetti(true);
+      setTimeout(() => setShowConfetti(false), 4000);
+    }, 15000);
+
+    return () => clearInterval(interval);
+  }, []);
+
   // Close sidebar when clicking outside on mobile
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      const target = event.target as Element;
+    const handleClickOutside = (event: Event) => {
+      const target = event.target;
       if (
         sidebarOpen &&
         target &&
-        !target.closest(".mobile-sidebar") &&
-        !target.closest(".menu-button")
+        !(target as HTMLElement).closest(".mobile-sidebar") &&
+        !(target as HTMLElement).closest(".menu-button")
       ) {
         setSidebarOpen(false);
       }
@@ -104,9 +115,9 @@ function AppHeader() {
     pulse: {
       scale: [1, 1.2, 1],
       transition: {
-        duration: 1,
+        duration: 0.5,
         repeat: Infinity,
-        repeatType: "loop" as const,
+        repeatType: "loop", // Change this to one of the allowed values: "reverse", "loop", "mirror"
       },
     },
   };
@@ -114,16 +125,11 @@ function AppHeader() {
   const zapAnimation = {
     pulse: {
       scale: [1, 1.2, 1],
-      rotate: [0, 10, -5, 0],
-      filter: [
-        "drop-shadow(0 0 2px #4f46e5)",
-        "drop-shadow(0 0 8px #4f46e5)",
-        "drop-shadow(0 0 2px #4f46e5)",
-      ],
+      rotate: [0, 10, 0],
+      filter: ["blur(0)", "blur(2px)", "blur(0)"],
       transition: {
-        duration: 3,
+        duration: 0.5,
         repeat: Infinity,
-        repeatType: "loop" as const,
       },
     },
   };
@@ -144,7 +150,29 @@ function AppHeader() {
       transition: {
         duration: 3,
         repeat: Infinity,
-        repeatType: "loop" as const,
+        repeatType: "loop",
+      },
+    },
+  };
+
+  const shimmerAnimation = {
+    shimmer: {
+      x: ["0%", "100%"],
+      transition: {
+        repeat: Infinity,
+        duration: 2,
+        ease: "easeInOut",
+      },
+    },
+  };
+
+  const bounceAnimation = {
+    bounce: {
+      y: [0, -10, 0],
+      transition: {
+        duration: 0.8,
+        repeat: Infinity,
+        repeatType: "loop",
       },
     },
   };
@@ -154,7 +182,7 @@ function AppHeader() {
       x: 0,
       opacity: 1,
       transition: {
-        type: "spring" as const,
+        type: "spring",
         stiffness: 300,
         damping: 30,
       },
@@ -163,7 +191,7 @@ function AppHeader() {
       x: "-100%",
       opacity: 0,
       transition: {
-        type: "spring" as const,
+        type: "spring",
         stiffness: 300,
         damping: 30,
       },
@@ -192,25 +220,46 @@ function AppHeader() {
       icon: Home,
       color: "from-blue-500 to-cyan-500",
     },
-
-    {
-      id: "credits",
-      label: "Pricing",
-      icon: CircleDollarSign,
-      color: "from-amber-500 to-orange-500",
-    },
-  ];
-
-  // Additional items for mobile sidebar
-  const sidebarItems = [
-    ...navItems,
     {
       id: "designs",
       label: "My Projects",
       icon: PenTool,
       color: "from-cyan-500 to-blue-500",
     },
+    {
+      id: "credits",
+      label: "Pricing",
+      icon: CircleDollarSign,
+      color: "from-amber-500 to-orange-500",
+    },
+    {
+      id: "profile",
+      label: "Settings",
+      icon: Settings,
+      color: "from-gray-600 to-gray-800",
+    },
+  ];
 
+  // Additional items for mobile sidebar
+  const sidebarItems = [
+    {
+      id: "dashboard",
+      label: "Home",
+      icon: Home,
+      color: "from-blue-500 to-cyan-500",
+    },
+    {
+      id: "designs",
+      label: "My Projects",
+      icon: PenTool,
+      color: "from-cyan-500 to-blue-500",
+    },
+    {
+      id: "credits",
+      label: "Pricing",
+      icon: CircleDollarSign,
+      color: "from-amber-500 to-orange-500",
+    },
     {
       id: "profile",
       label: "Settings",
@@ -297,12 +346,51 @@ function AppHeader() {
                   href={`/${item.id}`}
                   className={`flex items-center px-3 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${
                     activeTab === item.id
-                      ? "text-white bg-gradient-to-r " + item.color
+                      ? `text-white bg-gradient-to-r ${item.color}`
                       : "text-gray-700 hover:text-gray-900 hover:bg-gray-100/80"
-        kk          </nav>
+                  }`}
+                >
+                  <item.icon className="h-4 w-4 mr-2" />
+                  {item.label}
+                </Link>
+                {hoveredNavItem === item.id && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 5 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 5 }}
+                    className="absolute -bottom-1 left-0 right-0 h-0.5 bg-gradient-to-r from-pink-500 to-purple-500"
+                  />
+                )}
+              </motion.div>
+            ))}
+          </nav>
 
           {/* Right section with actions */}
           <div className="flex items-center space-x-2">
+            {/* Notification icon with counter */}
+            <motion.div
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="relative mr-1"
+            >
+              <Button
+                size="sm"
+                variant="ghost"
+                className="rounded-full p-2 relative"
+              >
+                <Bell className="h-5 w-5 text-gray-700" />
+                {notificationCount > 0 && (
+                  <motion.div
+                    variants={pulseAnimation}
+                    animate="pulse"
+                    className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full text-white text-xs flex items-center justify-center"
+                  >
+                    {notificationCount}
+                  </motion.div>
+                )}
+              </Button>
+            </motion.div>
+
             {/* Save button with success animation */}
             <motion.div
               whileHover={{ scale: 1.05 }}
@@ -328,6 +416,21 @@ function AppHeader() {
                     <span>Save</span>
                   </>
                 )}
+              </Button>
+            </motion.div>
+
+            {/* Pro upgrade button */}
+            <motion.div
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="hidden sm:block"
+            >
+              <Button
+                size="sm"
+                className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white border-none shadow-md flex items-center space-x-1.5"
+              >
+                <Crown className="w-4 h-4" />
+                <span>Pro</span>
               </Button>
             </motion.div>
 
@@ -421,6 +524,39 @@ function AppHeader() {
                     </motion.div>
                   ))}
                 </div>
+
+                {/* Pro upgrade section */}
+                <div className="p-4 mt-auto">
+                  <motion.div
+                    whileHover={{ scale: 1.02 }}
+                    className="bg-gradient-to-r from-yellow-400 to-orange-500 rounded-xl p-4 relative overflow-hidden"
+                  >
+                    <motion.div
+                      variants={shimmerAnimation}
+                      animate="shimmer"
+                      className="absolute inset-0 w-full h-full bg-white opacity-20 skew-x-12"
+                    />
+                    <div className="flex items-start space-x-3">
+                      <motion.div variants={bounceAnimation} animate="bounce">
+                        <Rocket className="w-8 h-8 text-white" />
+                      </motion.div>
+                      <div>
+                        <h3 className="text-white font-bold text-lg">
+                          Upgrade to Pro
+                        </h3>
+                        <p className="text-white/80 text-sm mt-1">
+                          Get unlimited access to premium features
+                        </p>
+                        <Button
+                          size="sm"
+                          className="mt-3 bg-white text-orange-500 hover:bg-white/90 border-none w-full"
+                        >
+                          Upgrade Now
+                        </Button>
+                      </div>
+                    </div>
+                  </motion.div>
+                </div>
               </div>
             </motion.div>
           </>
@@ -447,6 +583,65 @@ function AppHeader() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Confetti effect */}
+      <AnimatePresence>
+        {showConfetti && (
+          <>
+            {[...Array(15)].map((_, i) => (
+              <motion.div
+                key={i}
+                initial={{
+                  opacity: 1,
+                  y: -20,
+                  x: Math.random() * window.innerWidth,
+                }}
+                animate={{
+                  opacity: 0,
+                  y: window.innerHeight,
+                  x: Math.random() * window.innerWidth,
+                  rotate: Math.random() * 360,
+                }}
+                exit={{ opacity: 0 }}
+                transition={{
+                  duration: 4,
+                  ease: "easeOut",
+                  delay: Math.random() * 2,
+                }}
+                className="fixed top-0 z-20 pointer-events-none"
+                style={{
+                  width: Math.random() * 10 + 5 + "px",
+                  height: Math.random() * 10 + 5 + "px",
+                  backgroundColor: [
+                    `#FF5E5B`,
+                    `#39A0ED`,
+                    `#FACF5A`,
+                    `#3BC14A`,
+                    `#A76CF0`,
+                  ][Math.floor(Math.random() * 5)],
+                }}
+              />
+            ))}
+          </>
+        )}
+      </AnimatePresence>
+
+      {/* Feature spotlight - floating badge */}
+      <motion.div
+        initial={{ opacity: 0, y: 100 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 2, duration: 0.7 }}
+        className="fixed bottom-4 right-4 z-30 md:block hidden"
+      >
+        <motion.div
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          className="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-full py-2 px-4 text-white shadow-lg flex items-center space-x-2"
+        >
+          <Cpu className="h-5 w-5 text-white" />
+          <span className="text-sm font-medium">New AI Features!</span>
+        </motion.div>
+      </motion.div>
     </>
   );
 }

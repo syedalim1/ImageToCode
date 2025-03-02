@@ -26,11 +26,11 @@ IMPORTANT: Your generated code must be free of syntax errors. Pay special attent
 
 export async function POST(req: NextRequest) {
   try {
-    const { description, imageUrl, model, options, userEmail } =
+    const { description, imageUrl, model, options,  } =
       await req.json();
 
     // Validate required fields
-    if (!description || !imageUrl || !userEmail) {
+    if (!description || !imageUrl  ) {
       return NextResponse.json(
         {
           error: "Missing required fields: description, imageUrl, or userEmail",

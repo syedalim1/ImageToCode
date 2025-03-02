@@ -36,6 +36,8 @@ interface CodeContent {
 interface CodeRecord {
   id: number;
   uid: string;
+  Language: string;
+  mode: string;
   description: string;
   model: string;
   imageUrl: string;
