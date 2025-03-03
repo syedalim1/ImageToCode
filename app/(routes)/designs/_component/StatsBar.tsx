@@ -1,12 +1,13 @@
 import React from "react";
 import { ImageIcon, Code, Calendar, Filter } from "lucide-react";
+import { StatsBarProps } from "./types";
 
 function StatsBar({
   designsCount,
   generatedCodeCount,
   thisWeekCount,
   filteredResultsCount,
-}) {
+}: StatsBarProps) {
   return (
     <div className="bg-white/80 backdrop-blur-sm rounded-xl p-4 mb-8 shadow-md">
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">

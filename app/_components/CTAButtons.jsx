@@ -156,13 +156,14 @@ export default function CTAButtons() {
           <motion.span
             className="absolute -inset-px rounded-xl opacity-50"
             initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
             style={{
               background: "linear-gradient(45deg, #9333ea, #3b82f6, #9333ea)",
               backgroundSize: "200% 200%",
               filter: "blur(2px)",
+              backgroundPosition: "0% 0%"
             }}
             animate={{
+              opacity: 1,
               backgroundPosition: ["0% 0%", "100% 100%", "0% 0%"],
             }}
             transition={{ duration: 2, repeat: Infinity }}

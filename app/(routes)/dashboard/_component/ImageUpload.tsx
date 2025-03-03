@@ -15,10 +15,10 @@ import ProgressIndicator from "./ProgressIndicator";
 import LanguageSelector from "./LanguageSelector";
 
 const ImageUpload = () => {
-  const [selectedFile, setSelectedFile] = useState(null);
-  const [preview, setPreview] = useState(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [preview, setPreview] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<string | null>(null);
   const [userDescription, setUserDescription] = useState("");
   const [uploadedImageUrl, setUploadedImageUrl] = useState("");
   const { user } = useUser();
@@ -29,13 +29,13 @@ const ImageUpload = () => {
   const [activeTab, setActiveTab] = useState("upload");
   const [showSuccessIndicator, setShowSuccessIndicator] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
-  const containerRef = useRef(null);
+  const containerRef = useRef<HTMLDivElement | null>(null);
   const [selectedLanguage, setSelectedLanguage] = useState("react-tailwind");
   const [selectedTheme, setSelectedTheme] = useState("light");
   const [screenSize, setScreenSize] = useState("lg");
   const [showConfetti, setShowConfetti] = useState(false);
-  const [aiEnhancements, setAiEnhancements] = useState([]);
-  const [recentConversions, setRecentConversions] = useState([]);
+  const [aiEnhancements, setAiEnhancements] = useState<string[]>([]);
+  const [recentConversions, setRecentConversions] = useState<any[]>([]);
   const [previewMode, setPreviewMode] = useState("desktop");
 
   // Handle screen size detection
@@ -149,7 +149,7 @@ const ImageUpload = () => {
     }, 500);
   }, [uploadedImageUrl]);
 
-  const imagetoCodeConvert = async (imageUrl) => {
+  const imagetoCodeConvert = async (imageUrl: string): Promise<void> => {
     if (!imageUrl) {
       console.error("❌ Image URL is missing!");
       return;
@@ -215,7 +215,7 @@ const ImageUpload = () => {
     }
   };
 
-  const toggleOption = (option) => {
+  const toggleOption = (option: string): void => {
     setSelectedOptions((prev) =>
       prev.includes(option)
         ? prev.filter((item) => item !== option)
@@ -223,7 +223,7 @@ const ImageUpload = () => {
     );
   };
 
-  const toggleAIEnhancement = (enhancement) => {
+  const toggleAIEnhancement = (enhancement: string): void => {
     setAiEnhancements((prev) =>
       prev.includes(enhancement)
         ? prev.filter((item) => item !== enhancement)

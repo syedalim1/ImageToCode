@@ -1,9 +1,22 @@
 import React from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
+import { DesignListItemProps } from "./types";
 
-function DesignListItem({ design, index }) {
-  const formatDate = (dateString) => {
+interface Design {
+  id: number;
+  uid: string;
+  model: string;
+  imageUrl: string;
+  code: { content: string };
+  description: string | null;
+  email: string | null;
+  createdAt: string;
+  options: string[];
+}
+
+function DesignListItem({ design, index }: DesignListItemProps) {
+  const formatDate = (dateString: string): string => {
     try {
       const date = new Date(dateString);
       return date.toLocaleDateString("en-US", {

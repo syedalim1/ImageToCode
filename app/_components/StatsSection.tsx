@@ -11,7 +11,19 @@ import {
   ClockIcon,
 } from "@heroicons/react/24/outline";
 
-const stats = [
+interface Stat {
+  value: string;
+  label: string;
+  icon: React.ElementType;
+  color: string;
+  shadow: string;
+}
+
+interface CountUpState {
+  [key: string]: number;
+}
+
+const stats: Stat[] = [
   {
     value: "10M+",
     label: "Lines of Code Generated",
@@ -57,12 +69,14 @@ const stats = [
 ];
 
 export default function EnhancedStatsSection() {
-  const [countUp, setCountUp] = useState({});
+  const [countUp, setCountUp] = useState<CountUpState>({});
   const controls = useAnimation();
 
   // Counter animation for numbers
   useEffect(() => {
-    const newCountUp = {};
+    const newCountUp: CountUpState = {};
+    const timers: NodeJS.Timeout[] = [];
+
     stats.forEach((stat) => {
       const numericValue = parseInt(stat.value.replace(/[^0-9]/g, ""));
       newCountUp[stat.label] = 0;
@@ -80,10 +94,14 @@ export default function EnhancedStatsSection() {
             setCountUp({ ...newCountUp });
           }
         }, 50);
+        timers.push(interval);
       }, 500);
-
-      return () => clearTimeout(timer);
+      timers.push(timer);
     });
+
+    return () => {
+      timers.forEach(clearTimeout);
+    };
   }, []);
 
   // Scroll animation trigger

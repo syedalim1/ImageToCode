@@ -2,8 +2,9 @@ import React from "react";
 import { Button } from "@/components/ui/button";
 import { RefreshCw } from "lucide-react";
 import { motion } from "framer-motion";
+import { ErrorStateProps } from "./types";
 
-function ErrorState({ error, retryFn }) {
+function ErrorState({ error, retryFn }: ErrorStateProps) {
   return (
     <div className="flex flex-col items-center justify-center h-screen gap-6 bg-gradient-to-r from-red-50 to-pink-50 p-8">
       <motion.div

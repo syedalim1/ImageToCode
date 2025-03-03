@@ -7,7 +7,12 @@ const nextConfig: NextConfig = {
   
   // Image optimization
   images: {
-    domains: ['randomuser.me', 'placehold.co'],
+    domains: [
+      'randomuser.me', 
+      'placehold.co',
+      'fonts.googleapis.com',
+      'fonts.gstatic.com'
+    ],
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
     formats: ['image/webp'],
@@ -17,7 +22,6 @@ const nextConfig: NextConfig = {
   compress: true,
 
   // Performance optimizations
-  swcMinify: true,
   reactStrictMode: true,
   poweredByHeader: false,
   
@@ -49,9 +53,6 @@ const nextConfig: NextConfig = {
   },
 };
 
-// Enable bundle analyzer in production
-const withBundleAnalyzerConfig = withBundleAnalyzer({
+export default withBundleAnalyzer({
   enabled: process.env.ANALYZE === 'true',
-});
-
-export default withBundleAnalyzerConfig(nextConfig);
+})(nextConfig);

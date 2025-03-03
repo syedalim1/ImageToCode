@@ -3,8 +3,9 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { ImageIcon } from "lucide-react";
 import { motion } from "framer-motion";
+import { EmptyStateProps } from "./types";
 
-function EmptyState({ hasSearchOrFilter }) {
+function EmptyState({ hasSearchOrFilter }: EmptyStateProps) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}

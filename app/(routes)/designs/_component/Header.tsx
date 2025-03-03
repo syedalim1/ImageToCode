@@ -2,6 +2,7 @@ import React from "react";
 import { Button } from "@/components/ui/button";
 import { Search, SortAsc, SortDesc, Grid, List, RefreshCw } from "lucide-react";
 import { motion } from "framer-motion";
+import { HeaderProps } from "./types";
 
 function Header({
   searchTerm,
@@ -15,7 +16,7 @@ function Header({
   uniqueModels,
   isRefreshing,
   handleRefresh,
-}) {
+}: HeaderProps) {
   return (
     <div className="relative overflow-hidden rounded-2xl mb-8 bg-gradient-to-r from-blue-600 to-purple-600 shadow-lg">
       <div className="absolute inset-0 overflow-hidden">
