@@ -110,7 +110,7 @@ function AppHeader() {
       transition: {
         duration: 0.5,
         repeat: Infinity,
-        repeatType: "loop", // Change this to one of the allowed values: "reverse", "loop", "mirror"
+        repeatType: "loop" as const,
       },
     },
   };
@@ -123,6 +123,7 @@ function AppHeader() {
       transition: {
         duration: 0.5,
         repeat: Infinity,
+        repeatType: "loop" as const,
       },
     },
   };
@@ -143,7 +144,7 @@ function AppHeader() {
       transition: {
         duration: 3,
         repeat: Infinity,
-        repeatType: "loop",
+        repeatType: "loop" as const,
       },
     },
   };
@@ -276,7 +277,7 @@ function AppHeader() {
           }`}
       >
         {/* Decorative elements - top rainbow line with animation */}
-        <div className="h-1.5 w-full bg-gradient-to-r from-pink-500 via-yellow-500 via-green-500 via-blue-500 to-purple-500 relative overflow-hidden">
+        <div className="h-1.5 w-full bg-gradient-to-r from-pink-500 via-blue-500 to-purple-500 relative overflow-hidden">
           <motion.div
             className="absolute inset-0 bg-white opacity-30"
             animate={{

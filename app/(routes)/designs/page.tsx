@@ -32,9 +32,10 @@ interface Design {
   model: string;
   imageUrl: string;
   code: { content: string };
-  description: string;
+  description: string | null;
+  email: string | null;
   createdAt: string;
-  options: Record<string, any>;
+  options: string[];
 }
 
 interface DesignsGridProps {
@@ -67,7 +68,7 @@ function DesignsPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [viewMode, setViewMode] = useState("grid");
   const [sortOrder, setSortOrder] = useState("desc");
-  const [filterModel, setFilterModel] = useState(null);
+  const [filterModel, setFilterModel] = useState<string | null>(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
 
@@ -78,21 +79,17 @@ function DesignsPage() {
     try {
       setLoading(true);
       setError("");
-      if (user && user.id) {
-        const result = await db
-          .select()
-          .from(imagetocodeTable)
-          .where(
-            eq(
-              imagetocodeTable.email,
-              user.primaryEmailAddress?.emailAddress ?? ""
-            )
-          )
-          .orderBy(desc(imagetocodeTable.uid));
 
-        // Add some sample designs for demonstration if none exist
+      const result = await db
+        .select()
+        .from(imagetocodeTable)
+        .orderBy(desc(imagetocodeTable.createdAt))
+        .limit(50);
+
+      if (result) {
         if (result.length === 0) {
-          const sampleDesigns = [
+          // Sample designs for empty state
+          const sampleDesigns: Design[] = [
             {
               id: 1,
               uid: "sample-1",
@@ -101,8 +98,9 @@ function DesignsPage() {
                 "https://placehold.co/600x400/5271ff/ffffff?text=Sample+Design+1",
               code: { content: "<div>Sample code</div>" },
               description: "Sample Login Page",
+              email: null,
               createdAt: new Date().toISOString(),
-              options: {},
+              options: [],
             },
             {
               id: 2,
@@ -112,8 +110,9 @@ function DesignsPage() {
                 "https://placehold.co/600x400/ff5271/ffffff?text=Sample+Design+2",
               code: { content: "<div>Sample code</div>" },
               description: "Sample Dashboard",
-              createdAt: "2025-02-25T00:00:00.000Z", // 1 day ago
-              options: {},
+              email: null,
+              createdAt: "2025-02-25T00:00:00.000Z",
+              options: [],
             },
             {
               id: 3,
@@ -123,13 +122,26 @@ function DesignsPage() {
                 "https://placehold.co/600x400/52ff71/ffffff?text=Sample+Design+3",
               code: { content: "<div>Sample code</div>" },
               description: "Sample Product Page",
-              createdAt: "2025-02-24T00:00:00.000Z", // 2 days ago
-              options: {},
+              email: null,
+              createdAt: "2025-02-24T00:00:00.000Z",
+              options: [],
             },
           ];
           setDesigns(sampleDesigns);
         } else {
-          const validDesigns = result.filter((design) => design.code != null);
+          const validDesigns = result
+            .filter((design): design is Design => {
+              if (!design.code || typeof design.code !== 'object') return false;
+              const code = design.code as { content?: string };
+              return typeof code.content === 'string';
+            })
+            .map(design => ({
+              ...design,
+              code: typeof design.code === 'string' 
+                ? { content: design.code }
+                : design.code as { content: string },
+              options: Array.isArray(design.options) ? design.options : []
+            }));
           setDesigns(validDesigns);
         }
       }
@@ -188,7 +200,7 @@ function DesignsPage() {
   }));
 
   const weeklyData = Array(7)
-    .fill()
+    .fill(0)
     .map((_, i) => {
       const d = new Date();
       d.setDate(d.getDate() - i);
@@ -198,11 +210,10 @@ function DesignsPage() {
         name: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"][d.getDay()],
         count: designs.filter((design) => {
           const designDate = parseDate(design.createdAt);
-          return designDate ? designDate.toISOString().split("T")[0] === dateStr : false;
+          return designDate && designDate.toISOString().split("T")[0] === dateStr;
         }).length,
       };
-    })
-    .reverse();
+    });
 
   if (loading) {
     return <LoadingState />;
