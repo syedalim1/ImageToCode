@@ -10,7 +10,7 @@ import HeroBadge from "./HeroBadge";
 import HeroDescription from "./HeroDescription";
 import CTAButtons from "./CTAButtons";
 import DemoPreview from "./DemoPreview";
-import { codeExample, testimonials } from "./Constants";
+import { codeExample, testimonials } from "./Constants"; // Update the Constants import to use the correct path
 const AnimatedCodeSnippet = dynamic(() => import("./AnimatedCodeSnippet"), {
   ssr: false,
 });
