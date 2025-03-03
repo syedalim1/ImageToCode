@@ -1,10 +1,18 @@
 "use client";
 import { motion } from "framer-motion";
 import PricingCard from "./PricingCard";
+import {
+  Crown,
+  ArrowRight,
+  Zap,
+  Shield,
+  Clock,
+  Sparkles,
+  Star,
+  Award,
+} from "lucide-react";
 import Constants from "@/data/Constants";
-import { Sparkles, Star, Award, Crown, Check, ArrowRight } from "lucide-react";
-
-const pricingPlans = Constants.CREDIT_COSTS.PRICING_PLANS.map(
+export const pricingPlans = Constants.CREDIT_COSTS.PRICING_PLANS.map(
   (plan, index) => ({
     title:
       index === 0
@@ -21,7 +29,7 @@ const pricingPlans = Constants.CREDIT_COSTS.PRICING_PLANS.map(
       Boolean
     ),
     popular: index === 1,
-    cta: "Buy Now",
+    cta: index === 3 ? "Contact Sales" : "Get Started",
     save:
       index === 1
         ? "SAVE 17%"
@@ -93,77 +101,101 @@ const floatingAnimation = {
   },
 };
 
+// Array of colorful shapes for enhanced background
+const colorfulShapes = [
+  { color: "from-pink-300 to-purple-400", size: "w-64 h-64", blur: "blur-3xl" },
+  { color: "from-blue-300 to-cyan-400", size: "w-72 h-72", blur: "blur-3xl" },
+  {
+    color: "from-yellow-300 to-orange-400",
+    size: "w-56 h-56",
+    blur: "blur-3xl",
+  },
+  {
+    color: "from-green-300 to-emerald-400",
+    size: "w-48 h-48",
+    blur: "blur-2xl",
+  },
+  {
+    color: "from-purple-300 to-indigo-400",
+    size: "w-60 h-60",
+    blur: "blur-3xl",
+  },
+  { color: "from-rose-300 to-red-400", size: "w-40 h-40", blur: "blur-2xl" },
+];
+
 export default function PricingSection() {
   return (
     <div id="pricing" className="py-24 relative overflow-hidden">
-      {/* Animated background with decorative elements */}
-      <div className="absolute inset-0 bg-gradient-to-b from-white via-purple-50 to-blue-50 z-0" />
+      {/* Enhanced animated background with more colorful elements */}
+      <div className="absolute inset-0 bg-gradient-to-b from-white via-purple-50 to-blue-50 dark:from-gray-900 dark:via-purple-950 dark:to-blue-950 z-0">
+        {/* Add animated mesh gradient */}
+        <div className="absolute inset-0 opacity-30 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-purple-300 via-blue-200 to-transparent" />
+      </div>
 
-      {/* Decorative floating elements */}
-      <motion.div
-        className="absolute top-0 right-1/4 w-96 h-96 rounded-full bg-gradient-to-r from-pink-200 to-purple-200 opacity-20 blur-3xl"
-        animate={{
-          y: [-20, 20, -20],
-          x: [10, -10, 10],
-          scale: [1, 1.1, 1],
-        }}
-        transition={{ repeat: Infinity, duration: 20, ease: "easeInOut" }}
-      />
-
-      <motion.div
-        className="absolute bottom-20 left-1/4 w-80 h-80 rounded-full bg-gradient-to-r from-blue-200 to-cyan-200 opacity-20 blur-3xl"
-        animate={{
-          y: [20, -20, 20],
-          x: [-15, 15, -15],
-          scale: [1.1, 1, 1.1],
-        }}
-        transition={{
-          repeat: Infinity,
-          duration: 18,
-          ease: "easeInOut",
-          delay: 2,
-        }}
-      />
-
-      <motion.div
-        className="absolute top-1/3 left-10 w-64 h-64 rounded-full bg-gradient-to-r from-yellow-200 to-orange-200 opacity-10 blur-3xl"
-        animate={{
-          y: [-30, 30, -30],
-          x: [-10, 10, -10],
-          scale: [1, 1.2, 1],
-        }}
-        transition={{
-          repeat: Infinity,
-          duration: 25,
-          ease: "easeInOut",
-          delay: 5,
-        }}
-      />
-
-      {/* Small decorative shapes */}
-      {[...Array(6)].map((_, i) => (
+      {/* Enhanced decorative floating elements */}
+      {colorfulShapes.map((shape, i) => (
         <motion.div
           key={i}
+          className={`absolute rounded-full bg-gradient-to-r ${shape.color} opacity-20 ${shape.blur}`}
+          style={{
+            top: `${10 + Math.random() * 80}%`,
+            left: `${5 + Math.random() * 90}%`,
+            transform: `rotate(${Math.random() * 360}deg)`,
+          }}
+          animate={{
+            y: [
+              i % 2 === 0 ? -30 : 30,
+              i % 2 === 0 ? 30 : -30,
+              i % 2 === 0 ? -30 : 30,
+            ],
+            x: [
+              i % 3 === 0 ? -20 : 20,
+              i % 3 === 0 ? 20 : -20,
+              i % 3 === 0 ? -20 : 20,
+            ],
+            scale: [1, 1.1 + Math.random() * 0.2, 1],
+            rotate: [0, 5, 0, -5, 0],
+          }}
+          transition={{
+            repeat: Infinity,
+            duration: 15 + Math.random() * 15,
+            ease: "easeInOut",
+            delay: Math.random() * 5,
+          }}
+        />
+      ))}
+
+      {/* Small animated particles */}
+      {[...Array(12)].map((_, i) => (
+        <motion.div
+          key={`particle-${i}`}
           className={`absolute w-2 h-2 rounded-full bg-gradient-to-r ${
-            i % 3 === 0
+            i % 6 === 0
               ? "from-purple-400 to-pink-400"
-              : i % 3 === 1
+              : i % 6 === 1
               ? "from-blue-400 to-cyan-400"
-              : "from-indigo-400 to-blue-400"
+              : i % 6 === 2
+              ? "from-indigo-400 to-blue-400"
+              : i % 6 === 3
+              ? "from-green-400 to-teal-400"
+              : i % 6 === 4
+              ? "from-yellow-400 to-orange-400"
+              : "from-rose-400 to-red-400"
           }`}
           style={{
-            top: `${20 + Math.random() * 70}%`,
+            top: `${5 + Math.random() * 90}%`,
             left: `${5 + Math.random() * 90}%`,
           }}
           animate={{
-            y: [-15, 15, -15],
-            opacity: [0.7, 1, 0.7],
+            y: [-20, 20, -20],
+            x: [-20, 20, -20],
+            opacity: [0.4, 0.8, 0.4],
             scale: [1, 1.5, 1],
           }}
           transition={{
             repeat: Infinity,
-            duration: 3 + Math.random() * 5,
-            delay: Math.random() * 2,
+            duration: 5 + Math.random() * 10,
+            delay: Math.random() * 5,
           }}
         />
       ))}
@@ -172,11 +204,11 @@ export default function PricingSection() {
         <motion.div
           initial="hidden"
           whileInView="visible"
-          viewport={{ once: true }}
+          viewport={{ once: true, margin: "-100px" }}
           variants={fadeInScale}
           className="text-center mb-16"
         >
-          {/* Animated badge */}
+          {/* Enhanced animated badge */}
           <motion.div
             initial={{ opacity: 0, scale: 0.8 }}
             whileInView={{ opacity: 1, scale: 1 }}
@@ -184,10 +216,10 @@ export default function PricingSection() {
             transition={{ duration: 0.6 }}
             className="inline-block mb-3"
           >
-            <div className="bg-gradient-to-r from-purple-600 to-blue-500 p-0.5 rounded-full transform rotate-1 shadow-lg">
-              <div className="bg-white bg-opacity-95 rounded-full px-4 py-1.5 transform -rotate-1">
-                <span className="text-sm font-bold bg-gradient-to-r from-purple-600 to-blue-500 bg-clip-text text-transparent uppercase tracking-wider">
-                  Pricing Options
+            <div className="bg-gradient-to-r from-purple-600 via-pink-500 to-blue-500 p-0.5 rounded-full transform rotate-1 shadow-lg">
+              <div className="bg-white dark:bg-gray-800 bg-opacity-95 rounded-full px-6 py-2 transform -rotate-1">
+                <span className="text-sm font-bold bg-gradient-to-r from-purple-600 via-fuchsia-500 to-blue-500 bg-clip-text text-transparent uppercase tracking-wider flex items-center">
+                  <Zap className="w-4 h-4 mr-2 inline-block" /> Pricing Options
                 </span>
               </div>
             </div>
@@ -198,7 +230,7 @@ export default function PricingSection() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.7, delay: 0.2 }}
-            className="mt-4 text-5xl font-extrabold bg-gradient-to-r from-purple-600 via-fuchsia-500 to-blue-600 bg-clip-text text-transparent"
+            className="mt-4 text-4xl sm:text-5xl md:text-6xl font-extrabold bg-gradient-to-r from-purple-600 via-fuchsia-500 to-blue-600 bg-clip-text text-transparent"
           >
             Choose Your Perfect Plan
           </motion.h2>
@@ -208,31 +240,46 @@ export default function PricingSection() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.7, delay: 0.4 }}
-            className="mt-4 text-xl text-gray-600 max-w-3xl mx-auto"
+            className="mt-4 text-lg sm:text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto"
           >
             Simple, transparent pricing that grows with your business needs
           </motion.p>
 
-          {/* Animated underline */}
+          {/* Enhanced animated underline */}
           <motion.div
-            className="h-1 w-24 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full mx-auto mt-6"
+            className="h-1.5 w-24 bg-gradient-to-r from-purple-500 via-pink-500 to-blue-500 rounded-full mx-auto mt-6 shadow-sm"
             initial={{ width: 0, opacity: 0 }}
-            whileInView={{ width: 100, opacity: 1 }}
+            whileInView={{ width: 120, opacity: 1 }}
             viewport={{ once: true }}
             transition={{ duration: 0.7, delay: 0.6 }}
           />
         </motion.div>
 
-        {/* Pricing cards container with staggered animation */}
+        {/* Pricing card filter tabs - new addition */}
         <motion.div
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 relative"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.7, delay: 0.5 }}
+          className="flex justify-center mb-10"
+        ></motion.div>
+
+        {/* Enhanced pricing cards container with staggered animation */}
+        <motion.div
+          className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 lg:gap-8 relative"
           variants={staggerContainer}
           initial="hidden"
           whileInView="visible"
-          viewport={{ once: true }}
+          viewport={{ once: true, margin: "-100px" }}
         >
-          {/* Decorative line connecting pricing cards */}
-          <div className="absolute top-1/2 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-purple-200 to-transparent hidden lg:block" />
+          {/* Enhanced decorative line connecting pricing cards */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 1.5, delay: 1 }}
+            className="absolute top-1/2 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-purple-300 to-transparent hidden xl:block"
+          />
 
           {pricingPlans.map((plan, index) => (
             <motion.div
@@ -242,6 +289,7 @@ export default function PricingSection() {
                 y: -10,
                 transition: { duration: 0.3 },
               }}
+              className={`${plan.popular ? "md:-mt-4 md:mb-4" : ""}`}
             >
               <PricingCard
                 title={plan.title}
@@ -259,7 +307,7 @@ export default function PricingSection() {
           ))}
         </motion.div>
 
-        {/* Additional promotional elements */}
+        {/* Enhanced trust and promotional section */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -267,26 +315,27 @@ export default function PricingSection() {
           transition={{ duration: 0.7, delay: 0.8 }}
           className="mt-20"
         >
-          {/* Testimonial/Trust indicators */}
-          <div className="bg-white bg-opacity-80 backdrop-blur-sm rounded-2xl shadow-xl border border-purple-100 overflow-hidden">
+          {/* Trust indicators */}
+          <div className="bg-white dark:bg-gray-800 bg-opacity-80 dark:bg-opacity-70 backdrop-blur-sm rounded-2xl shadow-xl border border-purple-100 dark:border-purple-900 overflow-hidden">
             <div className="p-8">
-              <div className="flex flex-wrap justify-center gap-4 mb-6">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
                 {[
-                  "Trusted by thousands",
-                  "Enterprise-ready",
-                  "Secure & Compliant",
-                  "24/7 Support",
-                ].map((text, i) => (
+                  { text: "Trusted by thousands", icon: Shield },
+                  { text: "Enterprise-ready", icon: Crown },
+                  { text: "Secure & Compliant", icon: Shield },
+                  { text: "24/7 Support", icon: Clock },
+                ].map((item, i) => (
                   <motion.div
                     key={i}
                     initial={{ opacity: 0, y: 10 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
                     transition={{ delay: 0.1 * i + 0.5 }}
-                    className="bg-gradient-to-r from-purple-50 to-blue-50 px-4 py-2 rounded-full border border-purple-100"
+                    className="bg-gradient-to-br from-purple-50 to-blue-50 dark:from-purple-900/40 dark:to-blue-900/40 p-4 rounded-xl border border-purple-100 dark:border-purple-800/50 flex flex-col items-center justify-center text-center"
                   >
-                    <span className="text-sm font-medium text-gray-700">
-                      {text}
+                    <item.icon className="w-6 h-6 mb-2 text-purple-600 dark:text-purple-400" />
+                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                      {item.text}
                     </span>
                   </motion.div>
                 ))}
@@ -299,28 +348,108 @@ export default function PricingSection() {
                 transition={{ delay: 1 }}
                 className="text-center"
               >
-                <h3 className="text-xl font-bold text-gray-800 mb-3">
+                <h3 className="text-xl md:text-2xl font-bold text-gray-800 dark:text-white mb-3">
                   Start your transformation today
                 </h3>
-                <p className="text-gray-600 mb-6">
-                  Join thousands of developers accelerating their workflow
+                <p className="text-gray-600 dark:text-gray-300 mb-6 max-w-2xl mx-auto">
+                  Join thousands of developers accelerating their workflow with
+                  our powerful image-to-code conversion tools
                 </p>
 
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="inline-flex items-center px-6 py-3 rounded-lg bg-gradient-to-r from-purple-600 to-blue-500 text-white font-bold shadow-lg shadow-purple-200"
-                >
-                  Get Started <ArrowRight className="ml-2 h-4 w-4" />
-                </motion.button>
+                <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    className="inline-flex items-center justify-center px-6 py-3 rounded-lg bg-gradient-to-r from-purple-600 to-blue-500 text-white font-bold shadow-lg shadow-purple-200 dark:shadow-purple-900/30"
+                  >
+                    Get Started <ArrowRight className="ml-2 h-4 w-4" />
+                  </motion.button>
+
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    className="inline-flex items-center justify-center px-6 py-3 rounded-lg border-2 border-purple-200 dark:border-purple-800 text-purple-700 dark:text-purple-300 font-bold bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm hover:bg-purple-50 dark:hover:bg-purple-900/30 transition"
+                  >
+                    Book a Demo
+                  </motion.button>
+                </div>
               </motion.div>
             </div>
 
-            {/* Bottom decorative gradient bar */}
-            <div className="h-1.5 bg-gradient-to-r from-purple-400 via-pink-500 to-blue-500" />
+            {/* Enhanced bottom decorative gradient bar */}
+            <div className="h-2 bg-gradient-to-r from-purple-400 via-pink-500 to-blue-500 bg-size-200 animate-gradient-x" />
           </div>
+
+          {/* New FAQ section */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.7, delay: 1 }}
+            className="mt-16 bg-white dark:bg-gray-800 bg-opacity-80 dark:bg-opacity-70 backdrop-blur-sm rounded-2xl shadow-xl border border-purple-100 dark:border-purple-900 p-8"
+          >
+            <h3 className="text-2xl font-bold text-center text-gray-800 dark:text-white mb-8">
+              Frequently Asked Questions
+            </h3>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+              {[
+                {
+                  q: "How do credits work?",
+                  a: "Each credit allows you to convert a certain number of designs to code. Credits are consumed on successful conversions.",
+                },
+                {
+                  q: "Can I upgrade my plan anytime?",
+                  a: "Yes, you can upgrade your plan at any time. The price difference will be prorated for the remainder of your billing cycle.",
+                },
+                {
+                  q: "Do credits expire?",
+                  a: "Credits are valid for 12 months from the date of purchase. Unused credits will expire after this period.",
+                },
+                {
+                  q: "Is there a refund policy?",
+                  a: "We offer a 14-day money-back guarantee. If you're not satisfied, contact our support team for a full refund.",
+                },
+              ].map((faq, i) => (
+                <motion.div
+                  key={i}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: 0.2 * i + 0.5 }}
+                  className="bg-purple-50 dark:bg-purple-900/20 rounded-xl p-6 border border-purple-100 dark:border-purple-800/50"
+                >
+                  <h4 className="font-bold text-gray-800 dark:text-white mb-2">
+                    {faq.q}
+                  </h4>
+                  <p className="text-gray-600 dark:text-gray-300">{faq.a}</p>
+                </motion.div>
+              ))}
+            </div>
+          </motion.div>
         </motion.div>
       </div>
+
+      {/* Add CSS for animated gradient */}
+      <style jsx global>{`
+        @keyframes gradient-x {
+          0% {
+            background-position: 0% 50%;
+          }
+          50% {
+            background-position: 100% 50%;
+          }
+          100% {
+            background-position: 0% 50%;
+          }
+        }
+        .animate-gradient-x {
+          animation: gradient-x 15s ease infinite;
+        }
+        .bg-size-200 {
+          background-size: 200% 200%;
+        }
+      `}</style>
     </div>
   );
 }

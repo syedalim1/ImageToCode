@@ -122,60 +122,7 @@ function Authentication() {
               <div className="absolute -inset-1 bg-gradient-to-r from-violet-400 via-fuchsia-400 to-pink-400 rounded-full blur opacity-70 -z-10 animate-pulse"></div>
             </motion.div>
 
-            {/* User tooltip */}
-            <AnimatePresence>
-              {showUserTooltip && (
-                <motion.div 
-                  className="absolute right-0 mt-2 w-64 rounded-xl bg-white shadow-xl border border-indigo-100 p-3 z-50"
-                  variants={tooltipVariants}
-                  initial="hidden"
-                  animate="visible"
-                  exit="hidden"
-                >
-                  <div className="absolute right-5 -top-2 w-4 h-4 bg-white border-t border-l border-indigo-100 transform rotate-45"></div>
-                  
-                  <div className="flex items-start mb-2">
-                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center mr-3">
-                      <span className="text-lg text-white font-bold">JD</span>
-                    </div>
-                    <div>
-                      <p className="font-semibold text-gray-800">John Doe</p>
-                      <p className="text-sm text-gray-500">john.doe@example.com</p>
-                    </div>
-                  </div>
-                  
-                  <div className="mb-3">
-                    <div className="flex items-center bg-gradient-to-r from-amber-100 to-orange-100 rounded-lg p-2">
-                      <Crown className="h-4 w-4 text-amber-500 mr-2" />
-                      <div>
-                        <p className="text-sm font-medium text-amber-800">Pro Membership</p>
-                        <p className="text-xs text-amber-700">Valid until March 2026</p>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div className="space-y-1.5 text-sm mb-3">
-                    <div className="flex items-center text-gray-700">
-                      <Check className="h-3.5 w-3.5 text-green-500 mr-2" />
-                      <span>Unlimited projects</span>
-                    </div>
-                    <div className="flex items-center text-gray-700">
-                      <Check className="h-3.5 w-3.5 text-green-500 mr-2" />
-                      <span>Advanced AI features</span>
-                    </div>
-                    <div className="flex items-center text-gray-700">
-                      <Check className="h-3.5 w-3.5 text-green-500 mr-2" />
-                      <span>Premium support</span>
-                    </div>
-                  </div>
-                  
-                  <div className="flex justify-between">
-                    <button className="text-xs text-gray-600 hover:text-gray-800">Account Settings</button>
-                    <button className="text-xs text-gray-600 hover:text-gray-800">Sign out</button>
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
+           
           </div>
         ) : null}
       </SignedIn>
@@ -301,24 +248,6 @@ function Authentication() {
         </div>
       </SignedOut>
 
-      {/* Floating element to connect with logged-in state */}
-      <AnimatePresence>
-        {isClient && showProBadge && (
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ 
-              opacity: 1, 
-              y: 0,
-              transition: { delay: 1, duration: 0.5 }
-            }}
-            exit={{ opacity: 0, y: -10 }}
-            className="absolute -bottom-8 right-2 flex items-center text-xs font-medium text-amber-700"
-          >
-            <Gift className="h-3 w-3 mr-1 text-amber-500" />
-            <span>2 free credits</span>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </div>
   );
 }

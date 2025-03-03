@@ -11,7 +11,6 @@ import {
 import { desc, eq } from "drizzle-orm";
 import { useParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
-import Image from "next/image";
 import Link from "next/link";
 
 interface Design {
@@ -27,7 +26,7 @@ interface Design {
   };
 }
 
-export default function Page() {
+function DesignPage() {
   const params = useParams();
   const uid = Array.isArray(params.uid) ? params.uid[0] : params.uid;
 
@@ -35,6 +34,7 @@ export default function Page() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [activeTab, setActiveTab] = useState<"preview" | "code">("preview");
+  const [zoomImage, setZoomImage] = useState(false);
 
   useEffect(() => {
     if (uid) {
@@ -81,15 +81,35 @@ export default function Page() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 dark:from-gray-900 dark:via-indigo-950 dark:to-purple-950">
+      {/* Animated background shapes */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
+        <div className="absolute -top-24 -left-24 w-96 h-96 bg-pink-400 dark:bg-pink-600 rounded-full mix-blend-multiply dark:mix-blend-overlay filter blur-3xl opacity-20 animate-blob"></div>
+        <div className="absolute top-96 -right-24 w-96 h-96 bg-yellow-400 dark:bg-yellow-600 rounded-full mix-blend-multiply dark:mix-blend-overlay filter blur-3xl opacity-20 animate-blob animation-delay-2000"></div>
+        <div className="absolute -bottom-24 left-96 w-96 h-96 bg-blue-400 dark:bg-blue-600 rounded-full mix-blend-multiply dark:mix-blend-overlay filter blur-3xl opacity-20 animate-blob animation-delay-4000"></div>
+      </div>
+
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header with breadcrumbs */}
         <div className="mb-8">
-          <nav className="flex items-center text-sm font-medium text-gray-500 dark:text-gray-400">
+          <nav className="flex items-center text-sm font-medium text-gray-600 dark:text-gray-300">
             <Link
               href="/"
-              className="hover:text-blue-600 dark:hover:text-blue-400"
+              className="flex items-center hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
             >
+              <svg
+                className="w-5 h-5 mr-1"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
+                />
+              </svg>
               Home
             </Link>
             <svg
@@ -105,8 +125,21 @@ export default function Page() {
             </svg>
             <Link
               href="/designs"
-              className="hover:text-blue-600 dark:hover:text-blue-400"
+              className="flex items-center hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
             >
+              <svg
+                className="w-5 h-5 mr-1"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
+                />
+              </svg>
               Designs
             </Link>
             <svg
@@ -120,80 +153,114 @@ export default function Page() {
                 clipRule="evenodd"
               />
             </svg>
-            <span className="text-gray-800 dark:text-gray-200">
+            <span className="text-gray-800 dark:text-gray-200 font-semibold">
               {design?.description || "Design Details"}
             </span>
           </nav>
         </div>
 
         {loading ? (
-          <div className="flex flex-col items-center justify-center min-h-[400px]">
-            <div className="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
-            <p className="mt-4 text-lg font-medium text-gray-700 dark:text-gray-300">
+          <div className="flex flex-col items-center justify-center min-h-[400px] bg-white/80 dark:bg-gray-800/80 rounded-xl shadow-xl backdrop-blur-sm">
+            <div className="relative w-20 h-20">
+              <div className="absolute inset-0 rounded-full border-4 border-indigo-200 dark:border-indigo-900 opacity-25"></div>
+              <div className="absolute inset-0 rounded-full border-4 border-t-indigo-500 animate-spin"></div>
+              <div className="absolute inset-2 rounded-full border-4 border-t-violet-500 animate-spin animation-delay-300"></div>
+              <div className="absolute inset-4 rounded-full border-4 border-t-purple-500 animate-spin animation-delay-600"></div>
+            </div>
+            <p className="mt-6 text-lg font-medium bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400 bg-clip-text text-transparent animate-pulse">
               Loading design...
             </p>
           </div>
         ) : error ? (
-          <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-6 text-center">
-            <div className="flex justify-center mb-4">
-              <svg
-                className="w-12 h-12 text-red-500"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
+          <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-xl shadow-xl overflow-hidden border-l-4 border-red-500">
+            <div className="p-6 text-center">
+              <div className="flex justify-center mb-4">
+                <div className="relative">
+                  <div className="w-16 h-16 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center">
+                    <svg
+                      className="w-10 h-10 text-red-500"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                      />
+                    </svg>
+                  </div>
+                  <div className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full animate-ping opacity-75"></div>
+                </div>
+              </div>
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">
+                Error Loading Design
+              </h2>
+              <p className="text-gray-600 dark:text-gray-300 mb-6">{error}</p>
+              <button
+                onClick={fetchDesign}
+                className="px-6 py-3 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white rounded-lg transition-all shadow-md hover:shadow-lg transform hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50"
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77-1.333.192 3, 1.732 3z"
-                />
-              </svg>
+                <span className="flex items-center justify-center">
+                  <svg
+                    className="w-5 h-5 mr-2"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                    />
+                  </svg>
+                  Try Again
+                </span>
+              </button>
             </div>
-            <h2 className="text-xl font-bold text-red-800 dark:text-red-200 mb-2">
-              Error Loading Design
-            </h2>
-            <p className="text-red-700 dark:text-red-300">{error}</p>
-            <button
-              onClick={fetchDesign}
-              className="mt-4 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-md transition-colors"
-            >
-              Try Again
-            </button>
           </div>
         ) : design ? (
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-xl overflow-hidden">
+          <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-xl shadow-xl overflow-hidden border border-gray-100 dark:border-gray-700 transition-all duration-300 hover:shadow-2xl">
             {/* Design header */}
-            <div className="relative bg-gradient-to-br from-blue-600 to-purple-600 p-6 text-white rounded-t-xl overflow-hidden">
-              {/* Subtle background animation */}
-              <div className="absolute inset-0 opacity-20">
+            <div className="relative bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600 p-8 text-white rounded-t-xl overflow-hidden">
+              {/* Animated background patterns */}
+              <div className="absolute inset-0 overflow-hidden opacity-20">
                 <svg
+                  className="absolute top-0 left-0 w-full h-full"
                   viewBox="0 0 100 100"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
+                  preserveAspectRatio="none"
                 >
-                  <path d="M0 0h100v100H0z" fill="url(#gradient)" />
                   <defs>
-                    <linearGradient
-                      id="gradient"
-                      x1="0%"
-                      y1="0%"
-                      x2="100%"
-                      y2="100%"
+                    <pattern
+                      id="grid"
+                      width="10"
+                      height="10"
+                      patternUnits="userSpaceOnUse"
                     >
-                      <stop offset="0%" stopColor="rgba(255, 255, 255, 0.1)" />
-                      <stop offset="100%" stopColor="rgba(255, 255, 255, 0)" />
-                    </linearGradient>
+                      <path
+                        d="M 10 0 L 0 0 0 10"
+                        fill="none"
+                        stroke="rgba(255,255,255,0.1)"
+                        strokeWidth="0.5"
+                      />
+                    </pattern>
                   </defs>
+                  <rect width="100" height="100" fill="url(#grid)" />
                 </svg>
+                <div className="absolute -bottom-24 right-0 w-64 h-64 bg-white opacity-10 rounded-full blur-3xl"></div>
+                <div className="absolute top-0 left-1/3 w-20 h-20 bg-yellow-300 opacity-20 rounded-full blur-xl animate-float"></div>
+                <div className="absolute bottom-0 right-1/4 w-32 h-32 bg-pink-300 opacity-20 rounded-full blur-xl animate-float animation-delay-2000"></div>
               </div>
-              <h1 className="text-3xl font-bold mb-2 relative z-10">
+
+              <h1 className="text-4xl font-extrabold mb-3 relative z-10 bg-clip-text text-transparent bg-gradient-to-r from-white to-purple-100">
                 {design.description || "Untitled Design"}
               </h1>
-              <div className="flex flex-wrap gap-4 text-sm relative z-10">
-                <div className="flex items-center">
+              <div className="flex flex-wrap gap-6 text-sm relative z-10 mt-4">
+                <div className="flex items-center bg-white/10 backdrop-blur-sm rounded-lg px-4 py-2">
                   <svg
-                    className="w-5 h-5 mr-1"
+                    className="w-5 h-5 mr-2 text-pink-300"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -207,9 +274,9 @@ export default function Page() {
                   </svg>
                   <span>Created: {formatDate(design.createdAt)}</span>
                 </div>
-                <div className="flex items-center">
+                <div className="flex items-center bg-white/10 backdrop-blur-sm rounded-lg px-4 py-2">
                   <svg
-                    className="w-5 h-5 mr-1"
+                    className="w-5 h-5 mr-2 text-yellow-300"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -223,9 +290,9 @@ export default function Page() {
                   </svg>
                   <span>Model: {design.model}</span>
                 </div>
-                <div className="flex items-center">
+                <div className="flex items-center bg-white/10 backdrop-blur-sm rounded-lg px-4 py-2">
                   <svg
-                    className="w-5 h-5 mr-1"
+                    className="w-5 h-5 mr-2 text-blue-300"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -243,26 +310,50 @@ export default function Page() {
             </div>
 
             {/* Tabs */}
-            <div className="border-b border-gray-200 dark:border-gray-700">
+            <div className="border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50">
               <div className="flex">
                 <button
                   onClick={() => setActiveTab("preview")}
-                  className={`px-6 py-3 text-sm font-medium ${
-                    activeTab === "preview"
-                      ? "border-b-2 border-blue-500 text-blue-600 dark:text-blue-400"
-                      : "text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
-                  }`}
+                  className={`px-8 py-4 text-sm font-medium flex items-center transition-all ${activeTab === "preview"
+                      ? "border-b-2 border-indigo-500 text-indigo-600 dark:text-indigo-400 bg-white dark:bg-gray-800"
+                      : "text-gray-600 hover:text-indigo-600 dark:text-gray-300 dark:hover:text-indigo-400 hover:bg-white/50 dark:hover:bg-gray-800/50"
+                    }`}
                 >
+                  <svg
+                    className="w-5 h-5 mr-2"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"
+                    />
+                  </svg>
                   Preview
                 </button>
                 <button
                   onClick={() => setActiveTab("code")}
-                  className={`px-6 py-3 text-sm font-medium ${
-                    activeTab === "code"
-                      ? "border-b-2 border-blue-500 text-blue-600 dark:text-blue-400"
-                      : "text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
-                  }`}
+                  className={`px-8 py-4 text-sm font-medium flex items-center transition-all ${activeTab === "code"
+                      ? "border-b-2 border-indigo-500 text-indigo-600 dark:text-indigo-400 bg-white dark:bg-gray-800"
+                      : "text-gray-600 hover:text-indigo-600 dark:text-gray-300 dark:hover:text-indigo-400 hover:bg-white/50 dark:hover:bg-gray-800/50"
+                    }`}
                 >
+                  <svg
+                    className="w-5 h-5 mr-2"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                    />
+                  </svg>
                   Code
                 </button>
               </div>
@@ -272,19 +363,67 @@ export default function Page() {
             {design.imageUrl && (
               <div className="p-6 bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700">
                 <div className="flex justify-between items-center mb-4">
-                  <h2 className="text-lg font-medium text-gray-900 dark:text-white">
+                  <h2 className="text-lg font-medium text-gray-900 dark:text-white flex items-center">
+                    <svg
+                      className="w-5 h-5 mr-2 text-purple-500"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                      />
+                    </svg>
                     Original Image
                   </h2>
-                  <a
-                    href={design.imageUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 text-sm font-medium"
-                  >
-                    View Full Size
-                  </a>
+                  <div className="flex space-x-2">
+                    <button
+                      onClick={() => setZoomImage(!zoomImage)}
+                      className="flex items-center text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300 text-sm font-medium bg-white dark:bg-gray-800 px-3 py-1 rounded-md border border-gray-200 dark:border-gray-700 transition-colors"
+                    >
+                      <svg
+                        className="w-4 h-4 mr-1"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d={zoomImage ? "M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM13 10H7" : "M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v6m3-3H7"}
+                        />
+                      </svg>
+                      {zoomImage ? "Shrink" : "Expand"}
+                    </button>
+                    <a
+                      href={design.imageUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300 text-sm font-medium bg-white dark:bg-gray-800 px-3 py-1 rounded-md border border-gray-200 dark:border-gray-700 transition-colors"
+                    >
+                      <svg
+                        className="w-4 h-4 mr-1"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                        />
+                      </svg>
+                      View Full Size
+                    </a>
+                  </div>
                 </div>
-                <div className="relative h-64 bg-gray-200 dark:bg-gray-800 rounded-lg overflow-hidden">
+                <div className={`relative ${zoomImage ? 'h-96 md:h-[500px]' : 'h-64'} transition-all duration-300 bg-white dark:bg-gray-800 rounded-lg overflow-hidden shadow-md border border-gray-100 dark:border-gray-700 group`}>
+                  <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 to-pink-500/10 dark:from-purple-500/5 dark:to-pink-500/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
                   <img
                     src={design.imageUrl}
                     alt={design.description || "Design image"}
@@ -301,7 +440,7 @@ export default function Page() {
                   externalResources: ["https://cdn.tailwindcss.com"],
                   classes: {
                     "sp-wrapper":
-                      "custom-wrapper rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700",
+                      "custom-wrapper rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700 shadow-lg",
                     "sp-layout": "custom-layout",
                     "sp-tab-button": "custom-tab",
                   },
@@ -352,53 +491,114 @@ export default function Page() {
             </div>
 
             {/* Actions */}
-            <div className="p-6 bg-gray-50 dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 flex flex-wrap gap-4 justify-end">
-              <Link
-                href={`/view-code/${design.uid}`}
-                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md transition-colors"
-              >
-                Edit Code
-              </Link>
-              <button
-                onClick={() => window.print()}
-                className="px-4 py-2 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-white rounded-md transition-colors"
-              >
-                Print / Export
-              </button>
+            <div className="p-6 bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-900/80 border-t border-gray-200 dark:border-gray-700 flex flex-wrap gap-4 justify-between items-center">
+              <div className="flex items-center">
+                <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse mr-2"></div>
+                <span className="text-sm text-gray-600 dark:text-gray-400">Last updated: {formatDate(design.createdAt)}</span>
+              </div>
+
+              <div className="flex flex-wrap gap-3">
+                <Link
+                  href={`/view-code/${design.uid}`}
+                  className="flex items-center px-5 py-2.5 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white rounded-lg transition-all shadow-md hover:shadow-lg transform hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-opacity-50"
+                >
+                  <svg
+                    className="w-5 h-5 mr-2"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                    />
+                  </svg>
+                  Edit Code
+                </Link>
+                <button
+                  onClick={() => window.print()}
+                  className="flex items-center px-5 py-2.5 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 rounded-lg transition-all shadow-sm hover:shadow border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700"
+                >
+                  <svg
+                    className="w-5 h-5 mr-2 text-gray-500 dark:text-gray-400"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2z"
+                    />
+                  </svg>
+                  Export
+                </button>
+              </div>
             </div>
           </div>
         ) : (
-          <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-6 text-center">
-            <div className="flex justify-center mb-4">
-              <svg
-                className="w-12 h-12 text-yellow-500"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
+          <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-xl shadow-xl overflow-hidden border-l-4 border-yellow-500">
+            <div className="p-8 text-center">
+              <div className="flex justify-center mb-6">
+                <div className="relative">
+                  <div className="w-16 h-16 bg-yellow-100 dark:bg-yellow-900/30 rounded-full flex items-center justify-center">
+                    <svg
+                      className="w-10 h-10 text-yellow-500"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                      />
+                    </svg>
+                  </div>
+                  <div className="absolute -top-1 -right-1 w-5 h-5 bg-yellow-500 rounded-full animate-ping opacity-75"></div>
+                </div>
+              </div>
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">
+                No Design Available
+              </h2>
+              <p className="text-gray-600 dark:text-gray-300 mb-6">
+                The requested design could not be found.
+              </p>
+              <Link
+                href="/designs"
+                className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-white rounded-lg transition-all shadow-md hover:shadow-lg transform hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-opacity-50"
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77-1.333.192 3 1.732 3z"
-                />
-              </svg>
+                <svg
+                  className="w-5 h-5 mr-2"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M11 17l-5-5m0 0l5-5m-5 5h12"
+                  />
+                </svg>
+                Return to Designs
+              </Link>
             </div>
-            <h2 className="text-xl font-bold text-yellow-800 dark:text-yellow-200 mb-2">
-              No Design Available
-            </h2>
-            <p className="text-yellow-700 dark:text-yellow-300">
-              The requested design could not be found.
-            </p>
-            <Link
-              href="/"
-              className="inline-block mt-4 px-4 py-2 bg-yellow-600 hover:bg-yellow-700 text-white rounded-md transition-colors"
-            >
-              Return to Home
-            </Link>
           </div>
         )}
       </div>
+    </div>
+  );
+}
+
+export default function Page() {
+  return (
+    <div>
+      <DesignPage />
     </div>
   );
 }

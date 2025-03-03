@@ -13,7 +13,6 @@ import {
   Star,
   Bookmark,
   Flame,
-  Save,
   Crown,
   Gift,
   Rocket,
@@ -38,7 +37,6 @@ function AppHeader() {
   const [showSparkles, setShowSparkles] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [activeTab, setActiveTab] = useState("dashboard");
-  const [saveSuccess, setSaveSuccess] = useState(false);
   const [hoveredNavItem, setHoveredNavItem] = useState<string | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [notificationCount, setNotificationCount] = useState(3);
@@ -103,12 +101,7 @@ function AppHeader() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [sidebarOpen]);
 
-  // Handle save functionality
-  const handleSave = () => {
-    // Simulate save operation
-    setSaveSuccess(true);
-    setTimeout(() => setSaveSuccess(false), 2000);
-  };
+
 
   // Animation variants
   const pulseAnimation = {
@@ -279,9 +272,8 @@ function AppHeader() {
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.5 }}
-        className={`sticky top-0 z-40 w-full transition-all duration-300 ${rainbowGradient} ${
-          scrolled ? "shadow-lg" : "shadow-md"
-        }`}
+        className={`sticky top-0 z-40 w-full transition-all duration-300 ${rainbowGradient} ${scrolled ? "shadow-lg" : "shadow-md"
+          }`}
       >
         {/* Decorative elements - top rainbow line with animation */}
         <div className="h-1.5 w-full bg-gradient-to-r from-pink-500 via-yellow-500 via-green-500 via-blue-500 to-purple-500 relative overflow-hidden">
@@ -319,15 +311,17 @@ function AppHeader() {
               animate={{ opacity: 1 }}
               className="relative"
             >
-              <div className="text-xl font-bold bg-gradient-to-r from-pink-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent flex items-center">
-                <motion.div variants={zapAnimation} animate="pulse">
-                  <Image className="h-6 w-6 mr-1.5 text-purple-600 drop-shadow-md" />
-                </motion.div>
-                <span className="hidden sm:inline">ImageToCode</span>
-                <span className="sm:hidden">I2C</span>
-              </div>
-              <div className="absolute -inset-1 bg-purple-400/30 rounded-full blur-xl -z-10"></div>
-              <div className="absolute -inset-3 bg-blue-400/20 rounded-full blur-2xl -z-10 animate-pulse"></div>
+              <Link href="/" className="flex items-center">
+                <div className="text-xl font-bold bg-gradient-to-r from-pink-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent flex items-center">
+                  <motion.div variants={zapAnimation} animate="pulse">
+                    <Image className="h-6 w-6 mr-1.5 text-purple-600 drop-shadow-md" />
+                  </motion.div>
+                  <span className="hidden sm:inline">ImageToCode</span>
+                  <span className="sm:hidden">I2C</span>
+                </div>
+                <div className="absolute -inset-1 bg-purple-400/30 rounded-full blur-xl -z-10"></div>
+                <div className="absolute -inset-3 bg-blue-400/20 rounded-full blur-2xl -z-10 animate-pulse"></div>
+              </Link>
             </motion.div>
           </div>
 
@@ -344,11 +338,10 @@ function AppHeader() {
               >
                 <Link
                   href={`/${item.id}`}
-                  className={`flex items-center px-3 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${
-                    activeTab === item.id
+                  className={`flex items-center px-3 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${activeTab === item.id
                       ? `text-white bg-gradient-to-r ${item.color}`
                       : "text-gray-700 hover:text-gray-900 hover:bg-gray-100/80"
-                  }`}
+                    }`}
                 >
                   <item.icon className="h-4 w-4 mr-2" />
                   {item.label}
@@ -391,48 +384,7 @@ function AppHeader() {
               </Button>
             </motion.div>
 
-            {/* Save button with success animation */}
-            <motion.div
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              variants={saveAnimation}
-              animate={saveSuccess ? "success" : undefined}
-            >
-              <Button
-                onClick={handleSave}
-                size="sm"
-                className={`hidden sm:flex items-center space-x-1.5 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white border-none shadow-md ${
-                  saveSuccess ? "bg-green-500" : ""
-                }`}
-              >
-                {saveSuccess ? (
-                  <>
-                    <Sparkles className="w-4 h-4" />
-                    <span>Saved!</span>
-                  </>
-                ) : (
-                  <>
-                    <Save className="w-4 h-4" />
-                    <span>Save</span>
-                  </>
-                )}
-              </Button>
-            </motion.div>
 
-            {/* Pro upgrade button */}
-            <motion.div
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="hidden sm:block"
-            >
-              <Button
-                size="sm"
-                className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white border-none shadow-md flex items-center space-x-1.5"
-              >
-                <Crown className="w-4 h-4" />
-                <span>Pro</span>
-              </Button>
-            </motion.div>
 
             {/* Authentication component */}
             <Authentication />
@@ -465,12 +417,12 @@ function AppHeader() {
               <div className="flex flex-col h-full">
                 {/* Header */}
                 <div className="flex items-center justify-between p-4 border-b border-purple-700">
-                  <div className="flex items-center">
+                  <Link href="/" className="flex items-center">
                     <Image className="h-6 w-6 mr-2 text-white" />
                     <span className="text-xl font-bold text-white">
                       ImageToCode
                     </span>
-                  </div>
+                  </Link>
                   <motion.button
                     whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.9 }}
@@ -481,16 +433,7 @@ function AppHeader() {
                   </motion.button>
                 </div>
 
-                {/* User profile section */}
-                <div className="flex items-center space-x-3 p-4 border-b border-purple-700">
-                  <div className="w-12 h-12 rounded-full overflow-hidden bg-gradient-to-br from-pink-500 to-orange-400 flex items-center justify-center">
-                    <User className="h-6 w-6 text-white" />
-                  </div>
-                  <div>
-                    <p className="text-white font-medium">Welcome back!</p>
-                    <p className="text-purple-200 text-sm">Pro Member</p>
-                  </div>
-                </div>
+
 
                 {/* Menu items */}
                 <div className="flex-grow overflow-y-auto py-2 space-y-1">
@@ -503,10 +446,9 @@ function AppHeader() {
                       <Link
                         href={`/${item.id}`}
                         className={`flex items-center justify-between px-4 py-3 mx-2 rounded-lg text-sm font-medium 
-                          ${
-                            activeTab === item.id
-                              ? `bg-gradient-to-r ${item.color} text-white`
-                              : "text-white hover:bg-white/10"
+                          ${activeTab === item.id
+                            ? `bg-gradient-to-r ${item.color} text-white`
+                            : "text-white hover:bg-white/10"
                           }`}
                         onClick={() => {
                           setActiveTab(item.id);
@@ -525,38 +467,7 @@ function AppHeader() {
                   ))}
                 </div>
 
-                {/* Pro upgrade section */}
-                <div className="p-4 mt-auto">
-                  <motion.div
-                    whileHover={{ scale: 1.02 }}
-                    className="bg-gradient-to-r from-yellow-400 to-orange-500 rounded-xl p-4 relative overflow-hidden"
-                  >
-                    <motion.div
-                      variants={shimmerAnimation}
-                      animate="shimmer"
-                      className="absolute inset-0 w-full h-full bg-white opacity-20 skew-x-12"
-                    />
-                    <div className="flex items-start space-x-3">
-                      <motion.div variants={bounceAnimation} animate="bounce">
-                        <Rocket className="w-8 h-8 text-white" />
-                      </motion.div>
-                      <div>
-                        <h3 className="text-white font-bold text-lg">
-                          Upgrade to Pro
-                        </h3>
-                        <p className="text-white/80 text-sm mt-1">
-                          Get unlimited access to premium features
-                        </p>
-                        <Button
-                          size="sm"
-                          className="mt-3 bg-white text-orange-500 hover:bg-white/90 border-none w-full"
-                        >
-                          Upgrade Now
-                        </Button>
-                      </div>
-                    </div>
-                  </motion.div>
-                </div>
+
               </div>
             </motion.div>
           </>
