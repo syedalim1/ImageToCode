@@ -40,7 +40,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Select the best model for the task
-    const modelname = "google/gemini-2.0-flash-001";
+    const modelname = "google/gemini-2.0-flash-lite-preview-02-05:free";
 
     // Combine the main prompt with error prevention instructions and user description
     const des =
@@ -136,25 +136,38 @@ export async function POST(req: NextRequest) {
           }
 
           const data = await response.json();
-          
+
           // Extract the code content from the API response
-          if (data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content) {
+          if (
+            data.choices &&
+            data.choices[0] &&
+            data.choices[0].message &&
+            data.choices[0].message.content
+          ) {
             let codeContent = data.choices[0].message.content;
-            
+
             // Remove markdown code blocks if present
-            codeContent = codeContent.replace(/```javascript|```typescript|```jsx|```tsx|```/g, "").trim();
-            
+            codeContent = codeContent
+              .replace(/```javascript|```typescript|```jsx|```tsx|```/g, "")
+              .trim();
+
             // Stream the code content
             controller.enqueue(new TextEncoder().encode(codeContent));
           } else {
             // If we can't extract the content, return an error message
-            controller.enqueue(new TextEncoder().encode("Error: Unable to extract code from API response"));
+            controller.enqueue(
+              new TextEncoder().encode(
+                "Error: Unable to extract code from API response"
+              )
+            );
           }
-          
+
           controller.close();
         } catch (error) {
           console.error("Error in stream:", error);
-          controller.error(error instanceof Error ? error : new Error(String(error)));
+          controller.error(
+            error instanceof Error ? error : new Error(String(error))
+          );
         }
       },
     });

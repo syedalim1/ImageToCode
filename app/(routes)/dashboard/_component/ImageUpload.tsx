@@ -97,7 +97,7 @@ const ImageUpload = () => {
 
   // Handle upload
   const handleUpload = async () => {
-    if (!selectedFile) return;
+    if (!selectedFile || isUploading) return;
 
     setIsUploading(true);
     setError(null);
