@@ -31,11 +31,14 @@ const roboto = Roboto({
   fallback: ['system-ui', 'arial'],
 });
 
+export const viewport = {
+  themeColor: "#4F46E5",
+};
+
 export const metadata: Metadata = {
   title: "Image to Code - AI Powered Design to Code Conversion",
   description: "Transform your designs into production-ready code with AI",
   manifest: "/manifest.json",
-  themeColor: "#4F46E5",
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
@@ -48,7 +51,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <ClerkProvider>
+    <ClerkProvider 
+      publishableKey={process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY}
+    >
       <html lang="en" className="scroll-smooth">
         <head>
           {/* Resource hints */}

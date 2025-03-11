@@ -11,7 +11,7 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
   return (
     <>
       <PerformanceMonitor />
-      <div className="flex flex-col min-h-screen">
+      <div className="flex flex-col min-h-screen relative">
         {children}
       </div>
     </>
