@@ -84,11 +84,28 @@ function DesignsPage() {
       setLoading(true);
       setError("");
 
-      const result = await db
-        .select()
-        .from(imagetocodeTable)
-        .orderBy(desc(imagetocodeTable.createdAt))
-        .limit(50);
+      // Get the current user's email
+      const userEmail = user?.emailAddresses?.[0]?.emailAddress;
+
+      // BUG FIX: Only show designs belonging to the current user instead of all designs
+      // This addresses the issue where all designs were being shown to everyone
+      let result;
+      if (userEmail) {
+        // If user is logged in, fetch only their designs
+        result = await db
+          .select()
+          .from(imagetocodeTable)
+          .where(eq(imagetocodeTable.email, userEmail))
+          .orderBy(desc(imagetocodeTable.createdAt))
+          .limit(50);
+      } else {
+        // If no email (shouldn't happen if logged in), fetch with no email filter
+        result = await db
+          .select()
+          .from(imagetocodeTable)
+          .orderBy(desc(imagetocodeTable.createdAt))
+          .limit(50);
+      }
 
       if (result) {
         if (result.length === 0) {
