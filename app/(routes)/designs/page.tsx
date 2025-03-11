@@ -391,7 +391,7 @@ function DesignsPage() {
 
           {/* Designs Display */}
           {filteredAndSortedDesigns.length === 0 ? (
-            <EmptyState />
+            <EmptyState hasSearchOrFilter={!!(searchTerm || filterModel)} />
           ) : viewMode === "grid" ? (
             <DesignsGrid designs={filteredAndSortedDesigns} />
           ) : (
