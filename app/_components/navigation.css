@@ -1,0 +1,96 @@
+/* Transition styles for navigation */
+
+/* Base transition for page content */
+.page-transition-wrapper {
+  transition: opacity 200ms ease-in-out, transform 200ms ease-out;
+}
+
+/* Applied during navigation to improve perceived performance */
+.navigation-in-progress .page-transition-wrapper {
+  opacity: 0.8;
+  transform: translateY(8px);
+  pointer-events: none; /* Prevent interaction during navigation */
+}
+
+/* Define animations for content entering the page */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Animation classes for different elements */
+.fade-in {
+  animation: fadeIn 300ms ease-out forwards;
+}
+
+.scale-in {
+  animation: scaleIn 300ms ease-out forwards;
+}
+
+/* Stagger children animations */
+.stagger-children > * {
+  opacity: 0;
+  animation: fadeIn 300ms ease-out forwards;
+}
+
+.stagger-children > *:nth-child(1) {
+  animation-delay: 0ms;
+}
+.stagger-children > *:nth-child(2) {
+  animation-delay: 50ms;
+}
+.stagger-children > *:nth-child(3) {
+  animation-delay: 100ms;
+}
+.stagger-children > *:nth-child(4) {
+  animation-delay: 150ms;
+}
+.stagger-children > *:nth-child(5) {
+  animation-delay: 200ms;
+}
+.stagger-children > *:nth-child(n + 6) {
+  animation-delay: 250ms;
+}
+
+/* Performance optimizations */
+.hardware-accelerated {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  will-change: opacity, transform;
+}
+
+/* Loading indicator styles */
+.navigation-loader {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 3px;
+  width: 0%;
+  background: linear-gradient(to right, #4f46e5, #8b5cf6);
+  z-index: 9999;
+  transition: width 200ms ease-out;
+  opacity: 0;
+}
+
+.navigation-in-progress .navigation-loader {
+  opacity: 1;
+  width: 90%;
+  transition: width 8s cubic-bezier(0.1, 0.05, 0.2, 1);
+}
