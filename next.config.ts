@@ -18,66 +18,18 @@ const nextConfig: NextConfig = {
     formats: ["image/webp"],
   },
 
-  // Compression
+  // Basic configuration
   compress: true,
-
-  // Performance optimizations
   reactStrictMode: true,
   poweredByHeader: false,
-
-  // Improve page transitions
   pageExtensions: ["tsx", "ts", "jsx", "js"],
 
-  // Production optimizations
+  // Simplified experimental options
   experimental: {
-    optimizeCss: true,
     optimizePackageImports: ["framer-motion", "@clerk/nextjs"],
-    optimisticClientCache: true, // Enhance client-side transitions
     serverActions: {
       bodySizeLimit: "2mb",
     },
-    webVitalsAttribution: ["CLS", "LCP"], // Monitor core web vitals
-  },
-
-  // Webpack optimizations
-  webpack: (config, { dev, isServer }) => {
-    // Production optimizations
-    if (!dev && !isServer) {
-      // Enable tree shaking
-      config.optimization = {
-        ...config.optimization,
-        usedExports: true,
-        sideEffects: true,
-        minimize: true,
-        concatenateModules: true,
-      };
-
-      // Handle punycode deprecation
-      config.resolve.fallback = {
-        ...config.resolve.fallback,
-        punycode: false,
-      };
-
-      // Speed up builds and improve caching
-      if (config.cache) {
-        config.cache = {
-          ...config.cache,
-          type: "filesystem",
-          cacheDirectory: ".next/cache",
-          compression: false, // Faster at the cost of more disk space
-        };
-      }
-    }
-
-    return config;
-  },
-
-  // Faster redirects by returning HTTP headers for redirect instead of
-  // rendering a page which then redirects
-  redirects: async () => {
-    return [
-      // Add your redirects here
-    ];
   },
 
   // Add response headers for better performance

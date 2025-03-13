@@ -68,7 +68,6 @@
 .stagger-children > *:nth-child(n + 6) {
   animation-delay: 250ms;
 }
-
 /* Performance optimizations */
 .hardware-accelerated {
   transform: translateZ(0);

@@ -16,6 +16,7 @@ import {
   Star,
   Cpu,
   ArrowLeft,
+  RefreshCw,
 } from "lucide-react";
 
 // Components
@@ -70,6 +71,8 @@ const Page: React.FC = () => {
     quality: 0,
   });
   const [showFloatingButton, setShowFloatingButton] = useState(true);
+  const [isPaid, setIsPaid] = useState(false);
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
 
   // Calculate code statistics
   useEffect(() => {
@@ -334,6 +337,69 @@ const Page: React.FC = () => {
     return stars;
   };
 
+  // Function to handle payment request
+  const handlePaymentRequest = () => {
+    setShowPaymentModal(true);
+  };
+
+  // Function to process payment
+  const processPayment = async () => {
+    setLoading(true);
+    try {
+      // Call the payment API endpoint
+      const response = await axios.post("/api/payment/code-access", {
+        codeId: uid,
+      });
+
+      if (response.data.success) {
+        setIsPaid(true);
+        setShowPaymentModal(false);
+        setSuccess(
+          "Payment successful! You now have access to the source code."
+        );
+
+        // Store the access token in localStorage for persistence
+        localStorage.setItem(
+          `code_access_${uid}`,
+          JSON.stringify({
+            accessToken: response.data.accessToken,
+            expiresAt: response.data.expiresAt,
+          })
+        );
+      } else {
+        setError(response.data.message || "Payment failed. Please try again.");
+      }
+    } catch (err) {
+      handleError(err, "processing payment");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Check if user already has access to this code
+  useEffect(() => {
+    const checkExistingAccess = () => {
+      try {
+        const accessData = localStorage.getItem(`code_access_${uid}`);
+        if (accessData) {
+          const { expiresAt } = JSON.parse(accessData);
+
+          // Check if access is still valid
+          if (new Date(expiresAt) > new Date()) {
+            setIsPaid(true);
+          } else {
+            // Access has expired, remove it
+            localStorage.removeItem(`code_access_${uid}`);
+          }
+        }
+      } catch (error) {
+        console.error("Error checking access:", error);
+      }
+    };
+
+    checkExistingAccess();
+  }, [uid]);
+
   return (
     <div className="min-h-screen transition-colors duration-300">
       {/* Background pattern */}
@@ -365,6 +431,73 @@ const Page: React.FC = () => {
           >
             <BarChart2 className="h-6 w-6" />
           </motion.button>
+        )}
+      </AnimatePresence>
+
+      {/* Payment Modal */}
+      <AnimatePresence>
+        {showPaymentModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
+          >
+            <motion.div
+              initial={{ scale: 0.9, y: 20 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.9, y: 20 }}
+              className="bg-white dark:bg-gray-800 rounded-xl shadow-2xl p-6 max-w-md w-full"
+            >
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
+                Unlock Premium Code Access
+              </h2>
+              <p className="text-gray-600 dark:text-gray-300 mb-6">
+                Get access to the source code for this component. Download,
+                modify, and use it in your projects.
+              </p>
+
+              <div className="bg-gray-50 dark:bg-gray-700/50 p-4 rounded-lg mb-6">
+                <div className="flex justify-between mb-2">
+                  <span className="text-gray-600 dark:text-gray-300">
+                    Source code access
+                  </span>
+                  <span className="font-medium">$4.99</span>
+                </div>
+                <div className="flex justify-between mb-2">
+                  <span className="text-gray-600 dark:text-gray-300">
+                    Download rights
+                  </span>
+                  <span className="font-medium">Included</span>
+                </div>
+                <div className="border-t border-gray-200 dark:border-gray-600 my-2"></div>
+                <div className="flex justify-between font-bold">
+                  <span>Total</span>
+                  <span>$4.99</span>
+                </div>
+              </div>
+
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setShowPaymentModal(false)}
+                  className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-200 font-medium hover:bg-gray-50 dark:hover:bg-gray-700/50 transition"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={processPayment}
+                  disabled={loading}
+                  className="flex-1 px-4 py-2 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-lg text-white font-medium hover:from-blue-600 hover:to-indigo-700 transition flex items-center justify-center"
+                >
+                  {loading ? (
+                    <RefreshCw className="w-5 h-5 animate-spin" />
+                  ) : (
+                    <>Pay $4.99</>
+                  )}
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
         )}
       </AnimatePresence>
 
@@ -536,8 +669,8 @@ const Page: React.FC = () => {
                   <div className="mt-3 text-sm text-gray-500 dark:text-gray-400">
                     <p>
                       Generated with {record?.model || "AI"} on{" "}
-                      <ClientDate 
-                        date={record?.createdAt || Date.now()} 
+                      <ClientDate
+                        date={record?.createdAt || Date.now()}
                         format="local"
                         fallback="..."
                       />
@@ -559,6 +692,8 @@ const Page: React.FC = () => {
                     code={response}
                     onCodeChange={handleCodeChange}
                     isLoading={loading}
+                    isPaid={isPaid}
+                    onRequestPayment={handlePaymentRequest}
                   />
                 </motion.div>
               ) : (
@@ -624,7 +759,13 @@ const Page: React.FC = () => {
         >
           <p>Powered by advanced AI models to transform designs into code.</p>
           <p className="mt-1">
-            © <ClientDate date={new Date()} format="year" fallback={new Date().getFullYear().toString()} /> ImageToCode. All rights reserved.
+            ©{" "}
+            <ClientDate
+              date={new Date()}
+              format="year"
+              fallback={new Date().getFullYear().toString()}
+            />{" "}
+            ImageToCode. All rights reserved.
           </p>
         </motion.div>
       </div>
