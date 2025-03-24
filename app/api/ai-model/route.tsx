@@ -12,21 +12,13 @@ const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
 const SITE_NAME = process.env.SITE_NAME || "My Local App";
 
 // Additional instructions to prevent common syntax errors
-const ERROR_PREVENTION_PROMPT = `
-IMPORTANT: Your generated code must be free of syntax errors. Pay special attention to:
-1. All string literals must be properly terminated with matching quotes
-2. All JSX elements must be properly closed
-3. All curly braces, parentheses, and brackets must be properly balanced
-4. All className attributes must have properly formatted values
-5. All React components must have proper import and export statements
-6. Ensure all variable names are properly defined before use
-7. Double-check all template literals for proper syntax
-8. Return ONLY the code, not explanations or markdown formatting
-`;
 
-export async function POST(req: NextRequest) {
+export async function POST(
+  req: NextRequest,
+  { params }: { params: { uid: string } }
+) {
   try {
-    const { description, imageUrl, model, options, userEmail } =
+    const { description, imageUrl, mode, model, options, userEmail, language } =
       await req.json();
 
     // Validate required fields
@@ -40,15 +32,41 @@ export async function POST(req: NextRequest) {
     }
 
     // Select the best model for the task
-    const modelname = "google/gemini-2.0-flash-lite-preview-02-05:free";
+
+    let modelname;
+    if (mode === "normal") {
+      modelname = "google/gemini-2.0-pro-exp-02-05:free";
+    } else if (mode === "export") {
+      modelname = "google/gemini-2.0-pro-exp-02-05:free";
+    }
+    // best
+    // google/gemini-2.0-flash-001
 
     // Combine the main prompt with error prevention instructions and user description
+
     const des =
-      Constants.PROMPT +
-      ERROR_PREVENTION_PROMPT +
+      Constants.PROMPTFORNEXTJS +
+      Constants.ERROR_PREVENTION_PROMPTFORNEXTJS +
       description +
       "\n\n" +
       (options || "");
+
+    // else if (language == "react-tailwind") {
+    //   des =
+    //     Constants.PROMPTFORREACTJS +
+    //     Constants.ERROR_PREVENTION_PROMPTFORREACTJS +
+    //     description +
+    //     "\n\n" +
+    //     (options || "");
+    // }
+    // else if (language == "html-css") {
+    //   des =
+    //     Constants.PROMPTFORHTMLCSS +
+    //     Constants.ERROR_PREVENTION_PROMPTFORHTMLCSS +
+    //     description +
+    //     "\n\n" +
+    //     (options || "");
+    // }
 
     // Check if user has enough credits
     const user = await db
@@ -72,6 +90,14 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // Deduct 10 credits for generating a page
+    await db
+      .update(usersTable)
+      .set({
+        credits: currentCredits - 10,
+      })
+      .where(eq(usersTable.email, userEmail));
+
     // Verify API key exists
     if (!API_KEY) {
       console.error("OPENROUTER_API_KEY is missing from environment variables");
@@ -83,14 +109,6 @@ export async function POST(req: NextRequest) {
 
     // Log the selected model for debugging
     console.log(`Using model: ${modelname} for generation`);
-
-    // Deduct 10 credits for generating a page
-    await db
-      .update(usersTable)
-      .set({
-        credits: currentCredits - 10,
-      })
-      .where(eq(usersTable.email, userEmail));
 
     const payload = {
       model: modelname,
@@ -136,7 +154,9 @@ export async function POST(req: NextRequest) {
           }
 
           const data = await response.json();
-
+          console.log("====================================");
+          console.log(data, "   data");
+          console.log("====================================");
           // Extract the code content from the API response
           if (
             data.choices &&

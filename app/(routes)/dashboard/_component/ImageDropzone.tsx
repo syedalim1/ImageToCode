@@ -254,7 +254,7 @@ const ImageDropzone: React.FC<ImageDropzoneProps> = ({
 
               <motion.button
                 type="button"
-                onClick={open}
+               
                 className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors mb-6"
                 whileTap={{ scale: 0.97 }}
               >

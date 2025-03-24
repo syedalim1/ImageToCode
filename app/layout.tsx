@@ -56,26 +56,7 @@ export default function RootLayout({
     >
       <html lang="en" className="scroll-smooth">
         <head>
-          {/* Resource hints */}
-          <link
-            rel="preconnect"
-            href="https://fonts.googleapis.com"
-            crossOrigin="anonymous"
-          />
-          <link 
-            rel="preconnect" 
-            href="https://fonts.gstatic.com" 
-            crossOrigin="anonymous"
-          />
-          <link
-            rel="preconnect"
-            href="https://clerk.com"
-            crossOrigin="anonymous"
-          />
-          <link
-            rel="dns-prefetch"
-            href="https://clerk.com"
-          />
+       
           
           {/* Cache control */}
           <meta httpEquiv="Cache-Control" content="public, max-age=31536000, immutable" />

@@ -169,7 +169,6 @@ const ImageUpload = () => {
         mode: selectedMode,
         email: userEmail,
         options: selectedOptions,
-        aiEnhancements,
         theme: selectedTheme,
         createdAt: currentDate,
         model: "deepseek",
@@ -183,7 +182,6 @@ const ImageUpload = () => {
         mode: selectedMode,
         email: userEmail,
         options: selectedOptions,
-        aiEnhancements,
         theme: selectedTheme,
         createdAt: currentDate,
         model: "deepseek",
@@ -223,13 +221,6 @@ const ImageUpload = () => {
     );
   };
 
-  const toggleAIEnhancement = (enhancement: string): void => {
-    setAiEnhancements((prev) =>
-      prev.includes(enhancement)
-        ? prev.filter((item) => item !== enhancement)
-        : [...prev, enhancement]
-    );
-  };
 
   // Check if we can proceed to next step
   const canProceed = () => {
@@ -383,12 +374,12 @@ const ImageUpload = () => {
 
           {/* Options Area */}
           {activeTab === "options" && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
-              {/* Left Column */}
+            <div className="">
+             
               <div className="space-y-4">
                 {/* Language Selector */}
                 <motion.div
-                  className={`p-4 rounded-lg shadow-sm ${
+                  className={`p-4 rounded-lg shadow-sm w-full h-full ${
                     selectedTheme === "dark"
                       ? "bg-gray-800 border-gray-700"
                       : "bg-white border border-gray-100"
@@ -686,9 +677,9 @@ const ImageUpload = () => {
           >
             <div className="flex flex-col items-center text-center">
               <div className="relative w-20 h-20 mb-6">
-                <div className="absolute inset-0 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
-                <div className="absolute inset-2 border-4 border-purple-500 border-b-transparent rounded-full animate-spin animation-delay-150"></div>
-                <div className="absolute inset-4 border-4 border-teal-500 border-l-transparent rounded-full animate-spin animation-delay-300"></div>
+                <div className="absolute inset-0 border-4 border-blue-500 border-t-transparent rounded-full"></div>
+                <div className="absolute inset-2 border-4 border-purple-500 border-b-transparent rounded-full"></div>
+                <div className="absolute inset-4 border-4 border-teal-500 border-l-transparent rounded-full"></div>
               </div>
 
               <h3

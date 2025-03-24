@@ -24,7 +24,7 @@ export async function POST(req: NextRequest) {
       .values({
         name: userName,
         email: userEmail,
-        credits: 0,
+        credits: 100,
         phoneNumber,
         country,
       })

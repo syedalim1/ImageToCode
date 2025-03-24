@@ -62,12 +62,7 @@ const CodeHeader: React.FC<CodeHeaderProps> = ({ imageUrl, description }) => {
         </div>
       </motion.div>
       
-      <motion.div 
-        className="h-1 w-full bg-gradient-to-r from-blue-500 to-purple-500 rounded-full mt-4"
-        initial={{ width: 0 }}
-        animate={{ width: "100%" }}
-        transition={{ delay: 0.3, duration: 0.8 }}
-      />
+    
     </motion.header>
   );
 };

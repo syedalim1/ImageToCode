@@ -21,8 +21,6 @@ import {
   RefreshCw,
   Terminal,
   AlertTriangle,
-  Lock,
-  CreditCard,
 } from "lucide-react";
 import ClientOnly from "./ClientOnly";
 
@@ -30,8 +28,6 @@ interface EnhancedCodeEditorProps {
   code: string;
   onCodeChange?: (code: string | { content: string }) => void;
   isLoading?: boolean;
-  isPaid?: boolean;
-  onRequestPayment?: () => void;
 }
 
 interface CodeContent {
@@ -42,9 +38,11 @@ interface CodeContent {
 function CodeEditorWithCapture({
   setCode,
   readOnly = false,
+  style,
 }: {
   setCode: (code: string) => void;
   readOnly?: boolean;
+  style?: React.CSSProperties;
 }) {
   const { code, updateCode } = useActiveCode();
 
@@ -58,6 +56,7 @@ function CodeEditorWithCapture({
       style={{
         minWidth: "100%",
         height: "600px",
+        ...style,
       }}
       showLineNumbers
       showTabs
@@ -89,8 +88,6 @@ const EnhancedCodeEditor: React.FC<EnhancedCodeEditorProps> = ({
   code,
   onCodeChange,
   isLoading = false,
-  isPaid = false,
-  onRequestPayment = () => {},
 }) => {
   const [activeTab, setActiveTab] = useState<"code" | "preview" | "console">(
     "preview"
@@ -98,7 +95,7 @@ const EnhancedCodeEditor: React.FC<EnhancedCodeEditorProps> = ({
   const [currentCode, setCurrentCode] = useState(code);
   const [processedCode, setProcessedCode] = useState("");
   const [isDarkMode, setIsDarkMode] = useState(false);
-  const [isCopied, setIsCopied] = useState(false);
+
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [hasError, setHasError] = useState(false);
 
@@ -160,26 +157,10 @@ const EnhancedCodeEditor: React.FC<EnhancedCodeEditorProps> = ({
     }
   }, []);
 
-  // Disable code tab if not paid
-  useEffect(() => {
-    if (!isPaid && activeTab === "code") {
-      setActiveTab("preview");
-    }
-  }, [isPaid, activeTab]);
-
   const handleCodeChange = (newCode: string) => {
     setCurrentCode(newCode);
     if (onCodeChange) {
       onCodeChange(newCode);
-    }
-  };
-
-  // Clipboard operations should only run on client
-  const copyToClipboard = () => {
-    if (typeof navigator !== "undefined") {
-      navigator.clipboard.writeText(currentCode);
-      setIsCopied(true);
-      setTimeout(() => setIsCopied(false), 2000);
     }
   };
 
@@ -248,93 +229,52 @@ export default function ErrorFallback() {
 
   return (
     <motion.div
+      className={`rounded-xl overflow-hidden shadow-lg border border-gray-200 dark:border-gray-700 ${
+        isFullscreen ? "fixed inset-0 z-50 p-4 bg-white dark:bg-gray-900" : ""
+      }`}
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      className={`bg-white dark:bg-gray-900 rounded-xl shadow-lg overflow-hidden ${
-        isFullscreen ? "fixed inset-0 z-50" : ""
-      }`}
     >
-      {/* Tabs */}
-      <div className="flex justify-between items-center border-b border-gray-200 dark:border-gray-800 px-4 py-2">
-        <div className="flex space-x-1">
+      {/* Toolbar */}
+      <div className="bg-gradient-to-r from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-700 p-3 flex flex-wrap justify-between items-center">
+        <div className="flex space-x-2">
           <button
-            onClick={() => setActiveTab("preview")}
-            className={`px-3 py-2 rounded-md text-sm font-medium transition ${
-              activeTab === "preview"
-                ? "bg-indigo-100 text-indigo-700 dark:bg-indigo-900/50 dark:text-indigo-300"
-                : "text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200"
+            onClick={() => setActiveTab("code")}
+            className={`px-3 py-1.5 rounded-md flex items-center text-sm font-medium transition-all ${
+              activeTab === "code"
+                ? "bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300"
+                : "text-gray-600 hover:bg-gray-200 dark:text-gray-300 dark:hover:bg-gray-700"
             }`}
           >
-            <div className="flex items-center">
-              <Eye className="w-4 h-4 mr-1" />
-              Preview
-            </div>
+            <Code className="h-4 w-4 mr-1.5" />
+            Code
           </button>
           <button
-            onClick={() => (isPaid ? setActiveTab("code") : onRequestPayment())}
-            className={`px-3 py-2 rounded-md text-sm font-medium transition ${
-              activeTab === "code"
-                ? "bg-indigo-100 text-indigo-700 dark:bg-indigo-900/50 dark:text-indigo-300"
-                : "text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200"
-            } ${!isPaid ? "relative" : ""}`}
+            onClick={() => setActiveTab("preview")}
+            className={`px-3 py-1.5 rounded-md flex items-center text-sm font-medium transition-all ${
+              activeTab === "preview"
+                ? "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300"
+                : "text-gray-600 hover:bg-gray-200 dark:text-gray-300 dark:hover:bg-gray-700"
+            }`}
           >
-            <div className="flex items-center">
-              <Code className="w-4 h-4 mr-1" />
-              Code
-              {!isPaid && <Lock className="w-3 h-3 ml-1 text-yellow-500" />}
-            </div>
+            <Eye className="h-4 w-4 mr-1.5" />
+            Preview
           </button>
           <button
             onClick={() => setActiveTab("console")}
-            className={`px-3 py-2 rounded-md text-sm font-medium transition ${
+            className={`px-3 py-1.5 rounded-md flex items-center text-sm font-medium transition-all ${
               activeTab === "console"
-                ? "bg-indigo-100 text-indigo-700 dark:bg-indigo-900/50 dark:text-indigo-300"
-                : "text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200"
+                ? "bg-purple-100 text-purple-700 dark:bg-purple-900 dark:text-purple-300"
+                : "text-gray-600 hover:bg-gray-200 dark:text-gray-300 dark:hover:bg-gray-700"
             }`}
           >
-            <div className="flex items-center">
-              <Terminal className="w-4 h-4 mr-1" />
-              Console
-            </div>
+            <Terminal className="h-4 w-4 mr-1.5" />
+            Console
           </button>
         </div>
 
         <div className="flex space-x-2 mt-2 sm:mt-0">
-          <ClientOnly>
-            <motion.button
-              onClick={copyToClipboard}
-              className="px-3 py-1.5 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 rounded-md flex items-center text-sm font-medium hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              disabled={isCopied}
-            >
-              {isCopied ? (
-                <>
-                  <Check className="h-4 w-4 mr-1.5 text-green-500" />
-                  <span className="text-green-500">Copied!</span>
-                </>
-              ) : (
-                <>
-                  <Copy className="h-4 w-4 mr-1.5" />
-                  <span>Copy</span>
-                </>
-              )}
-            </motion.button>
-          </ClientOnly>
-
-          <ClientOnly>
-            <motion.button
-              onClick={downloadCode}
-              className="px-3 py-1.5 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 rounded-md flex items-center text-sm font-medium hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              <Download className="h-4 w-4 mr-1.5" />
-              <span>Download</span>
-            </motion.button>
-          </ClientOnly>
-
           <motion.button
             onClick={() => setIsDarkMode(!isDarkMode)}
             className="p-1.5 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 rounded-md flex items-center hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
@@ -450,44 +390,22 @@ try {
             <SandpackLayout
               style={{
                 width: "100%",
-                height: activeTab === "preview" ? "700px" : "800px",
+                height: "800px",
                 borderRadius: "0",
               }}
             >
               {activeTab === "code" && (
-                <>
-                  {isPaid ? (
-                    <CodeEditorWithCapture
-                      setCode={handleCodeChange}
-                      readOnly={false}
-                    />
-                  ) : (
-                    <div className="relative w-full h-full">
-                      <CodeEditorWithCapture
-                        setCode={() => {}}
-                        readOnly={true}
-                      />
-                      <div className="absolute inset-0 backdrop-blur-md bg-black/50 flex flex-col items-center justify-center z-10">
-                        <Lock className="w-12 h-12 text-yellow-400 mb-4" />
-                        <h3 className="text-white text-xl font-bold mb-2">
-                          Premium Content
-                        </h3>
-                        <p className="text-gray-200 text-center max-w-md mb-6">
-                          Access to the source code is available to premium
-                          users only. Unlock this code to view, copy, and
-                          download.
-                        </p>
-                        <button
-                          onClick={onRequestPayment}
-                          className="bg-gradient-to-r from-yellow-400 to-yellow-600 text-white px-6 py-3 rounded-full font-medium shadow-lg hover:shadow-xl transition-all flex items-center"
-                        >
-                          <CreditCard className="w-5 h-5 mr-2" />
-                          Unlock Access
-                        </button>
-                      </div>
-                    </div>
-                  )}
-                </>
+                <CodeEditorWithCapture
+                  style={{
+                    height: "100%",
+                    minWidth: "100%",
+                    display: "flex",
+                    flexDirection: "column",
+                    overflow: "auto",
+                  }}
+                  setCode={handleCodeChange}
+                  readOnly={false}
+                />
               )}
               {activeTab === "preview" && (
                 <SandpackPreview
@@ -507,6 +425,9 @@ try {
                   style={{
                     height: "100%",
                     minWidth: "100%",
+                    display: "flex",
+                    flexDirection: "column",
+                    overflow: "auto",
                   }}
                 />
               )}

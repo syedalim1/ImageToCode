@@ -6,37 +6,50 @@ import { eq } from "drizzle-orm";
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { description, imageUrl, model, uid, email, code, options } = body;
+    const {
+      description,
+      imageUrl,
+      uid,
+      email,
+      code,
+      options,
+      createdAt,
+      language,
+      mode,
+      theme,
+    } = body;
 
-    if (!uid || !imageUrl || !model || !email) {
+    if (!uid || !imageUrl || !email) {
       return NextResponse.json(
         {
           error: "Missing required fields",
-          missing: { uid, imageUrl, model, email },
+          missing: { uid, imageUrl, email },
         },
         { status: 400 }
       );
     }
-
+    const model = "gemini";
     console.log("🔹 Incoming Request Data:", body);
     let result;
 
     // Ensure code is properly formatted as a JSON object with content property
-    const formattedCode = typeof code === 'string' 
-      ? { content: code } 
-      : (code || { content: '' });
+    const formattedCode =
+      typeof code === "string" ? { content: code } : code || { content: "" };
 
     result = await db
       .insert(imagetocodeTable)
       .values({
         uid: uid,
-        description: description || '',
+        description: description || "",
         imageUrl: imageUrl,
         model: model,
         code: formattedCode,
         email: email,
-        createdAt: new Date().toISOString(),
-        options: options || {}
+        createdAt: createdAt || new Date(),
+        options: options || {},
+        mode: mode || "",
+        theme: theme || "",
+        language: language || "",
       })
       .returning();
 
@@ -77,12 +90,11 @@ export async function PUT(req: NextRequest) {
     }
 
     // Ensure code is properly formatted as a JSON object with content property
-    const formattedCode = typeof code === 'string' 
-      ? { content: code } 
-      : (code || { content: '' });
+    const formattedCode =
+      typeof code === "string" ? { content: code } : code || { content: "" };
 
     const updateData: any = {
-      code: formattedCode
+      code: formattedCode,
     };
 
     // Only include fields that are provided
@@ -148,10 +160,10 @@ export async function GET(req: NextRequest) {
 
     // Ensure the response has a consistent format for the code field
     const record = result[0];
-    
+
     // If code is null or undefined, provide a default empty object
     if (!record.code) {
-      record.code = { content: '' };
+      record.code = { content: "" };
     }
 
     return NextResponse.json(record);

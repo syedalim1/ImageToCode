@@ -8,7 +8,7 @@ import { ErrorBoundary, FallbackProps } from 'react-error-boundary';
 
 // Dynamically import heavy components
 const AppHeader = dynamic(() => import("./_components/AppHeader"), {
-  ssr: false,
+  ssr: true,
   loading: () => <div className="h-16 bg-white/80 backdrop-blur-sm border-b" />
 });
 
@@ -45,7 +45,7 @@ function Provider({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <ErrorBoundary FallbackComponent={ErrorFallback}>
       <AuthContextProvider>
-        <LazyMotion features={domAnimation}>
+    
           <div className="flex min-h-screen max-h-screen w-full overflow-hidden">
             {/* Main content area */}
             <div className="flex flex-col flex-1 w-full overflow-hidden">
@@ -79,7 +79,7 @@ function Provider({ children }: Readonly<{ children: React.ReactNode }>) {
               </motion.main>
             </div>
           </div>
-        </LazyMotion>
+        
       </AuthContextProvider>
     </ErrorBoundary>
   );
