@@ -175,6 +175,16 @@ IMPORTANT: Your generated code must be free of syntax errors. Pay special attent
 7. Double-check all template literals for proper syntax
 8. Return ONLY the code, not explanations or markdown formatting
 `,
+  CREDIT_COSTS: {
+    NORMAL_MODE: 10,
+    EXPERT_MODE: 40,
+    PRICING_PLANS: [
+      { price: 20, credits: 10 },
+      { price: 50, credits: 30, originalPrice: 60 },
+      { price: 140, credits: 90, originalPrice: 180 },
+      { price: 400, credits: 250, originalPrice: 500 },
+    ],
+  },
 };
 export const languages = [
   // Frontend frameworks
