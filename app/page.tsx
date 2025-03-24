@@ -9,7 +9,7 @@ const HeroSection = dynamic(() => import("./_components/HeroSection.tsx"), { ssr
 
 // Defer loading of below-the-fold content
 const StatsSection = dynamic(() => import("./_components/StatsSection.tsx"), { 
-  ssr: true,
+  ssr: false,
   loading: () => <div className="h-[300px] bg-gradient-to-b from-indigo-50/50 to-purple-50/50 animate-pulse" />
 });
 
