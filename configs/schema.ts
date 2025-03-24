@@ -27,6 +27,10 @@ export const imagetocodeTable = pgTable("imagetocode", {
   email: varchar({ length: 255 }),
   createdAt: varchar({ length: 255 }).notNull(),
   options: json().default({}),
+  mode: varchar({ length: 255 }).notNull(),
+  theme: varchar({ length: 255 }).notNull(),
+  language: varchar({ length: 255 }).notNull(),
+  
 });
 
 export const transactionsTable = pgTable("transactions", {
