@@ -1,34 +1,21 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Roboto } from "next/font/google";
+import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Provider from "./provider";
 import { ClerkProvider } from "@clerk/nextjs";
 import { ClientLayout } from "./_components/ClientLayout";
 
-// Optimize font loading
+// Optimize font loading - simplified for development
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
   display: 'swap',
-  preload: true,
-  fallback: ['system-ui', 'arial'],
 });
 
 const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+  variable: "--font-geist-mono", 
   subsets: ["latin"],
   display: 'swap',
-  preload: true,
-  fallback: ['monospace'],
-});
-
-const roboto = Roboto({
-  variable: "--font-roboto",
-  weight: ['400', '500', '700'],
-  subsets: ['latin'],
-  display: 'swap',
-  preload: true,
-  fallback: ['system-ui', 'arial'],
 });
 
 export const viewport = {
@@ -50,22 +37,21 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  if (!process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY) {
+    console.error("Missing NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY environment variable");
+  }
+
   return (
     <ClerkProvider 
-      publishableKey={process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY}
+      publishableKey={process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY || ""}
     >
       <html lang="en" className="scroll-smooth">
         <head>
-       
-          
-          {/* Cache control */}
-          <meta httpEquiv="Cache-Control" content="public, max-age=31536000, immutable" />
-          
           {/* PWA tags */}
           <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
         </head>
         <body
-          className={`${geistSans.variable} ${geistMono.variable} ${roboto.variable} antialiased`}
+          className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         >
           <Provider>
             <ClientLayout>
