@@ -28,6 +28,7 @@ const UserProfile: React.FC<UserProfileProps> = () => {
   const handleCountryChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setCountry(e.target.value);
   };
+console.log(user ,"user ");
 
   const handleUpdateProfile = async () => {
     if (!user) return;
@@ -127,7 +128,7 @@ const UserProfile: React.FC<UserProfileProps> = () => {
   if (!userLoaded || loading) {
     return (
       <div className="flex justify-center items-center h-screen bg-gradient-to-r from-purple-500 to-indigo-600">
-        <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-white"></div>
+        <div className="rounded-full h-32 w-32 border-2 border-white flex items-center justify-center text-white text-xl">Loading</div>
       </div>
     );
   }

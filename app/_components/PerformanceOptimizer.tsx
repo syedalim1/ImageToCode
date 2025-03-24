@@ -77,7 +77,7 @@ export default function PerformanceOptimizer({
     }
 
     // Handle scroll/resize debouncing
-    if (debounce > 0) {
+    if (debounce > 0 && (priority === "medium" || priority === "low")) {
       let resizeTimeout: NodeJS.Timeout;
       let scrollTimeout: NodeJS.Timeout;
 
