@@ -4,182 +4,152 @@ import { db } from "@/configs/db";
 import { usersTable } from "@/configs/schema";
 import { eq } from "drizzle-orm";
 
-const API_KEY = process.env.OPENROUTER_API_KEY;
-const OPENROUTER_API_URL =
-  process.env.OPENROUTER_API_URL ||
-  "https://openrouter.ai/api/v1/chat/completions";
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
-const SITE_NAME = process.env.SITE_NAME || "My Local App";
+// Centralized configuration
+const CONFIG = {
+  API: {
+    KEY: process.env.OPENROUTER_API_KEY,
+    URL:
+      process.env.OPENROUTER_API_URL ||
+      "https://openrouter.ai/api/v1/chat/completions",
+  },
+  SITE: {
+    URL: process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000",
+    NAME: process.env.SITE_NAME || "My Local App",
+  },
+  CREDITS: {
+    GENERATION_COST: 10,
+    MINIMUM_BALANCE: 10,
+  },
+  GENERATION: {
+    MAX_TOKENS: 4000,
+    TIMEOUT_MS: 45000,
+  },
+};
 
-// Additional instructions to prevent common syntax errors
+// Model selection helper
+function selectModelForGeneration(mode: string): string {
+  const modelMap = {
+    normal: "google/gemini-2.0-pro-exp-02-05:free",
+    export: "google/gemini-2.0-pro-exp-02-05:free",
+    // Add more modes and models as needed
+  };
+  return modelMap[mode as keyof typeof modelMap] || modelMap.normal;
+}
 
 export async function POST(req: NextRequest) {
   try {
+    // Parse and validate input
     const { description, imageUrl, mode, model, options, userEmail, language } =
       await req.json();
 
-    // Validate required fields
-    if (!description || !imageUrl || !userEmail) {
-      return NextResponse.json(
-        {
-          error: "Missing required fields: description, imageUrl, or userEmail",
-        },
-        { status: 400 }
-      );
+    // Verify API configuration
+    if (!CONFIG.API.KEY) {
+      throw new Error("OpenRouter API key is missing");
     }
 
-    // Select the best model for the task
-
-    let modelname;
-    if (mode === "normal") {
-      modelname = "google/gemini-2.0-pro-exp-02-05:free";
-    } else if (mode === "export") {
-      modelname = "google/gemini-2.0-pro-exp-02-05:free";
-    }
-    // best
-    // google/gemini-2.0-flash-001
-
-    const des =
+    // Prepare enhanced description
+    const enhancedDescription =
       Constants.PROMPTFORNEXTJS +
       Constants.ERROR_PREVENTION_PROMPTFORNEXTJS +
       description +
       "\n\n" +
       (options || "");
 
-    // Check if user has enough credits
-    const user = await db
+    // Fetch user and validate credits
+    const [user] = await db
       .select()
       .from(usersTable)
       .where(eq(usersTable.email, userEmail));
 
-    if (user.length === 0) {
+    if (!user) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    const currentCredits = user[0]?.credits ?? 0;
-
-    if (currentCredits < 10) {
+    const currentCredits = user.credits ?? 0;
+    if (currentCredits < CONFIG.CREDITS.MINIMUM_BALANCE) {
       return NextResponse.json(
         {
-          error:
-            "Insufficient credits. You need at least 10 credits to generate a page.",
+          error: `Insufficient credits. Minimum ${CONFIG.CREDITS.MINIMUM_BALANCE} credits required.`,
         },
         { status: 403 }
       );
     }
 
-    // Deduct 10 credits for generating a page
-    await db
-      .update(usersTable)
-      .set({
-        credits: currentCredits - 10,
-      })
-      .where(eq(usersTable.email, userEmail));
-
-    // Verify API key exists
-    if (!API_KEY) {
-      console.error("OPENROUTER_API_KEY is missing from environment variables");
-      return NextResponse.json(
-        { error: "Server configuration error" },
-        { status: 500 }
-      );
-    }
-
-    // Log the selected model for debugging
-    console.log(`Using model: ${modelname} for generation`);
-
+    const modelName = selectModelForGeneration(mode);
     const payload = {
-      model: modelname,
+      model: modelName,
       messages: [
         {
           role: "user",
           content: [
-            {
-              type: "text",
-              text: des,
-            },
-            {
-              type: "image_url",
-              image_url: {
-                url: imageUrl,
-              },
-            },
+            { type: "text", text: enhancedDescription },
+            { type: "image_url", image_url: { url: imageUrl } },
           ],
         },
       ],
-      stream: false, // We'll handle streaming manually
+      stream: false,
+      max_tokens: CONFIG.GENERATION.MAX_TOKENS,
+      timeout: CONFIG.GENERATION.TIMEOUT_MS / 1000,
     };
 
-    // Create a new ReadableStream to stream the response
-    const stream = new ReadableStream({
-      async start(controller) {
-        try {
-          const response = await fetch(OPENROUTER_API_URL, {
-            method: "POST",
-            headers: {
-              Authorization: `Bearer ${API_KEY}`,
-              "HTTP-Referer": SITE_URL,
-              "X-Title": SITE_NAME,
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(payload),
-          });
+    // Enhanced API request with comprehensive error handling
+    const controller = new AbortController();
+    const timeoutId = setTimeout(
+      () => controller.abort(),
+      CONFIG.GENERATION.TIMEOUT_MS
+    );
 
-          if (!response.ok) {
-            const errorText = await response.text();
-            controller.error(`API Error: ${errorText}`);
-            return;
-          }
+    try {
+      const apiResponse = await fetch(CONFIG.API.URL, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${CONFIG.API.KEY}`,
+          "HTTP-Referer": CONFIG.SITE.URL,
+          "X-Title": CONFIG.SITE.NAME,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+        signal: controller.signal,
+      });
 
-          const data = await response.json();
-          console.log("====================================");
-          console.log(data, "   data");
-          console.log("====================================");
-          // Extract the code content from the API response
-          if (
-            data.choices &&
-            data.choices[0] &&
-            data.choices[0].message &&
-            data.choices[0].message.content
-          ) {
-            let codeContent = data.choices[0].message.content;
+      clearTimeout(timeoutId);
 
-            // Remove markdown code blocks if present
-            codeContent = codeContent
-              .replace(/```javascript|```typescript|```jsx|```tsx|```/g, "")
-              .trim();
+      if (!apiResponse.ok) {
+        const errorText = await apiResponse.text();
+        throw new Error(`API Request Failed: ${errorText}`);
+      }
 
-            // Stream the code content
-            controller.enqueue(new TextEncoder().encode(codeContent));
-          } else {
-            // If we can't extract the content, return an error message
-            controller.enqueue(
-              new TextEncoder().encode(
-                "Error: Unable to extract code from API response"
-              )
-            );
-          }
+      const data = await apiResponse.json();
 
-          controller.close();
-        } catch (error) {
-          console.error("Error in stream:", error);
-          controller.error(
-            error instanceof Error ? error : new Error(String(error))
-          );
-        }
-      },
-    });
+      if (
+        data.choices &&
+        data.choices[0] &&
+        data.choices[0].message &&
+        data.choices[0].message.content
+      ) {
+        let codeContent = data.choices[0].message.content;
 
-    // Return the stream as the response
-    return new Response(stream);
+        // Remove markdown code blocks if present
+        codeContent = codeContent
+          .replace(/```javascript|```typescript|```jsx|```tsx|```/g, "")
+          .trim();
+
+        return new Response(codeContent);
+      }
+    } catch (apiError) {
+      console.error("API Request Error:", apiError);
+      return NextResponse.json(
+        { error: "Failed to generate content", details: String(apiError) },
+        { status: 500 }
+      );
+    }
   } catch (error) {
-    console.error("Server error:", error);
-    // Safely handle the unknown error type
-    const serverError = error as Error;
+    console.error("Server Processing Error:", error);
+
     return NextResponse.json(
       {
         error: "Internal Server Error",
-        details: serverError.message || "Unknown error occurred",
+        details: error instanceof Error ? error.message : String(error),
       },
       { status: 500 }
     );
