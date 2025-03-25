@@ -13,6 +13,8 @@ const isPublicRoute = createRouteMatcher([
   "/coming-soon(.*)",
   "/credits(.*)",
   "/view-code/(.*)",
+  "/sign-in(.*)",
+  "/sign-up(.*)",
 ]);
 
 // This example protects all routes including api/trpc routes
