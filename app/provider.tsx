@@ -1,14 +1,9 @@
 "use client";
 
-import dynamic from "next/dynamic";
 import { motion } from "framer-motion";
 import { Suspense, useEffect, useState } from "react";
+import AppHeader from "./_components/AppHeader";
 
-// Dynamically import heavy components
-const AppHeader = dynamic(() => import("./_components/AppHeader"), {
-  ssr: true,
-  loading: () => <div className="h-16 bg-white/80 backdrop-blur-sm border-b" />,
-});
 
 
 function Provider({ children }: Readonly<{ children: React.ReactNode }>) {
@@ -28,13 +23,9 @@ function Provider({ children }: Readonly<{ children: React.ReactNode }>) {
       {/* Main content area */}
       <div className="flex flex-col flex-1 w-full overflow-hidden">
         {/* Header */}
-        <Suspense
-          fallback={
-            <div className="h-16 bg-white/80 backdrop-blur-sm border-b" />
-          }
-        >
+      
           <AppHeader />
-        </Suspense>
+   
 
         {/* Main content with scrolling */}
         <motion.main
@@ -51,15 +42,9 @@ function Provider({ children }: Readonly<{ children: React.ReactNode }>) {
             backfaceVisibility: "hidden",
           }}
         >
-          <Suspense
-            fallback={
-              <div className="flex items-center justify-center min-h-[200px]">
-                <div className="animate-pulse">Loading...</div>
-              </div>
-            }
-          >
+         
             {children}
-          </Suspense>
+          
         </motion.main>
       </div>
     </div>

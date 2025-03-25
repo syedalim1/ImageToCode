@@ -374,66 +374,7 @@ export default function EnhancedStatsSection() {
           ))}
         </div>
 
-        {/* Enhanced bottom wave decoration */}
-        <div className="absolute bottom-0 left-0 w-full overflow-hidden">
-          <svg
-            className="w-full h-16 sm:h-24"
-            viewBox="0 0 1440 120"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-            preserveAspectRatio="none"
-          >
-            <motion.path
-              initial={{ opacity: 0.1, pathLength: 0 }}
-              animate={{ opacity: 0.2, pathLength: 1 }}
-              transition={{
-                duration: 2,
-                repeat: Infinity,
-                repeatType: "reverse",
-              }}
-              d="M0,64L48,80C96,96,192,128,288,128C384,128,480,96,576,85.3C672,75,768,85,864,96C960,107,1056,117,1152,117.3C1248,117,1344,107,1392,101.3L1440,96L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"
-              fill="url(#paint0_linear)"
-            />
-            <motion.path
-              initial={{ opacity: 0.1, pathLength: 0 }}
-              animate={{ opacity: 0.15, pathLength: 1 }}
-              transition={{
-                duration: 3,
-                repeat: Infinity,
-                repeatType: "reverse",
-                delay: 0.5,
-              }}
-              d="M0,32L48,37.3C96,43,192,53,288,58.7C384,64,480,64,576,69.3C672,75,768,85,864,90.7C960,96,1056,96,1152,85.3C1248,75,1344,53,1392,42.7L1440,32L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"
-              fill="url(#paint1_linear)"
-            />
-            <defs>
-              <linearGradient
-                id="paint0_linear"
-                x1="0"
-                y1="120"
-                x2="1440"
-                y2="120"
-                gradientUnits="userSpaceOnUse"
-              >
-                <stop stopColor="#4F46E5" />
-                <stop offset="0.5" stopColor="#A855F7" />
-                <stop offset="1" stopColor="#EC4899" />
-              </linearGradient>
-              <linearGradient
-                id="paint1_linear"
-                x1="0"
-                y1="80"
-                x2="1440"
-                y2="80"
-                gradientUnits="userSpaceOnUse"
-              >
-                <stop stopColor="#8B5CF6" />
-                <stop offset="0.5" stopColor="#D946EF" />
-                <stop offset="1" stopColor="#F59E0B" />
-              </linearGradient>
-            </defs>
-          </svg>
-        </div>
+        
       </div>
     </div>
   );

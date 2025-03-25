@@ -194,20 +194,7 @@ export default function CTASection() {
         </motion.div>
       </div>
 
-      {/* Bottom decorative wave */}
-      <div className="absolute bottom-0 left-0 right-0">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 1440 120"
-          className="w-full h-auto"
-        >
-          <path
-            fill="#ffffff"
-            fillOpacity="1"
-            d="M0,64L60,69.3C120,75,240,85,360,80C480,75,600,53,720,48C840,43,960,53,1080,58.7C1200,64,1320,64,1380,64L1440,64L1440,120L1380,120C1320,120,1200,120,1080,120C960,120,840,120,720,120C600,120,480,120,360,120C240,120,120,120,60,120L0,120Z"
-          ></path>
-        </svg>
-      </div>
+      
     </div>
   );
 }
