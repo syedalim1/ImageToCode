@@ -40,6 +40,9 @@ interface Design {
   email: string | null;
   createdAt: string;
   options: string[];
+  mode: string;
+  theme: string;
+  language: string;
 }
 
 interface DesignsGridProps {
@@ -128,6 +131,9 @@ function DesignsPage() {
               email: null,
               createdAt: new Date().toISOString(),
               options: [],
+              mode: "normal",
+              theme: "default",
+              language: "html-css",
             },
             {
               id: 2,
@@ -140,6 +146,9 @@ function DesignsPage() {
               email: null,
               createdAt: "2025-02-25T00:00:00.000Z",
               options: [],
+              mode: "normal",
+              theme: "default",
+              language: "html-css",
             },
             {
               id: 3,
@@ -152,6 +161,9 @@ function DesignsPage() {
               email: null,
               createdAt: "2025-02-24T00:00:00.000Z",
               options: [],
+              mode: "normal",
+              theme: "default",
+              language: "html-css",
             },
           ];
           setDesigns(sampleDesigns);

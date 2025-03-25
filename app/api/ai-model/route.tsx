@@ -11,15 +11,11 @@ const OPENROUTER_API_URL =
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
 const SITE_NAME = process.env.SITE_NAME || "My Local App";
 
-// Additional instructions to prevent common syntax errors
-
 export async function POST(
-  req: NextRequest,
-  { params }: { params: { uid: string } }
-) {
+  req: NextRequest
+): Promise<Response> {
   try {
-    const { description, imageUrl, mode, model, options, userEmail, language } =
-      await req.json();
+    const { description, imageUrl, mode, model, options, userEmail, language } = await req.json();
 
     // Validate required fields
     if (!description || !imageUrl || !userEmail) {
@@ -39,10 +35,6 @@ export async function POST(
     } else if (mode === "export") {
       modelname = "google/gemini-2.0-pro-exp-02-05:free";
     }
-    // best
-    // google/gemini-2.0-flash-001
-
-    // Combine the main prompt with error prevention instructions and user description
 
     const des =
       Constants.PROMPTFORNEXTJS +
@@ -50,8 +42,6 @@ export async function POST(
       description +
       "\n\n" +
       (options || "");
-
-    // else if (language == "react-tailwind") {
     //   des =
     //     Constants.PROMPTFORREACTJS +
     //     Constants.ERROR_PREVENTION_PROMPTFORREACTJS +

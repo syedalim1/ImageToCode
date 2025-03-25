@@ -1,6 +1,7 @@
 {
   "name": "nextjs-boilerplate-1",
   "version": "0.1.0",
+  
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -15,7 +16,6 @@
     "@codesandbox/sandpack-react": "^2.20.0",
     "@heroicons/react": "^2.2.0",
     "@neondatabase/serverless": "^0.10.4",
-    "@next/bundle-analyzer": "^15.2.0",
     "@radix-ui/react-dialog": "^1.1.5",
     "@radix-ui/react-popover": "^1.1.5",
     "@radix-ui/react-select": "^2.1.6",
@@ -54,6 +54,7 @@
     "web-vitals": "^4.2.4"
   },
   "devDependencies": {
+    "@next/bundle-analyzer": "^15.2.4",
     "@types/canvas-confetti": "^1.9.0",
     "@types/node": "^20",
     "@types/react": "^19",
