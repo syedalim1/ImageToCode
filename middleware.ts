@@ -30,8 +30,10 @@ export default clerkMiddleware(async (auth, req) => {
   const { userId } = await auth();
 
   // If the user isn't authenticated, redirect to sign-in
+  // Using the proper pattern from clerk docs to redirect
   if (!userId) {
-    // Using the proper pattern from clerk docs to redirect
+    console.log("redired .....");
+
     return NextResponse.redirect(new URL("/sign-in", req.url));
   }
 

@@ -2,10 +2,10 @@
 
 import { motion } from "framer-motion";
 import { Zap } from "lucide-react";
-import { useAuthContext } from "@/context/AuthContext";
+
 
 export const CreditHeader = () => {
-  const { credits } = useAuthContext();
+ 
 
   return (
     <motion.div

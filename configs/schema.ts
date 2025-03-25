@@ -30,7 +30,6 @@ export const imagetocodeTable = pgTable("imagetocode", {
   mode: varchar({ length: 255 }).notNull(),
   theme: varchar({ length: 255 }).notNull(),
   language: varchar({ length: 255 }).notNull(),
-  
 });
 
 export const transactionsTable = pgTable("transactions", {

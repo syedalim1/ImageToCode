@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useCallback } from "react";
-import { useAuthContext } from "@/context/AuthContext";
+
 import { motion, AnimatePresence } from "framer-motion";
 import CreditBalanceCard from "@/app/_components/CreditBalanceCard";
 import CreditPackages from "@/app/_components/CreditPackages";
@@ -39,7 +39,7 @@ const transactions = [
 ];
 
 export default function CreditsPage() {
-  const { credits } = useAuthContext();
+  
   const { user } = useUser();
   console.log(user, "user");
 

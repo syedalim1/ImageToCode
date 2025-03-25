@@ -1,18 +1,15 @@
 import React from 'react'
-import DashboardProvider from './provider';
+import {
+  ClerkProvider,
+ 
+} from "@clerk/nextjs";
 
 
-function DashboardLayout({
-    children,
+export default function DashboardLayout({
+  children,
 }: Readonly<{
-    children: React.ReactNode;
+  children: React.ReactNode;
 }>) {
-
-    return (
-        <DashboardProvider>
-            {children}
-        </DashboardProvider>
-    )
+  return <ClerkProvider>{ children }</ClerkProvider>;
 }
 
-export default DashboardLayout

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { useAuthContext } from "@/context/AuthContext";
+
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import {
@@ -13,6 +13,7 @@ import {
   CheckCircle,
   ArrowRight,
 } from "lucide-react";
+import { useUser } from "@clerk/nextjs";
 
 declare global {
   interface Window {
@@ -45,13 +46,13 @@ interface CreditPackagesProps {
 const CreditPackages: React.FC<CreditPackagesProps> = ({
   onPaymentSuccess,
 }) => {
-  const { user } = useAuthContext();
   const [loading, setLoading] = useState(false);
   const [selectedPackage, setSelectedPackage] = useState<string | null>(null);
   const [showSparkles, setShowSparkles] = useState(false);
   const [highlightedPackage, setHighlightedPackage] = useState<string | null>(
     null
   );
+  const { user } = useUser();
 
   useEffect(() => {
     // Load Razorpay script dynamically
@@ -95,10 +96,7 @@ const CreditPackages: React.FC<CreditPackagesProps> = ({
       price: 2000, // ₹20
       popular: false,
       color: "from-blue-500 to-blue-600",
-      features: [
-        "1 image-to-code conversions/month",
-       
-      ],
+      features: ["1 image-to-code conversions/month"],
     },
     {
       id: "standard",
@@ -109,10 +107,7 @@ const CreditPackages: React.FC<CreditPackagesProps> = ({
       discount: 17,
       popular: true,
       color: "from-purple-500 to-purple-600",
-      features: [
-        "3 image-to-code conversions/month",
-        
-      ],
+      features: ["3 image-to-code conversions/month"],
     },
     {
       id: "premium",
@@ -123,10 +118,7 @@ const CreditPackages: React.FC<CreditPackagesProps> = ({
       discount: 33,
       popular: false,
       color: "from-pink-500 to-pink-600",
-      features: [
-        "9 image-to-code conversions/month",
-       
-      ],
+      features: ["9 image-to-code conversions/month"],
     },
     {
       id: "enterprise",
@@ -137,10 +129,7 @@ const CreditPackages: React.FC<CreditPackagesProps> = ({
       discount: 33,
       popular: false,
       color: "from-amber-500 to-amber-600",
-      features: [
-        "25 image-to-code conversions/month",
-        
-      ],
+      features: ["25 image-to-code conversions/month"],
     },
   ];
 
@@ -176,7 +165,7 @@ const CreditPackages: React.FC<CreditPackagesProps> = ({
               ...response,
               packageId: pkg.id,
               credits: pkg.credits,
-              userEmail: user?.email,
+              userEmail: user?.primaryEmailAddress?.emailAddress,
             }),
           });
 

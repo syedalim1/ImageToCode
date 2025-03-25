@@ -54,7 +54,7 @@ export async function GET(req: NextRequest) {
       .select({
         credits: usersTable.credits,
         phoneNumber: usersTable.phoneNumber,
-        country: usersTable.country
+        country: usersTable.country,
       })
       .from(usersTable)
       .where(eq(usersTable.email, userEmail));
