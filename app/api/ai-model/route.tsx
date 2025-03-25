@@ -21,8 +21,8 @@ const CONFIG = {
     MINIMUM_BALANCE: 10,
   },
   GENERATION: {
-    MAX_TOKENS: 4000,
-    TIMEOUT_MS: 45000,
+    MAX_TOKENS: 10000,
+    TIMEOUT_MS: 4000,
   },
 };
 
@@ -114,10 +114,10 @@ export async function POST(req: NextRequest) {
 
       clearTimeout(timeoutId);
 
-      // if (!apiResponse.ok) {
-      //   const errorText = await apiResponse.text();
-      //   throw new Error(`API Request Failed: ${errorText}`);
-      // }
+      if (!apiResponse.ok) {
+        const errorText = await apiResponse.text();
+        throw new Error(`API Request Failed: ${errorText}`);
+      }
 
       const data = await apiResponse.json();
 
