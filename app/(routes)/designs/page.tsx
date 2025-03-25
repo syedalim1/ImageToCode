@@ -8,7 +8,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { Design } from "@/types/design";
 
 import LoadingState from "./_component/LoadingState";
-import ErrorState from "./_component/ErrorState";
+// import ErrorState from "./_component/ErrorState";
 
 import {
   DesignsHeader,
@@ -234,9 +234,9 @@ function DesignsPage() {
     return <LoadingState />;
   }
 
-  if (error && isSignedIn) {
-    return <ErrorState error={error} retryFn={fetchDesigns} />;
-  }
+  // if (error && isSignedIn) {
+  //   return <ErrorState error={error} retryFn={fetchDesigns} />;
+  // }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50">
