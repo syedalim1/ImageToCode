@@ -10,13 +10,13 @@ import { Design } from "@/types/design";
 import LoadingState from "./_component/LoadingState";
 import ErrorState from "./_component/ErrorState";
 
-import { 
-  DesignsHeader, 
+import {
+  DesignsHeader,
   DesignsFilters,
-  DesignsGrid, 
+  DesignsGrid,
   DesignsList,
   SignedOutView,
-  EmptyState 
+  EmptyState,
 } from "./components";
 import { db } from "@/configs/db";
 import { imagetocodeTable } from "@/configs/schema";
@@ -76,73 +76,21 @@ function DesignsPage() {
       }
 
       if (result) {
-        if (result.length === 0) {
-          // Sample designs for empty state
-          const sampleDesigns: Design[] = [
-            {
-              id: 1,
-              uid: "sample-1",
-              model: "GPT-4",
-              imageUrl:
-                "https://placehold.co/600x400/5271ff/ffffff?text=Sample+Design+1",
-              code: { content: "<div>Sample code</div>" },
-              description: "Sample Login Page",
-              email: null,
-              createdAt: new Date().toISOString(),
-              options: [],
-              mode: "normal",
-              theme: "default",
-              language: "html-css",
-            },
-            {
-              id: 2,
-              uid: "sample-2",
-              model: "Claude",
-              imageUrl:
-                "https://placehold.co/600x400/ff5271/ffffff?text=Sample+Design+2",
-              code: { content: "<div>Sample code</div>" },
-              description: "Sample Dashboard",
-              email: null,
-              createdAt: "2025-02-25T00:00:00.000Z",
-              options: [],
-              mode: "normal",
-              theme: "default",
-              language: "html-css",
-            },
-            {
-              id: 3,
-              uid: "sample-3",
-              model: "GPT-4",
-              imageUrl:
-                "https://placehold.co/600x400/52ff71/ffffff?text=Sample+Design+3",
-              code: { content: "<div>Sample code</div>" },
-              description: "Sample Product Page",
-              email: null,
-              createdAt: "2025-02-24T00:00:00.000Z",
-              options: [],
-              mode: "normal",
-              theme: "default",
-              language: "html-css",
-            },
-          ];
-          setDesigns(sampleDesigns);
-        } else {
-          const validDesigns = result
-            .filter((design): design is Design => {
-              if (!design.code || typeof design.code !== "object") return false;
-              const code = design.code as { content?: string };
-              return typeof code.content === "string";
-            })
-            .map((design) => ({
-              ...design,
-              code:
-                typeof design.code === "string"
-                  ? { content: design.code }
-                  : (design.code as { content: string }),
-              options: Array.isArray(design.options) ? design.options : [],
-            }));
-          setDesigns(validDesigns);
-        }
+        const validDesigns = result
+          .filter((design): design is Design => {
+            if (!design.code || typeof design.code !== "object") return false;
+            const code = design.code as { content?: string };
+            return typeof code.content === "string";
+          })
+          .map((design) => ({
+            ...design,
+            code:
+              typeof design.code === "string"
+                ? { content: design.code }
+                : (design.code as { content: string }),
+            options: Array.isArray(design.options) ? design.options : [],
+          }));
+        setDesigns(validDesigns);
       }
     } catch (err) {
       setError("Failed to fetch designs. Please try again later.");
@@ -295,7 +243,7 @@ function DesignsPage() {
       <div className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
         <SignedIn>
           {/* Header Component */}
-          <DesignsHeader 
+          <DesignsHeader
             isRefreshing={isRefreshing}
             showFilters={showFilters}
             handleRefresh={handleRefresh}
