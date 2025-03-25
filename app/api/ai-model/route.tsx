@@ -89,7 +89,7 @@ export async function POST(req: NextRequest) {
       ],
       stream: false,
       max_tokens: CONFIG.GENERATION.MAX_TOKENS,
-      timeout: CONFIG.GENERATION.TIMEOUT_MS / 1000,
+      timeout: CONFIG.GENERATION.TIMEOUT_MS / 14000,
     };
 
     // Enhanced API request with comprehensive error handling
