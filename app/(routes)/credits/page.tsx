@@ -8,6 +8,7 @@ import CreditPackages from "@/app/_components/CreditPackages";
 import TransactionHistory from "@/app/_components/TransactionHistory";
 import CreditSystemExplainer from "@/app/_components/CreditSystemExplainer";
 import { Zap, Clock, Info } from "lucide-react";
+import { useUser } from "@clerk/nextjs";
 
 // Sample transaction history
 const transactions = [
@@ -39,6 +40,9 @@ const transactions = [
 
 export default function CreditsPage() {
   const { credits } = useAuthContext();
+  const { user } = useUser();
+  console.log(user, "user");
+
   const [activeTab, setActiveTab] = useState<
     "packages" | "history" | "explainer"
   >("packages");
@@ -127,12 +131,14 @@ export default function CreditsPage() {
       </div>
 
       {/* Credit Balance Card */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-6 mb-12">
-        <CreditBalanceCard
-          onViewHistory={handleViewHistory}
-          onBuyCredits={handleBuyCredits}
-        />
-      </div>
+      {user ? (
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-6 mb-12">
+          <CreditBalanceCard
+            onViewHistory={handleViewHistory}
+            onBuyCredits={handleBuyCredits}
+          />
+        </div>
+      ) : null}
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -152,19 +158,21 @@ export default function CreditsPage() {
               <Zap className="h-4 w-4 mr-1" />
               Credit Packages
             </motion.button>
-            <motion.button
-              onClick={() => setActiveTab("history")}
-              className={`px-6 py-2 rounded-full text-sm font-medium transition-all flex items-center ${
-                activeTab === "history"
-                  ? "bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-md"
-                  : "text-gray-600 hover:text-gray-900"
-              }`}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              <Clock className="h-4 w-4 mr-1" />
-              Transaction History
-            </motion.button>
+            {user ? (
+              <motion.button
+                onClick={() => setActiveTab("history")}
+                className={`px-6 py-2 rounded-full text-sm font-medium transition-all flex items-center ${
+                  activeTab === "history"
+                    ? "bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-md"
+                    : "text-gray-600 hover:text-gray-900"
+                }`}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <Clock className="h-4 w-4 mr-1" />
+                Transaction History
+              </motion.button>
+            ) : null}
             <motion.button
               onClick={() => setActiveTab("explainer")}
               className={`px-6 py-2 rounded-full text-sm font-medium transition-all flex items-center ${

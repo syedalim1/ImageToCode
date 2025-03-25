@@ -75,8 +75,6 @@ function AppHeader() {
     return () => clearInterval(interval);
   }, []);
 
- 
-
   // Close sidebar when clicking outside on mobile
   useEffect(() => {
     const handleClickOutside = (event: Event) => {
@@ -105,10 +103,6 @@ function AppHeader() {
       });
     }
   }, [logoHovered, logoControls]);
-
-
-
- 
 
   // Enhanced sidebar animations
   const sidebarVariants = {
@@ -260,34 +254,6 @@ function AppHeader() {
             : "shadow-md shadow-blue-100/10"
         }`}
       >
-        {/* Decorative elements - enhanced rainbow line with shimmer effect */}
-        <div className="h-1.5 w-full bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500 relative overflow-hidden">
-          <motion.div
-            className="absolute inset-0 bg-white opacity-40"
-            animate={{
-              x: ["0%", "100%", "0%"],
-            }}
-            transition={{
-              duration: 3,
-              repeat: Infinity,
-              repeatType: "loop",
-              ease: "easeInOut",
-            }}
-          />
-          <motion.div
-            className="absolute inset-0 bg-white opacity-30"
-            animate={{
-              x: ["100%", "0%", "100%"],
-            }}
-            transition={{
-              duration: 3.5,
-              repeat: Infinity,
-              repeatType: "loop",
-              ease: "easeInOut",
-            }}
-          />
-        </div>
-
         <div className="flex items-center justify-between w-full px-4 py-3 relative">
           {/* Left section with logo and mobile menu button */}
           <div className="flex items-center space-x-3">
@@ -388,7 +354,6 @@ function AppHeader() {
 
           {/* Right section with enhanced actions */}
           <div className="flex items-center space-x-2">
-          
             {/* Authentication component */}
             <Authentication />
           </div>
@@ -515,7 +480,6 @@ function AppHeader() {
         )}
       </AnimatePresence>
 
-   
       {/* Enhanced feature spotlight with animated glow effect */}
       <motion.div
         initial={{ opacity: 0, y: 100 }}
