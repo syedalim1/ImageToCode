@@ -12,6 +12,7 @@ import { desc, eq } from "drizzle-orm";
 import { useParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
+import { log } from "node:console";
 
 interface Design {
   id: number;
@@ -20,6 +21,7 @@ interface Design {
   imageUrl: string;
   description: string | null;
   createdAt: string;
+  language: string;
   options: string[];
   code: {
     content: string;
@@ -35,6 +37,7 @@ function DesignPage() {
   const [error, setError] = useState("");
   const [activeTab, setActiveTab] = useState<"preview" | "code">("preview");
   const [zoomImage, setZoomImage] = useState(false);
+  const [Template, setTemplate] = useState<string>("");
 
   useEffect(() => {
     if (uid) {
@@ -56,7 +59,15 @@ function DesignPage() {
       if (result.length > 0) {
         setDesign(result[0] as Design);
         console.log(result[0], "designs");
-      } else {
+        if (design?.language == "react-tailwind") {
+          setTemplate("react");
+        }
+        else if (design?.language == "nextjs-tailwind") {
+          setTemplate("nextjs");
+        }
+        else if(design?.language == "html-css") {
+          setTemplate("html");
+      } }else {
         setError("No design found.");
       }
     } catch (err) {
@@ -314,10 +325,11 @@ function DesignPage() {
               <div className="flex">
                 <button
                   onClick={() => setActiveTab("preview")}
-                  className={`px-8 py-4 text-sm font-medium flex items-center transition-all ${activeTab === "preview"
+                  className={`px-8 py-4 text-sm font-medium flex items-center transition-all ${
+                    activeTab === "preview"
                       ? "border-b-2 border-indigo-500 text-indigo-600 dark:text-indigo-400 bg-white dark:bg-gray-800"
                       : "text-gray-600 hover:text-indigo-600 dark:text-gray-300 dark:hover:text-indigo-400 hover:bg-white/50 dark:hover:bg-gray-800/50"
-                    }`}
+                  }`}
                 >
                   <svg
                     className="w-5 h-5 mr-2"
@@ -336,10 +348,11 @@ function DesignPage() {
                 </button>
                 <button
                   onClick={() => setActiveTab("code")}
-                  className={`px-8 py-4 text-sm font-medium flex items-center transition-all ${activeTab === "code"
+                  className={`px-8 py-4 text-sm font-medium flex items-center transition-all ${
+                    activeTab === "code"
                       ? "border-b-2 border-indigo-500 text-indigo-600 dark:text-indigo-400 bg-white dark:bg-gray-800"
                       : "text-gray-600 hover:text-indigo-600 dark:text-gray-300 dark:hover:text-indigo-400 hover:bg-white/50 dark:hover:bg-gray-800/50"
-                    }`}
+                  }`}
                 >
                   <svg
                     className="w-5 h-5 mr-2"
@@ -394,7 +407,11 @@ function DesignPage() {
                           strokeLinecap="round"
                           strokeLinejoin="round"
                           strokeWidth={2}
-                          d={zoomImage ? "M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM13 10H7" : "M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v6m3-3H7"}
+                          d={
+                            zoomImage
+                              ? "M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM13 10H7"
+                              : "M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v6m3-3H7"
+                          }
                         />
                       </svg>
                       {zoomImage ? "Shrink" : "Expand"}
@@ -422,7 +439,11 @@ function DesignPage() {
                     </a>
                   </div>
                 </div>
-                <div className={`relative ${zoomImage ? 'h-96 md:h-[500px]' : 'h-64'} transition-all duration-300 bg-white dark:bg-gray-800 rounded-lg overflow-hidden shadow-md border border-gray-100 dark:border-gray-700 group`}>
+                <div
+                  className={`relative ${
+                    zoomImage ? "h-96 md:h-[500px]" : "h-64"
+                  } transition-all duration-300 bg-white dark:bg-gray-800 rounded-lg overflow-hidden shadow-md border border-gray-100 dark:border-gray-700 group`}
+                >
                   <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 to-pink-500/10 dark:from-purple-500/5 dark:to-pink-500/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
                   <img
                     src={design.imageUrl}
@@ -435,66 +456,70 @@ function DesignPage() {
 
             {/* Sandpack */}
             <div className="p-6">
-              <SandpackProvider
-                options={{
-                  externalResources: ["https://cdn.tailwindcss.com"],
-                  classes: {
-                    "sp-wrapper":
-                      "custom-wrapper rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700 shadow-lg",
-                    "sp-layout": "custom-layout",
-                    "sp-tab-button": "custom-tab",
-                  },
-                }}
-                customSetup={{
-                  dependencies: {
-                    "react-markdown": "latest",
-                    "lucide-react": "latest",
-                  },
-                }}
-                files={{
-                  "/App.js": design.code.content,
-                }}
-                theme="auto"
-                template="react"
-              >
-                <SandpackLayout
-                  style={{
-                    width: "100%",
-                    height: activeTab === "preview" ? "700px" : "800px",
-                    borderRadius: "0.5rem",
+              {Template == "react" ? (
+                <SandpackProvider
+                  options={{
+                    externalResources: ["https://cdn.tailwindcss.com"],
+                    classes: {
+                      "sp-wrapper":
+                        "custom-wrapper rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700 shadow-lg",
+                      "sp-layout": "custom-layout",
+                      "sp-tab-button": "custom-tab",
+                    },
                   }}
+                  customSetup={{
+                    dependencies: {
+                      "react-markdown": "latest",
+                      "lucide-react": "latest",
+                    },
+                  }}
+                  files={{
+                    "/App.js": design.code.content,
+                  }}
+                  theme="auto"
+                  template="react"
                 >
-                  {activeTab === "code" && (
-                    <SandpackCodeEditor
-                      style={{
-                        height: "100%",
-                        minWidth: "100%",
-                      }}
-                      showLineNumbers
-                      showTabs
-                      readOnly
-                    />
-                  )}
-                  {activeTab === "preview" && (
-                    <SandpackPreview
-                      style={{
-                        height: "100%",
-                        minWidth: "100%",
-                        display: "flex",
-                        flexDirection: "column",
-                        overflow: "auto",
-                      }}
-                    />
-                  )}
-                </SandpackLayout>
-              </SandpackProvider>
+                  <SandpackLayout
+                    style={{
+                      width: "100%",
+                      height: activeTab === "preview" ? "700px" : "800px",
+                      borderRadius: "0.5rem",
+                    }}
+                  >
+                    {activeTab === "code" && (
+                      <SandpackCodeEditor
+                        style={{
+                          height: "100%",
+                          minWidth: "100%",
+                        }}
+                        showLineNumbers
+                        showTabs
+                        readOnly
+                      />
+                    )}
+                    {activeTab === "preview" && (
+                      <SandpackPreview
+                        style={{
+                          height: "100%",
+                          minWidth: "100%",
+                          display: "flex",
+                          flexDirection: "column",
+                          overflow: "auto",
+                        }}
+                      />
+                    )}
+                  </SandpackLayout>
+                </SandpackProvider>
+              ) : null}
             </div>
 
             {/* Actions */}
             <div className="p-6 bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-900/80 border-t border-gray-200 dark:border-gray-700 flex flex-wrap gap-4 justify-between items-center">
               <div className="flex items-center">
                 <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse mr-2"></div>
-                <span className="text-sm text-gray-600 dark:text-gray-400">Last updated: {formatDate(design.createdAt)}</span>
+                <span className="text-sm text-gray-600 dark:text-gray-400">
+                  Last updated: {formatDate(design.createdAt)}
+                </span>
               </div>
 
               <div className="flex flex-wrap gap-3">

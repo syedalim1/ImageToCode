@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/configs/db";
 import { usersTable } from "@/configs/schema";
 import { eq } from "drizzle-orm";
+import OpenAI from "openai";
 
 // Centralized configuration
 const CONFIG = {
@@ -21,7 +22,7 @@ const CONFIG = {
     MINIMUM_BALANCE: 10,
   },
   GENERATION: {
-    MAX_TOKENS: 10000,
+    MAX_TOKENS: 100000,
     TIMEOUT_MS: 4000,
   },
 };
@@ -48,8 +49,12 @@ export async function POST(req: NextRequest) {
     }
 
     // Prepare enhanced description
+    if (language === "react-tailwind") {
+    } else if (language === "nextjs-tailwind") {
+    } else if (language === "html-css") {
+    }
     const enhancedDescription =
-      Constants.PROMPTFORNEXTJS +
+      Constants.IMAGE_TO_NEXTJS_PROMPT +
       Constants.ERROR_PREVENTION_PROMPTFORNEXTJS +
       description +
       "\n\n" +
@@ -133,7 +138,83 @@ export async function POST(req: NextRequest) {
         codeContent = codeContent
           .replace(/```javascript|```typescript|```jsx|```tsx|```/g, "")
           .trim();
+      //  ` try {
+          // const openai = new OpenAI({
+          //   baseURL: "https://api.deepseek.com",
+          //   apiKey: process.env.DEEPSEEK_API_KEY,
+          // });
 
+        //   const completion = await openai.chat.completions.create({
+        //     messages: [
+        //       {
+        //         role: "system",
+        //         content:
+        //           codeContent +
+        //           "\n\n" +
+        //           Constants.ERROR_PREVENTION_PROMPTFORNEXTJS +
+        //           "\n\n" +
+        //           "Give me More Responsive FIx All The Error Proper Run the Code And More Proffessinal More Attractive ",
+        //       },
+        //     ],
+        //     model: "deepseek-reasoner",
+        //   });
+        //   console.log(completion.choices[0].message.content);
+        // } catch (error) {
+        //   return NextResponse.json(
+        //     { error: "Failed to Deepseek generate content", details: String(error) },
+        //     { status: 500 }
+        //   );
+        // } `
+        //Document
+        `const axios = require('axios');
+let data = JSON.stringify({
+  "messages": [
+    {
+      "content": "You are a helpful assistant",
+      "role": "system"
+    },
+    {
+      "content": "Hi",
+      "role": "user"
+    }
+  ],
+  "model": "deepseek-chat",
+  "frequency_penalty": 0,
+  "max_tokens": 2048,
+  "presence_penalty": 0,
+  "response_format": {
+    "type": "text"
+  },
+  "stop": null,
+  "stream": false,
+  "stream_options": null,
+  "temperature": 1,
+  "top_p": 1,
+  "tools": null,
+  "tool_choice": "none",
+  "logprobs": false,
+  "top_logprobs": null
+});
+
+let config = {
+  method: 'post',
+maxBodyLength: Infinity,
+  url: 'https://api.deepseek.com/chat/completions',
+  headers: { 
+    'Content-Type': 'application/json', 
+    'Accept': 'application/json', 
+    'Authorization': 'Bearer <TOKEN>'
+  },
+  data : data
+};
+
+axios(config)
+.then((response) => {
+  console.log(JSON.stringify(response.data));
+})
+.catch((error) => {
+  console.log(error);
+});`;
         return new Response(codeContent);
       }
     } catch (apiError) {
