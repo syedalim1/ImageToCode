@@ -16,6 +16,7 @@ import {
   Crown,
   Zap,
   Layers,
+  Palette,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
@@ -104,7 +105,49 @@ function AppHeader() {
     }
   }, [logoHovered, logoControls]);
 
-  // Enhanced sidebar animations
+  // Enhanced nav items with more creative icons and colors
+  const navItems = [
+    {
+      id: "dashboard",
+      label: "Home",
+      icon: Home,
+      color: {
+        gradient: "from-blue-500 to-cyan-500",
+        activeBackground: "bg-gradient-to-tr from-blue-600 to-cyan-400",
+        activeGlow: "shadow-xl shadow-blue-500/50 ring-2 ring-blue-300/50",
+      },
+    },
+    {
+      id: "designs",
+      label: "My Designs",
+      icon: Layers,
+      color: {
+        gradient: "from-violet-500 to-purple-600",
+        activeBackground: "bg-gradient-to-tr from-violet-600 to-purple-500",
+        activeGlow: "shadow-xl shadow-purple-500/50 ring-2 ring-purple-300/50",
+      },
+    },
+    {
+      id: "credits",
+      label: "Pricing",
+      icon: Crown,
+      color: {
+        gradient: "from-amber-500 to-orange-500",
+        activeBackground: "bg-gradient-to-tr from-amber-600 to-orange-400",
+        activeGlow: "shadow-xl shadow-orange-500/50 ring-2 ring-orange-300/50",
+      },
+    },
+    {
+      id: "profile",
+      label: "Settings",
+      icon: Settings,
+      color: {
+        gradient: "from-gray-600 to-gray-800",
+        activeBackground: "bg-gradient-to-tr from-gray-700 to-gray-900",
+        activeGlow: "shadow-xl shadow-gray-500/50 ring-2 ring-gray-300/50",
+      },
+    },
+  ];
   const sidebarVariants = {
     open: {
       x: 0,
@@ -134,10 +177,18 @@ function AppHeader() {
     open: {
       x: 0,
       opacity: 1,
+      transition: {
+        type: "spring",
+        stiffness: 300,
+      },
     },
     closed: {
       x: -20,
       opacity: 0,
+      transition: {
+        type: "spring",
+        stiffness: 300,
+      },
     },
   };
 
@@ -156,77 +207,50 @@ function AppHeader() {
     },
   };
 
-  // Enhanced nav items with more creative icons and colors
-  const navItems = [
-    {
-      id: "dashboard",
-      label: "Home",
-      icon: Home,
-      color: "from-blue-500 to-cyan-500",
-      hoverEffect: "hover:shadow-blue-300/50",
-    },
-    {
-      id: "designs",
-      label: "My Designs",
-      icon: Layers,
-      color: "from-violet-500 to-purple-600",
-      hoverEffect: "hover:shadow-purple-300/50",
-    },
-    {
-      id: "credits",
-      label: "Pricing",
-      icon: Crown,
-      color: "from-amber-500 to-orange-500",
-      hoverEffect: "hover:shadow-amber-300/50",
-    },
-    {
-      id: "profile",
-      label: "Settings",
-      icon: Settings,
-      color: "from-gray-600 to-gray-800",
-      hoverEffect: "hover:shadow-gray-300/50",
-    },
-  ];
-
-  // Additional items for mobile sidebar
   const sidebarItems = [
     {
       id: "dashboard",
       label: "Home",
       icon: Home,
-      color: "from-blue-500 to-cyan-500",
+      color: {
+        active: "from-emerald-500 to-teal-600",
+        gradient: "bg-gradient-to-r from-emerald-400 to-teal-500",
+        glow: "shadow-emerald-500/50",
+      },
     },
     {
       id: "designs",
       label: "My Designs",
       icon: Layers,
-      color: "from-violet-500 to-purple-600",
+      color: {
+        active: "from-fuchsia-600 to-pink-500",
+        gradient: "bg-gradient-to-r from-fuchsia-500 to-pink-600",
+        glow: "shadow-fuchsia-500/50",
+      },
     },
     {
       id: "credits",
       label: "Pricing",
       icon: Crown,
-      color: "from-amber-500 to-orange-500",
-    },
-    {
-      id: "ai",
-      label: "AI Features",
-      icon: Cpu,
-      color: "from-green-500 to-emerald-600",
-    },
-    {
-      id: "favorites",
-      label: "Favorites",
-      icon: Star,
-      color: "from-yellow-500 to-amber-600",
+      color: {
+        active: "from-amber-600 to-orange-500",
+        gradient: "bg-gradient-to-r from-amber-500 to-orange-600",
+        glow: "shadow-amber-500/50",
+      },
     },
     {
       id: "profile",
       label: "Settings",
       icon: Settings,
-      color: "from-gray-600 to-gray-800",
+      color: {
+        active: "from-indigo-600 to-blue-500",
+        gradient: "bg-gradient-to-r from-indigo-500 to-blue-600",
+        glow: "shadow-indigo-500/50",
+      },
     },
   ];
+  // Navbar Component
+
 
   // Enhanced rainbow gradient for animated background
   const rainbowGradient = scrolled
@@ -311,44 +335,90 @@ function AppHeader() {
 
           {/* Center navigation - enhanced visual design */}
           <nav className="hidden md:flex items-center justify-center space-x-1 absolute left-1/2 transform -translate-x-1/2">
-            <div className="p-1 rounded-2xl bg-white/50 shadow-sm backdrop-blur-sm flex items-center">
-              {navItems.map((item) => (
-                <motion.div
-                  key={item.id}
-                  className="relative"
-                  onHoverStart={() => setHoveredNavItem(item.id)}
-                  onHoverEnd={() => setHoveredNavItem(null)}
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.98 }}
-                >
-                  <Link
-                    href={`/${item.id}`}
-                    className={`flex items-center px-3 py-2 rounded-xl text-sm font-medium transition-all duration-300 ${
-                      activeTab === item.id
-                        ? `text-white bg-gradient-to-r ${item.color} shadow-md ${item.hoverEffect}`
-                        : "text-gray-700 hover:text-gray-900 hover:bg-white/80 hover:shadow-sm"
-                    }`}
-                  >
-                    <item.icon className="h-4 w-4 mr-2" />
-                    {item.label}
-                    {activeTab === item.id && (
-                      <motion.div
-                        initial={{ scale: 0 }}
-                        animate={{ scale: 1 }}
-                        className="ml-2 w-1.5 h-1.5 rounded-full bg-white"
-                      />
-                    )}
-                  </Link>
-                  {hoveredNavItem === item.id && (
+            <div className="p-1 rounded-2xl  shadow-lg  flex items-center">
+              <motion.div
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, type: "spring" }}
+                className="p-1.5 rounded-3xl "
+              >
+                <div className="flex items-center space-x-1">
+                  {navItems.map((item) => (
                     <motion.div
-                      initial={{ opacity: 0, y: 5 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: 5 }}
-                      className="absolute -bottom-1 left-0 right-0 h-0.5 bg-gradient-to-r from-pink-500 to-purple-500"
-                    />
-                  )}
-                </motion.div>
-              ))}
+                      key={item.id}
+                      className="relative"
+                      onHoverStart={() => setHoveredNavItem(item.id)}
+                      onHoverEnd={() => setHoveredNavItem(null)}
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                    >
+                      <Link
+                        href={`/${item.id}`}
+                        onClick={() => setActiveTab(item.id)}
+                        className={`
+                    flex items-center px-4 py-2.5 rounded-2xl text-sm font-semibold 
+                    transition-all duration-300 group relative overflow-hidden
+                    ${
+                      activeTab === item.id
+                        ? `${item.color.activeBackground} text-white ${item.color.activeGlow}`
+                        : "text-gray-600 hover:bg-white/80 hover:text-gray-900"
+                    }
+                  `}
+                      >
+                        {/* Subtle background effect for active state */}
+                        {activeTab === item.id && (
+                          <motion.span
+                            layoutId="nav-bubble"
+                            className="absolute inset-0 bg-white/20 rounded-2xl"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                          />
+                        )}
+
+                        <item.icon
+                          className={`
+                      h-5 w-5 mr-2 
+                      ${
+                        activeTab === item.id
+                          ? "text-white"
+                          : "text-gray-500 group-hover:text-gray-700"
+                      }
+                    `}
+                        />
+                        {item.label}
+
+                        {/* Active indicator */}
+                        {activeTab === item.id && (
+                          <motion.div
+                            layoutId="active-dot"
+                            className="ml-2 w-2 h-2 rounded-full bg-white/80"
+                          />
+                        )}
+                      </Link>
+                    </motion.div>
+                  ))}
+                </div>
+              </motion.div>
+
+              {/* Hover underline effect */}
+              <AnimatePresence>
+                {hoveredNavItem && (
+                  <motion.div
+                    initial={{ opacity: 0, width: 0 }}
+                    animate={{
+                      opacity: 1,
+                      width: "100%",
+                      transition: { duration: 0.3 },
+                    }}
+                    exit={{
+                      opacity: 0,
+                      width: 0,
+                      transition: { duration: 0.2 },
+                    }}
+                    className="absolute bottom-0 left-0 h-0.5 bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500"
+                  />
+                )}
+              </AnimatePresence>
             </div>
           </nav>
 
@@ -361,6 +431,7 @@ function AppHeader() {
       </motion.header>
 
       {/* Mobile Sidebar with enhanced styling and animations */}
+
       <AnimatePresence>
         {sidebarOpen && (
           <>
@@ -384,33 +455,60 @@ function AppHeader() {
             >
               <div className="flex flex-col h-full">
                 {/* Enhanced Header with glow effect */}
-                <div className="flex items-center justify-between p-4 border-b border-purple-700/50 relative">
-                  <Link href="/" className="flex items-center">
-                    <div className="p-2 rounded-lg bg-white/10 mr-3 shadow-inner shadow-purple-800/50">
-                      <Image className="h-6 w-6 text-white" />
+                <div className="flex items-center justify-between p-4 border-b border-purple-700/30 relative overflow-hidden">
+                  <Link
+                    href="/"
+                    className="flex items-center group transition-all duration-300"
+                  >
+                    <div className="p-2.5 rounded-xl bg-gradient-to-br from-purple-600/20 to-purple-800/30 mr-4 shadow-md shadow-purple-800/40 group-hover:scale-105 transition-transform">
+                      <Palette className="h-7 w-7 text-white opacity-90 group-hover:opacity-100 transition-opacity" />
                     </div>
-                    <span className="text-xl font-bold text-white">
+                    <span
+                      className="text-2xl font-extrabold text-white tracking-tight 
+      bg-clip-text text-transparent bg-gradient-to-r from-white to-purple-300 
+      group-hover:from-purple-200 group-hover:to-purple-400 transition-all duration-300"
+                    >
                       ImageToCode
                     </span>
                   </Link>
+
                   <motion.button
                     whileHover={{
                       scale: 1.1,
-                      backgroundColor: "rgba(255,255,255,0.2)",
+                      backgroundColor: "rgba(126,34,206,0.3)", // More vibrant purple hover
                     }}
-                    whileTap={{ scale: 0.9 }}
+                    whileTap={{
+                      scale: 0.9,
+                      transition: { duration: 0.1 },
+                    }}
                     onClick={() => setSidebarOpen(false)}
-                    className="p-2 rounded-full hover:bg-purple-800/50"
+                    className="p-2.5 rounded-full hover:bg-purple-800/40  transition-all duration-300 group relative"
                   >
-                    <X className="h-5 w-5 text-white" />
+              
+
+                    {/* Subtle hover effect */}
+                    <span
+                      className="absolute inset-0 rounded-full border border-purple-500/30 
+      opacity-0 group-hover:opacity-100 animate-ping"
+                    ></span>
                   </motion.button>
 
-                  {/* Decorative glow element */}
-                  <div className="absolute -top-10 -right-10 w-20 h-20 bg-purple-400/20 rounded-full blur-xl"></div>
+                  {/* Enhanced decorative glow elements */}
+                  <div
+                    className="absolute -top-12 -right-12 w-24 h-24 
+    bg-gradient-to-br from-purple-400/20 via-purple-600/10 to-transparent 
+    rounded-full blur-2xl animate-pulse"
+                  ></div>
+
+                  <div
+                    className="absolute -bottom-8 -left-8 w-20 h-20 
+    bg-gradient-to-tr from-purple-500/10 via-purple-700/5 to-transparent 
+    rounded-full blur-xl"
+                  ></div>
                 </div>
 
                 {/* Enhanced menu items with staggered animation and visual indicators */}
-                <div className="flex-grow overflow-y-auto py-4 space-y-2 px-3">
+                <div className="flex-grow overflow-y-auto py-4 space-y-2 px-3 pt-6">
                   {sidebarItems.map((item, index) => (
                     <motion.div
                       key={item.id}
@@ -418,7 +516,7 @@ function AppHeader() {
                       custom={index}
                       whileHover={{
                         x: 5,
-                        backgroundColor: "rgba(255,255,255,0.1)",
+                        scale: 1.02,
                         transition: { duration: 0.2 },
                       }}
                       whileTap={{ scale: 0.98 }}
@@ -428,8 +526,8 @@ function AppHeader() {
                         className={`flex items-center justify-between px-4 py-3 rounded-xl text-sm font-medium relative overflow-hidden
                           ${
                             activeTab === item.id
-                              ? `bg-gradient-to-r ${item.color} text-white shadow-lg`
-                              : "text-white hover:shadow-md hover:shadow-purple-800/20"
+                              ? `${item.color.gradient} text-white ${item.color.glow} shadow-lg`
+                              : "text-white/80 hover:bg-white/10 hover:text-white"
                           }`}
                         onClick={() => {
                           setActiveTab(item.id);
@@ -455,7 +553,7 @@ function AppHeader() {
                           <div
                             className={`p-2 rounded-lg ${
                               activeTab === item.id
-                                ? "bg-white/20"
+                                ? "bg-white/30"
                                 : "bg-white/10"
                             } mr-3`}
                           >
@@ -469,10 +567,13 @@ function AppHeader() {
                   ))}
                 </div>
 
-                {/* Version info */}
-                <div className="p-4 text-white/50 text-xs text-center border-t border-purple-700/30">
-                  <p>ImageToCode v2.5.0</p>
-                  <p className="mt-1">Transform designs into code with AI</p>
+                {/* Version info with decorative elements */}
+                <div className="p-4 text-white/50 text-xs text-center border-t border-purple-700/30 bg-black/10">
+                  <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-500 via-fuchsia-500 to-amber-500 opacity-50"></div>
+                  <p className="font-semibold">ImageToCode v2.5.0</p>
+                  <p className="mt-1 text-white/40">
+                    Transform designs into code with AI
+                  </p>
                 </div>
               </div>
             </motion.div>
