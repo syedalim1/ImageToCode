@@ -183,7 +183,7 @@ function Authentication() {
         ) : null}
       </SignedIn>
       <SignedOut>
-        <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
+        <div className="flex flex-row  gap-3 sm:gap-4">
           {/* Enhanced Sign In Button */}
           <motion.div
             ref={signInRef}

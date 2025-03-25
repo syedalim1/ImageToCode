@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { useUser } from "@clerk/nextjs";
 
 function AppHeader() {
   const [scrolled, setScrolled] = useState(false);
@@ -35,6 +36,7 @@ function AppHeader() {
   const lastScrollY = useRef(0);
   const [headerVisible, setHeaderVisible] = useState(true);
 
+  const { user } = useUser();
   // Enhanced responsive behavior
   useEffect(() => {
     const checkMobile = () => {
@@ -249,8 +251,6 @@ function AppHeader() {
       },
     },
   ];
-  // Navbar Component
-
 
   // Enhanced rainbow gradient for animated background
   const rainbowGradient = scrolled
@@ -282,19 +282,21 @@ function AppHeader() {
           {/* Left section with logo and mobile menu button */}
           <div className="flex items-center space-x-3">
             {/* Mobile menu button with enhanced gradient */}
-            <motion.button
-              whileHover={{
-                scale: 1.05,
-                boxShadow: "0 0 10px rgba(147, 51, 234, 0.5)",
-              }}
-              whileTap={{ scale: 0.95 }}
-              onClick={() => setSidebarOpen(true)}
-              className="md:hidden flex items-center justify-center w-10 h-10 rounded-lg bg-gradient-to-br from-violet-600 to-purple-700 text-white shadow-md shadow-purple-300/30 menu-button"
-              aria-label="Open menu"
-            >
-              <Menu className="h-5 w-5" />
-            </motion.button>
 
+            {user ? (
+              <motion.button
+                whileHover={{
+                  scale: 1.05,
+                  boxShadow: "0 0 10px rgba(147, 51, 234, 0.5)",
+                }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => setSidebarOpen(true)}
+                className="md:hidden flex items-center justify-center w-10 h-10 rounded-lg bg-gradient-to-br from-violet-600 to-purple-700 text-white shadow-md shadow-purple-300/30 menu-button"
+                aria-label="Open menu"
+              >
+                <Menu className="h-5 w-5" />
+              </motion.button>
+            ) : null}
             {/* Enhanced Logo with 3D effect and interactive animation */}
             <motion.div
               initial={{ opacity: 0 }}
@@ -334,28 +336,29 @@ function AppHeader() {
           </div>
 
           {/* Center navigation - enhanced visual design */}
-          <nav className="hidden md:flex items-center justify-center space-x-1 absolute left-1/2 transform -translate-x-1/2">
-            <div className="p-1 rounded-2xl  shadow-lg  flex items-center">
-              <motion.div
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, type: "spring" }}
-                className="p-1.5 rounded-3xl "
-              >
-                <div className="flex items-center space-x-1">
-                  {navItems.map((item) => (
-                    <motion.div
-                      key={item.id}
-                      className="relative"
-                      onHoverStart={() => setHoveredNavItem(item.id)}
-                      onHoverEnd={() => setHoveredNavItem(null)}
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                    >
-                      <Link
-                        href={`/${item.id}`}
-                        onClick={() => setActiveTab(item.id)}
-                        className={`
+          {user ? (
+            <nav className="hidden md:flex items-center justify-center space-x-1 absolute left-1/2 transform -translate-x-1/2">
+              <div className="p-1 rounded-2xl  shadow-lg  flex items-center">
+                <motion.div
+                  initial={{ opacity: 0, y: -20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, type: "spring" }}
+                  className="p-1.5 rounded-3xl "
+                >
+                  <div className="flex items-center space-x-1">
+                    {navItems.map((item) => (
+                      <motion.div
+                        key={item.id}
+                        className="relative"
+                        onHoverStart={() => setHoveredNavItem(item.id)}
+                        onHoverEnd={() => setHoveredNavItem(null)}
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                      >
+                        <Link
+                          href={`/${item.id}`}
+                          onClick={() => setActiveTab(item.id)}
+                          className={`
                     flex items-center px-4 py-2.5 rounded-2xl text-sm font-semibold 
                     transition-all duration-300 group relative overflow-hidden
                     ${
@@ -364,19 +367,19 @@ function AppHeader() {
                         : "text-gray-600 hover:bg-white/80 hover:text-gray-900"
                     }
                   `}
-                      >
-                        {/* Subtle background effect for active state */}
-                        {activeTab === item.id && (
-                          <motion.span
-                            layoutId="nav-bubble"
-                            className="absolute inset-0 bg-white/20 rounded-2xl"
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                          />
-                        )}
+                        >
+                          {/* Subtle background effect for active state */}
+                          {activeTab === item.id && (
+                            <motion.span
+                              layoutId="nav-bubble"
+                              className="absolute inset-0 bg-white/20 rounded-2xl"
+                              initial={{ opacity: 0 }}
+                              animate={{ opacity: 1 }}
+                            />
+                          )}
 
-                        <item.icon
-                          className={`
+                          <item.icon
+                            className={`
                       h-5 w-5 mr-2 
                       ${
                         activeTab === item.id
@@ -384,43 +387,44 @@ function AppHeader() {
                           : "text-gray-500 group-hover:text-gray-700"
                       }
                     `}
-                        />
-                        {item.label}
-
-                        {/* Active indicator */}
-                        {activeTab === item.id && (
-                          <motion.div
-                            layoutId="active-dot"
-                            className="ml-2 w-2 h-2 rounded-full bg-white/80"
                           />
-                        )}
-                      </Link>
-                    </motion.div>
-                  ))}
-                </div>
-              </motion.div>
+                          {item.label}
 
-              {/* Hover underline effect */}
-              <AnimatePresence>
-                {hoveredNavItem && (
-                  <motion.div
-                    initial={{ opacity: 0, width: 0 }}
-                    animate={{
-                      opacity: 1,
-                      width: "100%",
-                      transition: { duration: 0.3 },
-                    }}
-                    exit={{
-                      opacity: 0,
-                      width: 0,
-                      transition: { duration: 0.2 },
-                    }}
-                    className="absolute bottom-0 left-0 h-0.5 bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500"
-                  />
-                )}
-              </AnimatePresence>
-            </div>
-          </nav>
+                          {/* Active indicator */}
+                          {activeTab === item.id && (
+                            <motion.div
+                              layoutId="active-dot"
+                              className="ml-2 w-2 h-2 rounded-full bg-white/80"
+                            />
+                          )}
+                        </Link>
+                      </motion.div>
+                    ))}
+                  </div>
+                </motion.div>
+
+                {/* Hover underline effect */}
+                <AnimatePresence>
+                  {hoveredNavItem && (
+                    <motion.div
+                      initial={{ opacity: 0, width: 0 }}
+                      animate={{
+                        opacity: 1,
+                        width: "100%",
+                        transition: { duration: 0.3 },
+                      }}
+                      exit={{
+                        opacity: 0,
+                        width: 0,
+                        transition: { duration: 0.2 },
+                      }}
+                      className="absolute bottom-0 left-0 h-0.5 bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500"
+                    />
+                  )}
+                </AnimatePresence>
+              </div>
+            </nav>
+          ) : null}
 
           {/* Right section with enhanced actions */}
           <div className="flex items-center space-x-2">
@@ -484,8 +488,6 @@ function AppHeader() {
                     onClick={() => setSidebarOpen(false)}
                     className="p-2.5 rounded-full hover:bg-purple-800/40  transition-all duration-300 group relative"
                   >
-              
-
                     {/* Subtle hover effect */}
                     <span
                       className="absolute inset-0 rounded-full border border-purple-500/30 
@@ -508,6 +510,8 @@ function AppHeader() {
                 </div>
 
                 {/* Enhanced menu items with staggered animation and visual indicators */}
+                {/* if user login */}
+
                 <div className="flex-grow overflow-y-auto py-4 space-y-2 px-3 pt-6">
                   {sidebarItems.map((item, index) => (
                     <motion.div

@@ -1,16 +1,9 @@
 "use client";
 
-import { useEffect } from "react";
 import { SignIn } from "@clerk/nextjs";
-import { useRouter } from "next/navigation";
 
 export default function SignInPage() {
-  const router = useRouter();
 
-  // Redirect to home after sign-in
-  const handleSignInComplete = () => {
-    router.push("/");
-  };
 
   return (
     <div className="flex items-center justify-center min-h-[calc(100vh-4rem)] py-12 px-4 sm:px-6 lg:px-8">

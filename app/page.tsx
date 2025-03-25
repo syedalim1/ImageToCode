@@ -1,48 +1,13 @@
 "use client";
 
-import { Suspense, lazy } from "react";
-import dynamic from "next/dynamic";
+import CTASection from "./_components/CTASection";
+import FeaturesSection from "./_components/FeaturesSection";
 import Footer from "./_components/Footer";
+import HeroSection from "./_components/HeroSection";
+import PricingSection from "./_components/PricingSection";
+import EnhancedStatsSection from "./_components/StatsSection";
 
-// Use React.lazy for non-critical components
-const HeroSection = dynamic(() => import("./_components/HeroSection.tsx"), {
-  ssr: true,
-});
 
-// Defer loading of below-the-fold content
-const StatsSection = dynamic(() => import("./_components/StatsSection.tsx"), {
-  ssr: true,
-  loading: () => (
-    <div className="h-[300px] bg-gradient-to-b from-indigo-50/50 to-purple-50/50 animate-pulse" />
-  ),
-});
-
-const FeaturesSection = dynamic(
-  () => import("./_components/FeaturesSection.tsx"),
-  {
-    ssr: true,
-    loading: () => (
-      <div className="h-[400px] bg-gradient-to-b from-indigo-50/50 to-purple-50/50 animate-pulse" />
-    ),
-  }
-);
-
-const PricingSection = dynamic(
-  () => import("./_components/PricingSection.tsx"),
-  {
-    ssr: true,
-    loading: () => (
-      <div className="h-[300px] bg-gradient-to-b from-indigo-50/50 to-purple-50/50 animate-pulse" />
-    ),
-  }
-);
-
-const CTASection = dynamic(() => import("./_components/CTASection.tsx"), {
-  ssr: true,
-  loading: () => (
-    <div className="h-[200px] bg-gradient-to-b from-indigo-50/50 to-purple-50/50 animate-pulse" />
-  ),
-});
 
 export default function Home() {
   return (
@@ -51,21 +16,13 @@ export default function Home() {
       <div style={{ contain: "content" }}>
         <HeroSection />
 
-        <Suspense fallback={<div className="h-[300px] animate-pulse" />}>
-          <StatsSection />
-        </Suspense>
+        <EnhancedStatsSection />
 
-        <Suspense fallback={<div className="h-[400px] animate-pulse" />}>
-          <FeaturesSection />
-        </Suspense>
+        <FeaturesSection />
 
-        <Suspense fallback={<div className="h-[300px] animate-pulse" />}>
-          <PricingSection />
-        </Suspense>
+        <PricingSection />
 
-        <Suspense fallback={<div className="h-[200px] animate-pulse" />}>
-          <CTASection />
-        </Suspense>
+        <CTASection />
 
         <Footer />
       </div>
