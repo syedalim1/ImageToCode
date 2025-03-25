@@ -19,7 +19,7 @@ import {
   Info,
 } from "lucide-react";
 import { useState, useEffect } from "react";
-import { cn } from "@/lib/utils";
+
 
 interface ActionButtonsProps {
   onSave: () => void;
@@ -204,19 +204,8 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
     setTimeout(() => setSaveSuccess(false), 2000);
   };
 
-  // Open GitHub repository
-  const openGitHub = () => {
-    window.open("https://github.com/yourusername/your-repo", "_blank");
-  };
-
-  // Cycle through color themes
-  const cycleColorTheme = () => {
-    const themes = Object.keys(colorThemes);
-    const currentIndex = themes.indexOf(colorTheme);
-    const nextIndex = (currentIndex + 1) % themes.length;
-    setColorTheme(themes[nextIndex]);
-  };
-
+  
+ 
   // Tooltip handler
   const handleTooltip = (tip: string) => {
     setShowTooltip(tip);
@@ -541,33 +530,6 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
           </motion.div>
         )}
       </div>
-
-      {/* Code quality indicator (only when code exists) */}
-      {hasCode && !isLoading && (
-        <motion.div
-          className="flex justify-end mt-2"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.5 }}
-        >
-          <div className="flex items-center gap-1 px-3 py-1.5 bg-gradient-to-r from-green-50 to-emerald-50 text-green-700 rounded-full text-xs border border-green-100 shadow-sm">
-            <Award className="h-4 w-4 text-green-500" />
-            <span>Code Quality: Excellent</span>
-            <div className="flex ml-1">
-              {[1, 2, 3, 4, 5].map((star) => (
-                <motion.div
-                  key={star}
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  transition={{ delay: 0.5 + star * 0.1 }}
-                >
-                  <ThumbsUp className="h-3 w-3 text-green-500 fill-green-500" />
-                </motion.div>
-              ))}
-            </div>
-          </div>
-        </motion.div>
-      )}
     </div>
   );
 };

@@ -89,7 +89,7 @@ const Page: React.FC = () => {
       const qualityBase = Math.min(lines / 10, 10);
       const qualityBonus = Math.min(functions / 2, 5);
       const quality = Math.min(Math.round(qualityBase + qualityBonus), 10);
-    
+
       setCodeStats({
         lines,
         characters,
@@ -118,7 +118,7 @@ const Page: React.FC = () => {
       const { data } = await axios.get<APIResponse>(
         `/api/codetoimage?uid=${uid}`
       );
-   
+
       const normalizedRecord: CodeRecord = {
         ...data,
         code:
@@ -181,10 +181,10 @@ const Page: React.FC = () => {
   };
 
   const generateCode = async (record: CodeRecord) => {
-    // if (regenerationCount >= MAX_REGENERATIONS) {
-    //   setError("Maximum regenerations reached");
-    //   return;
-    // }
+    if (regenerationCount >= MAX_REGENERATIONS) {
+      setError("Maximum regenerations reached");
+      return;
+    }
 
     const userdatabase = await db
       .select()
@@ -211,10 +211,10 @@ const Page: React.FC = () => {
       setResponse("");
       setError("");
       setShowStats(false);
-      
-console.log('====================================');
-console.log(record," record");
-console.log('====================================');
+
+      console.log('====================================');
+      console.log(record, " record");
+      console.log('====================================');
       const res = await fetch("/api/ai-model", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -358,9 +358,8 @@ console.log('====================================');
       stars.push(
         <Star
           key={i}
-          className={`h-4 w-4 ${
-            filled ? "text-yellow-400 fill-yellow-400" : "text-gray-300"
-          }`}
+          className={`h-4 w-4 ${filled ? "text-yellow-400 fill-yellow-400" : "text-gray-300"
+            }`}
         />
       );
     }
