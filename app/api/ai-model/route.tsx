@@ -49,10 +49,10 @@ export async function POST(req: NextRequest) {
     }
 
     // Prepare enhanced description
-    if (language === "react-tailwind") {
-    } else if (language === "nextjs-tailwind") {
-    } else if (language === "html-css") {
-    }
+    // if (language === "react-tailwind") {
+    // } else if (language === "nextjs-tailwind") {
+    // } else if (language === "html-css") {
+    // }
     const enhancedDescription =
       Constants.IMAGE_TO_NEXTJS_PROMPT +
       Constants.ERROR_PREVENTION_PROMPTFORNEXTJS +
@@ -138,35 +138,58 @@ export async function POST(req: NextRequest) {
         codeContent = codeContent
           .replace(/```javascript|```typescript|```jsx|```tsx|```/g, "")
           .trim();
-      //  ` try {
-          // const openai = new OpenAI({
-          //   baseURL: "https://api.deepseek.com",
-          //   apiKey: process.env.DEEPSEEK_API_KEY,
-          // });
 
-        //   const completion = await openai.chat.completions.create({
-        //     messages: [
-        //       {
-        //         role: "system",
-        //         content:
-        //           codeContent +
-        //           "\n\n" +
-        //           Constants.ERROR_PREVENTION_PROMPTFORNEXTJS +
-        //           "\n\n" +
-        //           "Give me More Responsive FIx All The Error Proper Run the Code And More Proffessinal More Attractive ",
-        //       },
-        //     ],
-        //     model: "deepseek-reasoner",
-        //   });
-        //   console.log(completion.choices[0].message.content);
-        // } catch (error) {
-        //   return NextResponse.json(
-        //     { error: "Failed to Deepseek generate content", details: String(error) },
-        //     { status: 500 }
-        //   );
-        // } `
-        //Document
-        `const axios = require('axios');
+        return new Response(codeContent);
+      }
+    } catch (apiError) {
+      console.error("API Request Error:", apiError);
+      return NextResponse.json(
+        { error: "Failed to generate content", details: String(apiError) },
+        { status: 500 }
+      );
+    }
+  } catch (error) {
+    console.error("Server Processing Error:", error);
+
+    return NextResponse.json(
+      {
+        error: "Internal Server Error",
+        details: error instanceof Error ? error.message : String(error),
+      },
+      { status: 500 }
+    );
+  }
+}
+
+//  ` try {
+// const openai = new OpenAI({
+//   baseURL: "https://api.deepseek.com",
+//   apiKey: process.env.DEEPSEEK_API_KEY,
+// });
+
+//   const completion = await openai.chat.completions.create({
+//     messages: [
+//       {
+//         role: "system",
+//         content:
+//           codeContent +
+//           "\n\n" +
+//           Constants.ERROR_PREVENTION_PROMPTFORNEXTJS +
+//           "\n\n" +
+//           "Give me More Responsive FIx All The Error Proper Run the Code And More Proffessinal More Attractive ",
+//       },
+//     ],
+//     model: "deepseek-reasoner",
+//   });
+//   console.log(completion.choices[0].message.content);
+// } catch (error) {
+//   return NextResponse.json(
+//     { error: "Failed to Deepseek generate content", details: String(error) },
+//     { status: 500 }
+//   );
+// } `
+//Document
+`const axios = require('axios');
 let data = JSON.stringify({
   "messages": [
     {
@@ -215,24 +238,3 @@ axios(config)
 .catch((error) => {
   console.log(error);
 });`;
-        return new Response(codeContent);
-      }
-    } catch (apiError) {
-      console.error("API Request Error:", apiError);
-      return NextResponse.json(
-        { error: "Failed to generate content", details: String(apiError) },
-        { status: 500 }
-      );
-    }
-  } catch (error) {
-    console.error("Server Processing Error:", error);
-
-    return NextResponse.json(
-      {
-        error: "Internal Server Error",
-        details: error instanceof Error ? error.message : String(error),
-      },
-      { status: 500 }
-    );
-  }
-}

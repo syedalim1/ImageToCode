@@ -175,11 +175,7 @@ Production-ready implementation
   8. Return ONLY the code, not explanations or markdown formatting
   9. Ensure all imports are properly formatted
   10. Ensure to give me correct order code responsive for mobile, tablet, and desktop
-  
-   `,
-
-  ERROR_PREVENTION_PROMPTFORNEXTJS: `
-IMPORTANT: Your generated code must be free of syntax errors. Pay special attention to:
+  IMPORTANT: Your generated code must be free of syntax errors. Pay special attention to:
 1. All string literals must be properly terminated with matching quotes
 2. All JSX elements must be properly closed
 3. All curly braces, parentheses, and brackets must be properly balanced
@@ -187,8 +183,11 @@ IMPORTANT: Your generated code must be free of syntax errors. Pay special attent
 5. All React components must have proper import and export statements
 6. Ensure all variable names are properly defined before use
 7. Double-check all template literals for proper syntax
-8. Return ONLY the code, not explanations or markdown formatting`,
+8. Return ONLY the code, not explanations or markdown formatting
+   `,
 
+  ERROR_PREVENTION_PROMPTFORNEXTJS: `
+`,
   CREDIT_COSTS: {
     NORMAL_MODE: 10,
     EXPERT_MODE: 40,
