@@ -299,21 +299,11 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
               </motion.div>
             )}
             <span className="font-medium">
-              {hasCode
-                ? `Regenerate (${regenerationCount}/${maxRegenerations})`
+              {isLoading
+                ? `Processing... `
                 : "Generate Code"}
             </span>
-            {showTooltip === "generate" && (
-              <motion.div
-                className="absolute -top-10 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white text-xs rounded py-1 px-2 shadow-lg"
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-              >
-                {hasCode
-                  ? "Generate a new version"
-                  : "Generate code from image"}
-              </motion.div>
-            )}
+          
           </motion.button>
         )}
 
@@ -509,26 +499,7 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
           </motion.div>
         )}
 
-        {isLoading && (
-          <motion.div
-            className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-gray-600 to-gray-800 text-white rounded-lg shadow-md"
-            variants={item}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{
-              opacity: 1,
-              y: 0,
-              boxShadow: [
-                "0 4px 6px rgba(0, 0, 0, 0.1)",
-                "0 10px 15px rgba(0, 0, 0, 0.2)",
-                "0 4px 6px rgba(0, 0, 0, 0.1)",
-              ],
-              transition: { boxShadow: { repeat: Infinity, duration: 2 } },
-            }}
-          >
-            <RefreshCw className="h-5 w-5 animate-spin" />
-            <span className="font-medium">Processing...</span>
-          </motion.div>
-        )}
+       
       </div>
     </div>
   );

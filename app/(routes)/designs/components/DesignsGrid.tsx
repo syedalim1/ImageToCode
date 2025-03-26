@@ -183,56 +183,11 @@ const DesignsGrid: React.FC<DesignsGridProps> = ({ designs, onDelete }) => {
             className="backdrop-blur-sm bg-white/90 rounded-xl overflow-hidden shadow-lg dark:bg-gray-800/90 border border-gray-100 dark:border-gray-700 hover:shadow-xl transition-all duration-300 cursor-pointer relative group"
             onClick={() => handleDesignClick(design.uid)}
           >
-            {/* Decorative corner elements */}
-            <div className="absolute -top-6 -right-6 w-12 h-12 bg-indigo-200/30 rounded-full blur-xl group-hover:bg-indigo-300/40 transition-all duration-500"></div>
-            <div className="absolute -bottom-6 -left-6 w-12 h-12 bg-purple-200/30 rounded-full blur-xl group-hover:bg-purple-300/40 transition-all duration-500"></div>
-            
-            {/* Favorite Star */}
-            <div className="absolute top-2 left-2 z-10">
-              <motion.button
-                whileHover={{ scale: 1.2 }}
-                whileTap={{ scale: 0.9 }}
-                className={`p-1.5 rounded-full ${
-                  favorites.includes(design.uid) 
-                    ? 'bg-yellow-400 text-white' 
-                    : 'bg-white/80 backdrop-blur-sm text-gray-400 hover:text-yellow-400'
-                } shadow-sm transition-colors duration-200`}
-                onClick={(e) => toggleFavorite(e, design.uid)}
-              >
-                <Star className="w-4 h-4" fill={favorites.includes(design.uid) ? "currentColor" : "none"} />
-              </motion.button>
-            </div>
+         
+          
             
             <div className="relative aspect-video bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-800 overflow-hidden">
-              {/* Image overlay with animation on hover */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end justify-between p-3 z-10">
-                <div className="flex gap-1">
-                  <motion.button
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.9 }}
-                    className="p-1.5 rounded-full bg-white/90 backdrop-blur-sm text-gray-700 hover:text-indigo-600 shadow-sm transition-colors"
-                    onClick={(e) => handleQuickView(e, design)}
-                  >
-                    <Info className="w-3.5 h-3.5" />
-                  </motion.button>
-                  <motion.button
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.9 }}
-                    className="p-1.5 rounded-full bg-white/90 backdrop-blur-sm text-gray-700 hover:text-indigo-600 shadow-sm transition-colors"
-                    onClick={(e) => handleShare(e, design)}
-                  >
-                    <Share2 className="w-3.5 h-3.5" />
-                  </motion.button>
-                  <motion.button
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.9 }}
-                    className="p-1.5 rounded-full bg-white/90 backdrop-blur-sm text-gray-700 hover:text-indigo-600 shadow-sm transition-colors"
-                    onClick={(e) => handleExport(e, design)}
-                  >
-                    <Download className="w-3.5 h-3.5" />
-                  </motion.button>
-                </div>
-              </div>
+            
               
               <img
                 src={design.imageUrl}
@@ -293,19 +248,10 @@ const DesignsGrid: React.FC<DesignsGridProps> = ({ designs, onDelete }) => {
               </div>
               
               {/* Action buttons */}
-              <div className="flex gap-2 mt-2">
-                <motion.button 
-                  className="flex-1 py-1.5 px-2 rounded-md text-sm font-medium bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white shadow-md transition-all flex items-center justify-center gap-1"
-                  whileHover={{ scale: 1.03 }}
-                  whileTap={{ scale: 0.97 }}
-                  onClick={() => handleDesignClick(design.uid)}
-                >
-                  <Code className="w-3.5 h-3.5" />
-                  View Code
-                </motion.button>
+            
                 
                 <motion.button
-                  className="flex-1 py-1.5 px-2 rounded-md text-sm font-medium bg-gradient-to-r from-red-500 to-rose-600 hover:from-red-600 hover:to-rose-700 text-white shadow-md transition-all flex items-center justify-center gap-1 group"
+                  className=" w-full py-1.5 px-2 rounded-md text-sm font-medium bg-gradient-to-r from-red-500 to-rose-600 hover:from-red-600 hover:to-rose-700 text-white shadow-md transition-all flex items-center justify-center gap-1 group"
                   whileHover={{ scale: 1.03 }}
                   whileTap={{ scale: 0.97 }}
                   onClick={(e) => handleDeleteClick(e, design.uid)}
@@ -313,7 +259,7 @@ const DesignsGrid: React.FC<DesignsGridProps> = ({ designs, onDelete }) => {
                   <Trash2 className="w-3.5 h-3.5 group-hover:rotate-12 transition-transform duration-300" />
                   Delete
                 </motion.button>
-              </div>
+              
             </div>
           </motion.div>
         ))}

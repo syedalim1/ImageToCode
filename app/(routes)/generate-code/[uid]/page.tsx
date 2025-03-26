@@ -29,7 +29,6 @@ import SuccessConfetti from "../_components/SuccessConfetti";
 import ClientDate from "../_components/ClientDate";
 import { db } from "@/configs/db";
 import { usersTable } from "@/configs/schema";
-import { NextResponse } from "next/server";
 import { eq } from "drizzle-orm";
 
 interface CodeContent {
@@ -75,29 +74,6 @@ const Page: React.FC = () => {
   });
   const [showFloatingButton, setShowFloatingButton] = useState(true);
 
-  // Calculate code statistics
-  useEffect(() => {
-    if (response) {
-      const lines = response.split("\n").length;
-      const characters = response.length;
-      const functionMatches = response.match(/function\s+\w+\s*\(/g) || [];
-      const arrowFunctionMatches =
-        response.match(/const\s+\w+\s*=\s*(\([^)]*\)|[^=]+)=>/g) || [];
-      const functions = functionMatches.length + arrowFunctionMatches.length;
-
-      // Simple quality score based on code length and structure
-      const qualityBase = Math.min(lines / 10, 10);
-      const qualityBonus = Math.min(functions / 2, 5);
-      const quality = Math.min(Math.round(qualityBase + qualityBonus), 10);
-
-      setCodeStats({
-        lines,
-        characters,
-        functions,
-        quality,
-      });
-    }
-  }, [response]);
 
   // Handle success message timeout
   useEffect(() => {
@@ -343,28 +319,7 @@ const Page: React.FC = () => {
     router.push("/");
   };
 
-  // Quality indicator colors
-  const getQualityColor = (quality: number) => {
-    if (quality >= 8) return "text-green-500";
-    if (quality >= 5) return "text-yellow-500";
-    return "text-red-500";
-  };
 
-  // Render quality stars
-  const renderQualityStars = (quality: number) => {
-    const stars = [];
-    for (let i = 0; i < 5; i++) {
-      const filled = i < Math.ceil(quality / 2);
-      stars.push(
-        <Star
-          key={i}
-          className={`h-4 w-4 ${filled ? "text-yellow-400 fill-yellow-400" : "text-gray-300"
-            }`}
-        />
-      );
-    }
-    return stars;
-  };
 
   return (
     <div className="min-h-screen transition-colors duration-300">
@@ -419,7 +374,7 @@ const Page: React.FC = () => {
           </button>
           <ChevronRight className="h-4 w-4 text-gray-400" />
           <span className="text-indigo-600 dark:text-indigo-400 font-medium">
-            View Code
+            Generating Code
           </span>
         </nav>
 
@@ -541,27 +496,6 @@ const Page: React.FC = () => {
                       <p className="text-2xl font-bold text-gray-800 dark:text-gray-200">
                         {codeStats.functions}
                       </p>
-                    </div>
-
-                    <div className="bg-white dark:bg-gray-800 p-3 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
-                      <div className="flex items-center mb-1">
-                        <Zap className="h-4 w-4 text-yellow-500 mr-2" />
-                        <span className="text-sm text-gray-500 dark:text-gray-400">
-                          Quality Score
-                        </span>
-                      </div>
-                      <div className="flex items-center">
-                        <p
-                          className={`text-2xl font-bold mr-2 ${getQualityColor(
-                            codeStats.quality
-                          )}`}
-                        >
-                          {codeStats.quality}/10
-                        </p>
-                        <div className="flex">
-                          {renderQualityStars(codeStats.quality)}
-                        </div>
-                      </div>
                     </div>
                   </div>
 

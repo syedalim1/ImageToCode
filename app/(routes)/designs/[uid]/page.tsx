@@ -12,7 +12,6 @@ import { desc, eq } from "drizzle-orm";
 import { useParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
-import { log } from "node:console";
 
 interface Design {
   id: number;
@@ -456,7 +455,7 @@ function DesignPage() {
 
             {/* Sandpack */}
             <div className="p-6">
-              {Template == "react" ? (
+              
                 <SandpackProvider
                   options={{
                     externalResources: ["https://cdn.tailwindcss.com"],
@@ -510,7 +509,7 @@ function DesignPage() {
                     )}
                   </SandpackLayout>
                 </SandpackProvider>
-              ) : null}
+              
             </div>
 
             {/* Actions */}
@@ -523,25 +522,7 @@ function DesignPage() {
               </div>
 
               <div className="flex flex-wrap gap-3">
-                <Link
-                  href={`/view-code/${design.uid}`}
-                  className="flex items-center px-5 py-2.5 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white rounded-lg transition-all shadow-md hover:shadow-lg transform hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-opacity-50"
-                >
-                  <svg
-                    className="w-5 h-5 mr-2"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-                    />
-                  </svg>
-                  Edit Code
-                </Link>
+                
                 <button
                   onClick={() => window.print()}
                   className="flex items-center px-5 py-2.5 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 rounded-lg transition-all shadow-sm hover:shadow border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700"
@@ -564,57 +545,7 @@ function DesignPage() {
               </div>
             </div>
           </div>
-        ) : (
-          <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-xl shadow-xl overflow-hidden border-l-4 border-yellow-500">
-            <div className="p-8 text-center">
-              <div className="flex justify-center mb-6">
-                <div className="relative">
-                  <div className="w-16 h-16 bg-yellow-100 dark:bg-yellow-900/30 rounded-full flex items-center justify-center">
-                    <svg
-                      className="w-10 h-10 text-yellow-500"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-                      />
-                    </svg>
-                  </div>
-                  <div className="absolute -top-1 -right-1 w-5 h-5 bg-yellow-500 rounded-full animate-ping opacity-75"></div>
-                </div>
-              </div>
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">
-                No Design Available
-              </h2>
-              <p className="text-gray-600 dark:text-gray-300 mb-6">
-                The requested design could not be found.
-              </p>
-              <Link
-                href="/designs"
-                className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-white rounded-lg transition-all shadow-md hover:shadow-lg transform hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-opacity-50"
-              >
-                <svg
-                  className="w-5 h-5 mr-2"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M11 17l-5-5m0 0l5-5m-5 5h12"
-                  />
-                </svg>
-                Return to Designs
-              </Link>
-            </div>
-          </div>
-        )}
+        ) :null}
       </div>
     </div>
   );

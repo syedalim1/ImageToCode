@@ -1,7 +1,6 @@
 // File: HeroSection.jsx
 "use client";
 import { useScroll, useTransform } from "framer-motion";
-import ClientFloatingElements from "./ClientFloatingElements";
 import dynamic from "next/dynamic";
 import { useEffect, useRef, useState } from "react";
 import AbstractShapes from "./AbstractShapes";
@@ -69,7 +68,6 @@ export default function HeroSection() {
       }}
     >
       {/* Enhanced animated background elements */}
-      <ClientFloatingElements />
       <AbstractShapes />
 
       {/* Grid pattern overlay */}

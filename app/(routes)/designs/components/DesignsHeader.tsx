@@ -14,6 +14,7 @@ const DesignsHeader: React.FC<DesignsHeaderProps> = ({
   showFilters,
   handleRefresh,
   toggleFilters,
+  
 }) => {
   return (
     <motion.div
@@ -70,26 +71,7 @@ const DesignsHeader: React.FC<DesignsHeaderProps> = ({
           </div>
 
           <div className="flex flex-wrap items-center gap-2">
-            {/* Export designs button */}
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="flex items-center gap-1.5 py-2 px-4 rounded-lg bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 shadow-sm transition-all"
-            >
-              <Download className="w-4 h-4 text-indigo-500" />
-              <span className="text-sm font-medium">Export</span>
-            </motion.button>
-            
-            {/* Share button */}
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="flex items-center gap-1.5 py-2 px-4 rounded-lg bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 shadow-sm transition-all"
-            >
-              <Share2 className="w-4 h-4 text-indigo-500" />
-              <span className="text-sm font-medium">Share</span>
-            </motion.button>
-            
+         
             {/* Refresh button */}
             <motion.button
               whileHover={{ scale: 1.05 }}
@@ -121,30 +103,7 @@ const DesignsHeader: React.FC<DesignsHeaderProps> = ({
           </div>
         </div>
         
-        {/* Stats bar */}
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4 }}
-          className="mt-6 pt-4 border-t border-gray-100 flex flex-wrap justify-between gap-4"
-        >
-          <div className="flex-1 min-w-[120px]">
-            <div className="text-xs text-gray-500 mb-1">Total Designs</div>
-            <div className="font-semibold text-gray-800">24</div>
-          </div>
-          <div className="flex-1 min-w-[120px]">
-            <div className="text-xs text-gray-500 mb-1">Last Created</div>
-            <div className="font-semibold text-gray-800">2 days ago</div>
-          </div>
-          <div className="flex-1 min-w-[120px]">
-            <div className="text-xs text-gray-500 mb-1">Storage Used</div>
-            <div className="font-semibold text-gray-800">12.4 MB</div>
-          </div>
-          <div className="flex-1 min-w-[120px]">
-            <div className="text-xs text-gray-500 mb-1">Favorite Models</div>
-            <div className="font-semibold text-gray-800">GPT-4, DALL-E</div>
-          </div>
-        </motion.div>
+       
       </div>
     </motion.div>
   );

@@ -226,17 +226,11 @@ function DesignsPage() {
     }
   };
 
-  if (!isClient) {
-    return null; // Prevent flash of content during hydration
-  }
-
+ 
   if (loading && isSignedIn) {
     return <LoadingState />;
   }
 
-  // if (error && isSignedIn) {
-  //   return <ErrorState error={error} retryFn={fetchDesigns} />;
-  // }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50">
@@ -245,6 +239,7 @@ function DesignsPage() {
           {/* Header Component */}
           <DesignsHeader
             isRefreshing={isRefreshing}
+      
             showFilters={showFilters}
             handleRefresh={handleRefresh}
             toggleFilters={() => setShowFilters(!showFilters)}
@@ -274,7 +269,7 @@ function DesignsPage() {
               onDelete={handleDelete}
             />
           ) : (
-            <DesignsList designs={filteredAndSortedDesigns} />
+                <DesignsList designs={filteredAndSortedDesigns} onDelete={handleDelete} />
           )}
         </SignedIn>
 

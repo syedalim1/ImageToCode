@@ -89,21 +89,7 @@ const CodeHeader: React.FC<CodeHeaderProps> = ({
           </div>
 
           <div className="flex space-x-3">
-            {imageUrl && (
-              <motion.button
-                className="flex items-center px-4 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg hover:from-blue-700 hover:to-indigo-700 transition-all duration-300 shadow-md group"
-                whileHover={{ scale: 1.05, boxShadow: "0 0 15px rgba(79, 70, 229, 0.6)" }}
-                whileTap={{ scale: 0.95 }}
-              >
-                <motion.div
-                  animate={{ rotate: [0, 15, 0] }}
-                  transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-                >
-                  <Image className="h-5 w-5 mr-2 text-white" />
-                </motion.div>
-                <span className="font-medium">View Image</span>
-              </motion.button>
-            )}
+           
 
             <motion.div
               className="flex items-center px-4 py-2.5 bg-gradient-to-r from-purple-600 to-pink-500 text-white rounded-lg shadow-md relative overflow-hidden"

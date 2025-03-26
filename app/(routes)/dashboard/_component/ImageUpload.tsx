@@ -194,7 +194,7 @@ const ImageUpload = () => {
 
       setTimeout(() => {
         setShowConfetti(false);
-        router.push(`/view-code/${uid}`);
+        router.push(`/generate-code/${uid}`);
       }, 2500);
     } catch (error) {
       if (axios.isAxiosError(error)) {
