@@ -1,4 +1,6 @@
 "use client";
+
+import { is } from "drizzle-orm";
 import { motion } from "framer-motion";
 import {
   Save,
@@ -20,7 +22,7 @@ import {
   Import,
 } from "lucide-react";
 import { useState, useEffect } from "react";
-
+import { log } from "console";
 
 interface ActionButtonsProps {
   onSave: () => void;
@@ -167,6 +169,30 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
     setTimeout(() => setIsDownloaded(false), 2000);
   };
 
+  const Extraimproveai = async () => {
+    isLoading = true;
+    const response = await fetch("/api/improve-extra-improve-ai", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ code: "Hii " }),
+    });
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || "Request failed");
+    }
+    console.log("====================================");
+    console.log(response, "response");
+    console.log("====================================");
+    const optimizedCode = await response.text();
+    console.log("Optimized Code:", optimizedCode);
+    console.log("====================================");
+    console.log(optimizedCode, "code");
+    console.log("====================================");
+
+    isLoading = false;
+  };
   // Handle share functionality
   const handleShare = async () => {
     try {
@@ -205,8 +231,6 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
     setTimeout(() => setSaveSuccess(false), 2000);
   };
 
-  
- 
   // Tooltip handler
   const handleTooltip = (tip: string) => {
     setShowTooltip(tip);
@@ -223,8 +247,6 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
 
   return (
     <div className="space-y-4">
-      
-
       {/* Main buttons container */}
       <motion.div
         className="flex flex-wrap gap-3 justify-end"
@@ -232,7 +254,6 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
         initial="hidden"
         animate="show"
       >
-        
         {hasCode && (
           <motion.button
             onClick={handleSave}
@@ -300,23 +321,19 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
               </motion.div>
             )}
             <span className="font-medium">
-              {isLoading
-                ? `Processing... `
-                : "Generate Code"}
+              {isLoading ? `Processing... ` : "Generate Code"}
             </span>
-          
           </motion.button>
         )}
-
       </motion.div>
-        {hasCode && (
-          <>
+      {hasCode && (
+        <>
           <div className="flex gap-4">
-
             <motion.button
-              onClick={handleDownload}
-              className={`relative flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r ${colorThemes[colorTheme as keyof typeof colorThemes].download
-                } text-white rounded-lg shadow-lg transition-all`}
+              onClick={Extraimproveai}
+              className={`relative flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r ${
+                colorThemes[colorTheme as keyof typeof colorThemes].download
+              } text-white rounded-lg shadow-lg transition-all`}
               variants={item}
               whileHover={{
                 scale: 1.05,
@@ -324,16 +341,10 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
               }}
               whileTap={{ scale: 0.95 }}
               disabled={isLoading}
-              onMouseEnter={() => handleTooltip("download")}
-              onMouseLeave={() => handleTooltip("")}
             >
-      
-                <Import className="h-5 w-5" />
-             
-              <span className="font-medium">
-              Extra Improve Code
-              </span>
-             
+              <Import className="h-5 w-5" />
+
+              <span className="font-medium">Extra Improve Code</span>
             </motion.button>
             <motion.button
               onClick={handleDownload}
@@ -444,70 +455,69 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
             </motion.button>
           </div>
 
-            {/* New Format Code button */}
-            {onFormatCode && (
-              <motion.button
-                onClick={onFormatCode}
-                className={`relative flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r ${
-                  colorThemes[colorTheme as keyof typeof colorThemes].format
-                } text-white rounded-lg shadow-lg transition-all`}
-                variants={item}
-                whileHover={{
-                  scale: 1.05,
-                  boxShadow: "0 5px 15px rgba(0, 0, 0, 0.1)",
-                }}
-                whileTap={{ scale: 0.95 }}
-                disabled={isLoading}
-                onMouseEnter={() => handleTooltip("format")}
-                onMouseLeave={() => handleTooltip("")}
-              >
-                <Code className="h-5 w-5" />
-                <span className="font-medium">Format Code</span>
-                {showTooltip === "format" && (
-                  <motion.div
-                    className="absolute -top-10 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white text-xs rounded py-1 px-2 shadow-lg"
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                  >
-                    Prettify and format code
-                  </motion.div>
-                )}
-              </motion.button>
-            )}
+          {/* New Format Code button */}
+          {onFormatCode && (
+            <motion.button
+              onClick={onFormatCode}
+              className={`relative flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r ${
+                colorThemes[colorTheme as keyof typeof colorThemes].format
+              } text-white rounded-lg shadow-lg transition-all`}
+              variants={item}
+              whileHover={{
+                scale: 1.05,
+                boxShadow: "0 5px 15px rgba(0, 0, 0, 0.1)",
+              }}
+              whileTap={{ scale: 0.95 }}
+              disabled={isLoading}
+              onMouseEnter={() => handleTooltip("format")}
+              onMouseLeave={() => handleTooltip("")}
+            >
+              <Code className="h-5 w-5" />
+              <span className="font-medium">Format Code</span>
+              {showTooltip === "format" && (
+                <motion.div
+                  className="absolute -top-10 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white text-xs rounded py-1 px-2 shadow-lg"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                >
+                  Prettify and format code
+                </motion.div>
+              )}
+            </motion.button>
+          )}
 
-            {/* New Preview Code button */}
-            {onPreviewCode && (
-              <motion.button
-                onClick={onPreviewCode}
-                className={`relative flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r ${
-                  colorThemes[colorTheme as keyof typeof colorThemes].preview
-                } text-white rounded-lg shadow-lg transition-all`}
-                variants={item}
-                whileHover={{
-                  scale: 1.05,
-                  boxShadow: "0 5px 15px rgba(0, 0, 0, 0.1)",
-                }}
-                whileTap={{ scale: 0.95 }}
-                disabled={isLoading}
-                onMouseEnter={() => handleTooltip("preview")}
-                onMouseLeave={() => handleTooltip("")}
-              >
-                <Monitor className="h-5 w-5" />
-                <span className="font-medium">Preview</span>
-                {showTooltip === "preview" && (
-                  <motion.div
-                    className="absolute -top-10 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white text-xs rounded py-1 px-2 shadow-lg"
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                  >
-                    See code in action
-                  </motion.div>
-                )}
-              </motion.button>
-            )}
-
-          </>
-        )}
+          {/* New Preview Code button */}
+          {onPreviewCode && (
+            <motion.button
+              onClick={onPreviewCode}
+              className={`relative flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r ${
+                colorThemes[colorTheme as keyof typeof colorThemes].preview
+              } text-white rounded-lg shadow-lg transition-all`}
+              variants={item}
+              whileHover={{
+                scale: 1.05,
+                boxShadow: "0 5px 15px rgba(0, 0, 0, 0.1)",
+              }}
+              whileTap={{ scale: 0.95 }}
+              disabled={isLoading}
+              onMouseEnter={() => handleTooltip("preview")}
+              onMouseLeave={() => handleTooltip("")}
+            >
+              <Monitor className="h-5 w-5" />
+              <span className="font-medium">Preview</span>
+              {showTooltip === "preview" && (
+                <motion.div
+                  className="absolute -top-10 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white text-xs rounded py-1 px-2 shadow-lg"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                >
+                  See code in action
+                </motion.div>
+              )}
+            </motion.button>
+          )}
+        </>
+      )}
 
       {/* Status indicators */}
       <div className="flex flex-wrap gap-3 justify-end">
@@ -524,8 +534,6 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
             </span>
           </motion.div>
         )}
-
-       
       </div>
     </div>
   );
