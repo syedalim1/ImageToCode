@@ -161,34 +161,6 @@ export async function POST(req: NextRequest) {
   }
 }
 
-//  ` try {
-// const openai = new OpenAI({
-//   baseURL: "https://api.deepseek.com",
-//   apiKey: process.env.DEEPSEEK_API_KEY,
-// });
-
-//   const completion = await openai.chat.completions.create({
-//     messages: [
-//       {
-//         role: "system",
-//         content:
-//           codeContent +
-//           "\n\n" +
-//           Constants.ERROR_PREVENTION_PROMPTFORNEXTJS +
-//           "\n\n" +
-//           "Give me More Responsive FIx All The Error Proper Run the Code And More Proffessinal More Attractive ",
-//       },
-//     ],
-//     model: "deepseek-reasoner",
-//   });
-//   console.log(completion.choices[0].message.content);
-// } catch (error) {
-//   return NextResponse.json(
-//     { error: "Failed to Deepseek generate content", details: String(error) },
-//     { status: 500 }
-//   );
-// } `
-//Document
 `const axios = require('axios');
 let data = JSON.stringify({
   "messages": [

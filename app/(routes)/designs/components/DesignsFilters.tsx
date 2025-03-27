@@ -1,29 +1,19 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Search, X, Grid, List, ArrowDownAZ, ArrowUpZA, Filter, Sparkles, Sliders } from 'lucide-react';
+import { Search, X, Grid, List, Sliders } from 'lucide-react';
 
 interface DesignsFiltersProps {
   searchTerm: string;
   setSearchTerm: (term: string) => void;
-  filterModel: string | null;
-  setFilterModel: (model: string | null) => void;
-  uniqueModels: string[];
   viewMode: string;
   setViewMode: (mode: string) => void;
-  sortOrder: string;
-  setSortOrder: (order: string) => void;
 }
 
 const DesignsFilters: React.FC<DesignsFiltersProps> = ({
   searchTerm,
   setSearchTerm,
-  filterModel,
-  setFilterModel,
-  uniqueModels,
   viewMode,
   setViewMode,
-  sortOrder,
-  setSortOrder,
 }) => {
   return (
     <motion.div
@@ -118,35 +108,8 @@ const DesignsFilters: React.FC<DesignsFiltersProps> = ({
               </div>
             </div>
 
-            <div className="relative flex-1 group">
-              <div className="absolute inset-0 rounded-lg bg-gradient-to-r from-indigo-100 to-purple-100 opacity-0 group-hover:opacity-50 transition-opacity duration-300"></div>
-              <div className="relative flex rounded-lg overflow-hidden border border-gray-200 bg-white/90">
-                <motion.button
-                  onClick={() => setSortOrder("desc")}
-                  whileHover={{ y: -1 }}
-                  whileTap={{ y: 1 }}
-                  className={`flex-1 px-3 py-2.5 flex items-center justify-center gap-1.5 transition-colors duration-200 ${sortOrder === "desc"
-                      ? "bg-gradient-to-r from-purple-500 to-indigo-500 text-white"
-                      : "bg-white text-gray-700 hover:bg-purple-50"
-                    }`}
-                >
-                  <ArrowDownAZ className="w-4 h-4" />
-                  <span className="text-xs font-medium hidden sm:inline">Newest</span>
-                </motion.button>
-                <motion.button
-                  onClick={() => setSortOrder("asc")}
-                  whileHover={{ y: -1 }}
-                  whileTap={{ y: 1 }}
-                  className={`flex-1 px-3 py-2.5 flex items-center justify-center gap-1.5 transition-colors duration-200 ${sortOrder === "asc"
-                      ? "bg-gradient-to-r from-purple-500 to-indigo-500 text-white"
-                      : "bg-white text-gray-700 hover:bg-purple-50"
-                    }`}
-                >
-                  <ArrowUpZA className="w-4 h-4" />
-                  <span className="text-xs font-medium hidden sm:inline">Oldest</span>
-                </motion.button>
-              </div>
-            </div>
+
+          
           </motion.div>
         </div>
       </div>

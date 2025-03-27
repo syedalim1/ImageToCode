@@ -34,18 +34,8 @@ function DesignsPage() {
   const [designs, setDesigns] = useState<Design[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [viewMode, setViewMode] = useState("grid");
-  const [sortOrder, setSortOrder] = useState("desc");
-  const [filterModel, setFilterModel] = useState<string | null>(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
-  const [isClient, setIsClient] = useState(false);
-
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
-
-  // Get unique models for filter dropdown
-  const uniqueModels = [...new Set(designs.map((design) => design.model))];
 
   const fetchDesigns = async () => {
     try {
@@ -112,37 +102,6 @@ function DesignsPage() {
     }
   }, [user, isSignedIn]);
 
-  // Filter and sort designs
-  const filteredAndSortedDesigns = designs
-    // First ensure there are no duplicate UIDs
-    .filter(
-      (design, index, self) =>
-        index === self.findIndex((d) => d.uid === design.uid)
-    )
-    .filter((design) => {
-      // Apply search filter
-      const matchesSearch =
-        !searchTerm ||
-        (design.description &&
-          design.description
-            .toLowerCase()
-            .includes(searchTerm.toLowerCase())) ||
-        design.model.toLowerCase().includes(searchTerm.toLowerCase());
-
-      // Apply model filter
-      const matchesModel = !filterModel || design.model === filterModel;
-
-      return matchesSearch && matchesModel;
-    })
-    .sort((a, b) => {
-      // Sort by creation date
-      const dateA = parseDate(a.createdAt);
-      const dateB = parseDate(b.createdAt);
-      if (!dateA || !dateB) return 0;
-      return sortOrder === "asc"
-        ? dateA.getTime() - dateB.getTime()
-        : dateB.getTime() - dateA.getTime();
-    });
 
   const weeklyData = Array(7)
     .fill(0)
@@ -234,7 +193,7 @@ function DesignsPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50">
-      <div className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
+      <div className=" mx-auto p-4 sm:p-6 lg:p-8">
         <SignedIn>
           {/* Header Component */}
           <DesignsHeader
@@ -250,26 +209,21 @@ function DesignsPage() {
             <DesignsFilters
               searchTerm={searchTerm}
               setSearchTerm={setSearchTerm}
-              filterModel={filterModel}
-              setFilterModel={setFilterModel}
-              uniqueModels={uniqueModels}
               viewMode={viewMode}
               setViewMode={setViewMode}
-              sortOrder={sortOrder}
-              setSortOrder={setSortOrder}
             />
           )}
 
           {/* Designs Display */}
-          {filteredAndSortedDesigns.length === 0 ? (
-            <EmptyState hasSearchOrFilter={!!(searchTerm || filterModel)} />
+          {designs.length === 0 ? (
+            <EmptyState hasSearchOrFilter={!!(searchTerm )} />
           ) : viewMode === "grid" ? (
             <DesignsGrid
-              designs={filteredAndSortedDesigns}
+              designs={designs}
               onDelete={handleDelete}
             />
           ) : (
-                <DesignsList designs={filteredAndSortedDesigns} onDelete={handleDelete} />
+                <DesignsList designs={designs} onDelete={handleDelete}  />
           )}
         </SignedIn>
 

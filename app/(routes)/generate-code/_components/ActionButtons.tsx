@@ -17,6 +17,7 @@ import {
   ThumbsUp,
   Award,
   Info,
+  Import,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 
@@ -307,8 +308,33 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
           </motion.button>
         )}
 
+      </motion.div>
         {hasCode && (
           <>
+          <div className="flex gap-4">
+
+            <motion.button
+              onClick={handleDownload}
+              className={`relative flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r ${colorThemes[colorTheme as keyof typeof colorThemes].download
+                } text-white rounded-lg shadow-lg transition-all`}
+              variants={item}
+              whileHover={{
+                scale: 1.05,
+                boxShadow: "0 5px 15px rgba(0, 0, 0, 0.1)",
+              }}
+              whileTap={{ scale: 0.95 }}
+              disabled={isLoading}
+              onMouseEnter={() => handleTooltip("download")}
+              onMouseLeave={() => handleTooltip("")}
+            >
+      
+                <Import className="h-5 w-5" />
+             
+              <span className="font-medium">
+              Extra Improve Code
+              </span>
+             
+            </motion.button>
             <motion.button
               onClick={handleDownload}
               className={`relative flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r ${
@@ -416,6 +442,7 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
                 </motion.div>
               )}
             </motion.button>
+          </div>
 
             {/* New Format Code button */}
             {onFormatCode && (
@@ -481,7 +508,6 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
 
           </>
         )}
-      </motion.div>
 
       {/* Status indicators */}
       <div className="flex flex-wrap gap-3 justify-end">

@@ -58,15 +58,7 @@ function DesignPage() {
       if (result.length > 0) {
         setDesign(result[0] as Design);
         console.log(result[0], "designs");
-        if (design?.language == "react-tailwind") {
-          setTemplate("react");
-        }
-        else if (design?.language == "nextjs-tailwind") {
-          setTemplate("nextjs");
-        }
-        else if(design?.language == "html-css") {
-          setTemplate("html");
-      } }else {
+       }else {
         setError("No design found.");
       }
     } catch (err) {

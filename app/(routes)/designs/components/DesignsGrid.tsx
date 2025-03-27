@@ -1,7 +1,7 @@
 import React, { useState, MouseEvent, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Trash2, Heart, Share2, Download, Star, Info, Code, ExternalLink, Sparkles, Image as ImageIcon } from 'lucide-react';
+import { Trash2, Heart, Share2, Download, Star, Info, Code, ExternalLink, Sparkles, Image as ImageIcon, ShieldAlert, AlertTriangle } from 'lucide-react';
 import { toast, ToastOptions } from 'react-toastify';
 import { Button } from '@/components/ui/button';
 import { Design } from '@/types/design';
@@ -17,7 +17,6 @@ const DesignsGrid: React.FC<DesignsGridProps> = ({ designs, onDelete }) => {
   const router = useRouter();
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
   const [favorites, setFavorites] = useState<string[]>([]);
-  const [selectedDesign, setSelectedDesign] = useState<Design | null>(null);
   const [showQuickView, setShowQuickView] = useState<boolean>(false);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
 
@@ -26,7 +25,7 @@ const DesignsGrid: React.FC<DesignsGridProps> = ({ designs, onDelete }) => {
     const handleMouseMove = (e: globalThis.MouseEvent) => {
       setMousePosition({ x: e.clientX, y: e.clientY });
     };
-    
+
     window.addEventListener('mousemove', handleMouseMove);
     return () => window.removeEventListener('mousemove', handleMouseMove);
   }, []);
@@ -46,45 +45,6 @@ const DesignsGrid: React.FC<DesignsGridProps> = ({ designs, onDelete }) => {
   const handleDeleteClick = (e: MouseEvent, uid: string) => {
     e.stopPropagation();
     setDeleteConfirm(uid);
-  };
-
-  const handleQuickView = (e: MouseEvent, design: Design) => {
-    e.stopPropagation();
-    setSelectedDesign(design);
-    setShowQuickView(true);
-  };
-
-  const toggleFavorite = (e: MouseEvent, uid: string) => {
-    e.stopPropagation();
-    let newFavorites;
-    
-    if (favorites.includes(uid)) {
-      newFavorites = favorites.filter(id => id !== uid);
-      toast.info("Removed from favorites", { autoClose: 2000 });
-    } else {
-      newFavorites = [...favorites, uid];
-      toast.success("Added to favorites", { autoClose: 2000 });
-    }
-    
-    setFavorites(newFavorites);
-    localStorage.setItem('favoriteDesigns', JSON.stringify(newFavorites));
-  };
-
-  const handleShare = (e: MouseEvent, design: Design) => {
-    e.stopPropagation();
-    // Copy share link to clipboard
-    navigator.clipboard.writeText(`${window.location.origin}/designs/${design.uid}`);
-    toast.success("Share link copied to clipboard!", { autoClose: 2000 });
-  };
-
-  const handleExport = (e: MouseEvent, design: Design) => {
-    e.stopPropagation();
-    toast.info("Preparing design export...", { autoClose: 2000 });
-    
-    // Simulate export process
-    setTimeout(() => {
-      toast.success("Design exported successfully!", { autoClose: 3000 });
-    }, 1500);
   };
 
   const confirmDelete = (uid: string) => {
@@ -135,8 +95,8 @@ const DesignsGrid: React.FC<DesignsGridProps> = ({ designs, onDelete }) => {
 
   const cardVariants = {
     hidden: { opacity: 0, y: 30 },
-    show: { 
-      opacity: 1, 
+    show: {
+      opacity: 1,
       y: 0,
       transition: {
         type: "spring",
@@ -149,7 +109,7 @@ const DesignsGrid: React.FC<DesignsGridProps> = ({ designs, onDelete }) => {
   return (
     <>
       {/* Floating interactive background element */}
-      <motion.div 
+      <motion.div
         className="fixed w-80 h-80 rounded-full filter blur-3xl opacity-10 pointer-events-none"
         style={{
           background: 'linear-gradient(135deg, #6366f1 0%, #a855f7 100%)',
@@ -168,8 +128,8 @@ const DesignsGrid: React.FC<DesignsGridProps> = ({ designs, onDelete }) => {
         }}
       />
 
-      <motion.div 
-        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 relative z-10"
+      <motion.div
+        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5  gap-6 relative z-10"
         variants={containerVariants}
         initial="hidden"
         animate="show"
@@ -180,15 +140,15 @@ const DesignsGrid: React.FC<DesignsGridProps> = ({ designs, onDelete }) => {
             variants={cardVariants}
             whileHover={{ y: -8, scale: 1.02, transition: { duration: 0.3 } }}
             whileTap={{ scale: 0.98 }}
-            className="backdrop-blur-sm bg-white/90 rounded-xl overflow-hidden shadow-lg dark:bg-gray-800/90 border border-gray-100 dark:border-gray-700 hover:shadow-xl transition-all duration-300 cursor-pointer relative group"
+            className="backdrop-blur-sm bg-white/90 rounded-xl  overflow-hidden shadow-lg dark:bg-gray-800/90 border border-gray-100 dark:border-gray-700 hover:shadow-xl transition-all duration-300 cursor-pointer relative group"
             onClick={() => handleDesignClick(design.uid)}
           >
-         
-          
-            
+
+
+
             <div className="relative aspect-video bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-800 overflow-hidden">
-            
-              
+
+
               <img
                 src={design.imageUrl}
                 alt={design.description || "Design preview"}
@@ -198,16 +158,12 @@ const DesignsGrid: React.FC<DesignsGridProps> = ({ designs, onDelete }) => {
                     "https://placehold.co/600x400/5271ff/ffffff?text=Image+Not+Available";
                 }}
               />
-              
-              <div className="absolute top-2 right-2 bg-black/70 backdrop-blur-sm text-white text-xs px-2 py-1 rounded-full flex items-center gap-1">
-                <Sparkles className="w-3 h-3 text-yellow-400" />
-                {design.model}
-              </div>
+
             </div>
-            
+
             <div className="p-4">
               <div className="flex items-start justify-between mb-2">
-                <motion.h3 
+                <motion.h3
                   className="font-semibold text-lg truncate text-gray-800 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
@@ -216,10 +172,10 @@ const DesignsGrid: React.FC<DesignsGridProps> = ({ designs, onDelete }) => {
                   {design.description || "Untitled Design"}
                 </motion.h3>
               </div>
-              
+
               <div className="flex justify-between items-center mb-3">
                 <span className="flex items-center text-sm text-gray-500 dark:text-gray-400">
-                  <motion.span 
+                  <motion.span
                     className="inline-block mr-1"
                     whileHover={{ rotate: 360 }}
                     transition={{ duration: 0.5 }}
@@ -246,135 +202,113 @@ const DesignsGrid: React.FC<DesignsGridProps> = ({ designs, onDelete }) => {
                       ))}
                 </div>
               </div>
-              
+
               {/* Action buttons */}
-            
-                
-                <motion.button
-                  className=" w-full py-1.5 px-2 rounded-md text-sm font-medium bg-gradient-to-r from-red-500 to-rose-600 hover:from-red-600 hover:to-rose-700 text-white shadow-md transition-all flex items-center justify-center gap-1 group"
-                  whileHover={{ scale: 1.03 }}
-                  whileTap={{ scale: 0.97 }}
-                  onClick={(e) => handleDeleteClick(e, design.uid)}
-                >
-                  <Trash2 className="w-3.5 h-3.5 group-hover:rotate-12 transition-transform duration-300" />
-                  Delete
-                </motion.button>
-              
-            </div>
-          </motion.div>
-        ))}
-      </motion.div>
-      
-      {/* Quick View Modal */}
-      <AnimatePresence>
-        {showQuickView && selectedDesign && (
+
+
+              <motion.button
+                className=" w-full py-1.5 px-2 rounded-md text-sm font-medium bg-gradient-to-r from-red-500 to-rose-600 hover:from-red-600 hover:to-rose-700 text-white shadow-md transition-all flex items-center justify-center gap-1 group"
+                whileHover={{ scale: 1.03 }}
+                whileTap={{ scale: 0.97 }}
+                onClick={(e) => handleDeleteClick(e, design.uid)}
+              >
+                <Trash2 className="w-3.5 h-3.5 group-hover:rotate-12 transition-transform duration-300" />
+                Delete
+              </motion.button>
+{deleteConfirm !== null && deleteConfirm === design.uid ?
+        <AnimatePresence >
           <motion.div
-            className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            onClick={() => setShowQuickView(false)}
+            className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50"
+            onClick={() => setDeleteConfirm(null)}
           >
             <motion.div
-              className="relative bg-white dark:bg-gray-800 rounded-xl max-w-2xl w-full mx-4 shadow-2xl overflow-hidden"
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
+              initial={{ scale: 0.8, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.8, opacity: 0, y: 20 }}
+              transition={{
+                type: "spring",
+                damping: 25,
+                stiffness: 300
+              }}
+              className="relative bg-white/90 backdrop-blur-md rounded-2xl p-8 max-w-md w-full mx-4 shadow-[0_20px_60px_-15px_rgba(0,0,0,0.3)] border border-white/20"
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="relative aspect-video">
-                <img
-                  src={selectedDesign.imageUrl}
-                  alt={selectedDesign.description || "Design preview"}
-                  className="w-full h-full object-cover"
-                  onError={(e) => {
-                    (e.target as HTMLImageElement).src =
-                      "https://placehold.co/600x400/5271ff/ffffff?text=Image+Not+Available";
+              {/* Decorative elements */}
+              <div className="absolute -top-4 -left-4 w-24 h-24 bg-red-500/10 rounded-full blur-xl"></div>
+              <div className="absolute -bottom-4 -right-4 w-24 h-24 bg-pink-500/10 rounded-full blur-xl"></div>
+
+              <div className="relative text-center">
+                <motion.div
+                  className="relative w-20 h-20 bg-gradient-to-br from-red-500 to-rose-700 rounded-full flex items-center justify-center mx-auto mb-6 overflow-hidden"
+                  initial={{ rotate: 0 }}
+                  animate={{
+                    rotate: [0, -5, 0, 5, 0],
+                    scale: [1, 1.05, 1, 1.05, 1]
                   }}
-                />
-                <button
-                  className="absolute top-3 right-3 bg-black/70 text-white p-1.5 rounded-full"
-                  onClick={() => setShowQuickView(false)}
+                  transition={{
+                    duration: 5,
+                    repeat: Infinity,
+                    repeatType: "reverse"
+                  }}
                 >
-                  <motion.span whileHover={{ rotate: 90 }} transition={{ duration: 0.3 }}>
-                    ✕
-                  </motion.span>
-                </button>
-              </div>
-              
-              <div className="p-6">
-                <h3 className="text-2xl font-bold mb-2 text-gray-900 dark:text-white">
-                  {selectedDesign.description || "Untitled Design"}
-                </h3>
+                  <div className="absolute inset-0 bg-gradient-to-tr from-red-600/40 to-transparent"></div>
+                  <Trash2 className="w-10 h-10 text-white drop-shadow-lg" />
+                </motion.div>
+
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.2 }}
+                >
+                  <h3 className="text-sm font-bold text-gray-900 mb-2 flex items-center justify-center gap-2">
+                    <ShieldAlert className="w-5 h-5 text-red-500" />
+                    Delete Design?
+                  </h3>
+
                 
-                <div className="grid grid-cols-2 gap-4 mb-4">
-                  <div>
-                    <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Created</p>
-                    <p className="font-medium text-gray-800 dark:text-gray-200">
-                      {parseDate(selectedDesign.createdAt)
-                        ? new Date(selectedDesign.createdAt).toLocaleDateString()
-                        : "Unknown date"}
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Model</p>
-                    <p className="font-medium text-gray-800 dark:text-gray-200 flex items-center">
-                      <Sparkles className="w-4 h-4 text-yellow-400 mr-1" />
-                      {selectedDesign.model}
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Unique ID</p>
-                    <p className="font-medium text-gray-800 dark:text-gray-200 truncate">
-                      {selectedDesign.uid}
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Options</p>
-                    <div className="flex space-x-2">
-                      {selectedDesign.options &&
-                        selectedDesign.options.map((option: string, idx: number) => (
-                          <span
-                            key={idx}
-                            className="inline-block w-3 h-3 rounded-full"
-                            style={{ backgroundColor: COLORS[idx % COLORS.length] }}
-                          ></span>
-                        ))}
-                    </div>
-                  </div>
-                </div>
-                
-                <div className="flex gap-2 mt-4">
-                  <Button
-                    className="flex-1 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white"
-                    onClick={() => {
-                      setShowQuickView(false);
-                      handleDesignClick(selectedDesign.uid);
-                    }}
+                </motion.div>
+
+                <div className="flex justify-center gap-4">
+                  <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
+                    <Button
+                      onClick={() => setDeleteConfirm(null)}
+                      className="bg-white border border-gray-200 hover:bg-gray-50 text-gray-800 px-5 py-2 rounded-lg shadow-sm transition-all duration-200"
+                    >
+                      Cancel
+                    </Button>
+                  </motion.div>
+
+                  <motion.div
+                    whileHover={{ scale: 1.03 }}
+                    whileTap={{ scale: 0.97 }}
+                    className="relative group"
                   >
-                    <ExternalLink className="w-4 h-4 mr-2" />
-                    Open Design
-                  </Button>
-                  
-                  <Button
-                    className="flex-1 bg-white border border-gray-200 text-gray-700 hover:bg-gray-50"
-                    onClick={() => setShowQuickView(false)}
-                  >
-                    Close
-                  </Button>
+                    <div className="absolute -inset-0.5 bg-gradient-to-r from-red-600 to-rose-600 rounded-lg blur opacity-60 group-hover:opacity-80 transition duration-200"></div>
+                    <Button
+                      onClick={() => confirmDelete(deleteConfirm as string)}
+                      className="relative bg-gradient-to-r from-red-500 to-rose-600 hover:from-red-600 hover:to-rose-700 text-white px-5 py-2 rounded-lg shadow-md transition-all duration-200"
+                    >
+                      Delete
+                    </Button>
+                  </motion.div>
                 </div>
               </div>
             </motion.div>
           </motion.div>
-        )}
-      </AnimatePresence>
+        </AnimatePresence>
+        : null}
+            </div>
+          </motion.div>
+        ))}
+      </motion.div>
+
+   
+
+     
       
-      <DeleteConfirmationModal
-        isOpen={deleteConfirm !== null}
-        designUid={deleteConfirm}
-        onClose={() => setDeleteConfirm(null)}
-        onConfirm={confirmDelete}
-      />
     </>
   );
 };

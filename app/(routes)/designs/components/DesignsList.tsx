@@ -1,119 +1,32 @@
 import React, { useState, useEffect, useMemo, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { Design } from "@/types/design"; 
+import { Design } from "@/types/design";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
-  Copy,
   EyeIcon,
   CodeIcon,
   StarIcon,
-  TrendingUpIcon,
   CalendarDays,
-  Palette, 
-  SparklesIcon, 
-  CheckCircle, 
+
+  SparklesIcon,
   InfoIcon,
-  Filter,
-  Heart,
-  HeartOff,
-  Award,
-  Share2,
-  BarChart3,
-  ArrowUpDown,
-  ThumbsUp,
-  Save,
-  AlertTriangle,
+  
   Sparkles,
   Trash2,
+  ShieldAlert,
+  AlertCircle,
+ 
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { toast } from "react-toastify";
-import { Badge } from "@/components/ui/badge";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { cn } from "@/lib/utils"; 
-import { COLORS } from "@/constants/colors";
-
-// Create component definitions for missing UI components
-// Dropdown Menu components
-const DropdownMenu = ({ children }: { children: React.ReactNode }) => {
-  return <div className="relative inline-block text-left">{children}</div>;
-};
-
-const DropdownMenuTrigger = ({ children }: { children: React.ReactNode }) => {
-  return <div>{children}</div>;
-};
-
-const DropdownMenuContent = ({ children }: { children: React.ReactNode }) => {
-  return (
-    <div className="absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-10">
-      <div className="py-1">{children}</div>
-    </div>
-  );
-};
-
-const DropdownMenuItem = ({
-  children,
-  onClick,
-}: {
-  children: React.ReactNode;
-  onClick?: () => void;
-}) => {
-  return (
-    <div
-      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer"
-      onClick={onClick}
-    >
-      {children}
-    </div>
-  );
-};
-
-// Card components
-const Card = ({ 
-  children, 
-  className 
-}: { 
-  children: React.ReactNode;
-  className?: string;
-}) => {
-  return <div className={cn("rounded-lg overflow-hidden", className)}>{children}</div>;
-};
-
-const CardContent = ({ 
-  children, 
-  className 
-}: { 
-  children: React.ReactNode;
-  className?: string;
-}) => {
-  return <div className={cn("p-4", className)}>{children}</div>;
-};
-
-// Progress component
-const Progress = ({ 
-  value, 
-  className, 
-  indicatorClassName 
-}: { 
-  value: number;
-  className?: string;
-  indicatorClassName?: string;
-}) => {
-  return (
-    <div className={cn("w-full bg-gray-200 rounded-full h-2.5", className)}>
-      <div
-        className={cn("h-full rounded-full", indicatorClassName || "bg-blue-600")}
-        style={{ width: `${value}%` }}
-      ></div>
-    </div>
-  );
-};
+import { cn } from "@/lib/utils";
+import { toast, ToastOptions } from "react-toastify";
 
 // --- Helper Functions ---
 const parseDate = (dateString: string): Date | null => {
@@ -122,26 +35,25 @@ const parseDate = (dateString: string): Date | null => {
   return isNaN(date.getTime()) ? null : date;
 };
 
-
 // Generate dynamic background gradient based on design ID for more uniqueness
 const generateDynamicGradient = (uid: string): string => {
   // Create colors based on the uid characters
   const hash = uid.split('').reduce((acc, char) => char.charCodeAt(0) + acc, 0);
   const hue1 = hash % 360;
   const hue2 = (hash * 7) % 360;
-  
+
   return `linear-gradient(135deg, hsla(${hue1}, 80%, 60%, 0.08), hsla(${hue2}, 80%, 60%, 0.12))`;
 };
 
 // Floating animation for decorative elements
 const floatingAnimation = {
   initial: { y: 0 },
-  animate: { 
+  animate: {
     y: [0, -8, 0],
-    transition: { 
+    transition: {
       duration: 3,
       repeat: Infinity,
-      ease: "easeInOut" 
+      ease: "easeInOut"
     }
   }
 };
@@ -150,43 +62,58 @@ const floatingAnimation = {
 interface DesignListItemProps {
   design: Design;
   index: number;
-  isFavorite: boolean;
-  viewCount: number;
-  onToggleFavorite: () => void;
+  onDelete: (uid: string) => Promise<void>;
 }
 
 const DesignListItem: React.FC<DesignListItemProps> = ({
   design,
   index,
-  viewCount,
-  onDelete
+  onDelete,
 }) => {
   const router = useRouter();
   const [isImageLoading, setIsImageLoading] = useState(true);
-  const [isCopied, setIsCopied] = useState(false);
   const [showPlaceholder, setShowPlaceholder] = useState(false);
-  const [showStats, setShowStats] = useState(false);
-  const [scorePercentage, setScorePercentage] = useState(0);
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
+  const [isHovering, setIsHovering] = useState(false);
 
-  
-  // Generate animated progress on mount for quality score
-  useEffect(() => {
-    // Use a randomized quality score since it's not defined in Design interface
-    const quality = Math.floor(Math.random() * 100);
-    const timer = setTimeout(() => {
-      setScorePercentage(quality);
-    }, 300);
-    return () => clearTimeout(timer);
-  }, [design.uid]); // Only depend on uid
+  const handleDeleteClick = (e: React.MouseEvent, uid: string) => {
+    e.stopPropagation();
+    setDeleteConfirm(uid);
+  };
+
+  const confirmDelete = (uid: string) => {
+    onDelete(uid)
+      .then(() => {
+        toast.success("Design deleted successfully!", {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+        } as ToastOptions);
+      })
+      .catch(() => {
+        toast.error("Failed to delete design", {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+        } as ToastOptions);
+      })
+      .finally(() => {
+        setDeleteConfirm(null);
+      });
+  };
 
   const handleNavigation = (path: string, event?: React.MouseEvent) => {
     event?.stopPropagation(); // Prevent triggering other click events if nested
     router.push(path);
   };
-
- 
-
 
   const creationDate = useMemo(
     () => parseDate(design.createdAt),
@@ -202,36 +129,41 @@ const DesignListItem: React.FC<DesignListItemProps> = ({
   const cardStyle = {
     background: generateDynamicGradient(design.uid || '0'),
   };
-  const handleDeleteClick = (e: MouseEvent, uid: string) => {
-    e.stopPropagation();
-    setDeleteConfirm(uid);
-  };
+
   return (
-    <TooltipProvider delayDuration={200}>
+    <div className="w-full sm:w-full md:w-1/2 lg:w-1/3 xl:w-1/4 p-2">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: index * 0.08, ease: "easeOut" }}
         whileHover="hover"
-        className="flex flex-col md:flex-row bg-white rounded-lg shadow-lg border border-gray-200 overflow-hidden group transition-all duration-300 hover:shadow-xl hover:border-indigo-300 hover:-translate-y-1 relative"
+        onHoverStart={() => setIsHovering(true)}
+        onHoverEnd={() => setIsHovering(false)}
+        className="flex flex-col h-full bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden group transition-all duration-300 hover:shadow-xl hover:border-indigo-300 dark:hover:border-indigo-500 hover:-translate-y-1 relative"
         style={cardStyle}
         onClick={() => handleNavigation(`/designs/${design.uid}`)}
       >
-        {/* Decorative elements */}
-        <motion.div 
-          className="absolute top-2 right-2 h-12 w-12 opacity-10 pointer-events-none"
-          variants={floatingAnimation}
-          initial="initial"
-          animate="animate"
-        >
-          <SparklesIcon className="text-indigo-600 w-full h-full" />
-        </motion.div>
+        {/* Glassmorphism effect overlay */}
+        <div className="absolute inset-0 bg-white/10 dark:bg-black/10 backdrop-blur-[1px] opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-0 pointer-events-none"></div>
         
+        {/* Decorative floating dots */}
+        <motion.div 
+          className="absolute -right-3 -top-3 w-10 h-10 rounded-full bg-gradient-to-br from-blue-400/20 to-indigo-500/20 z-0 pointer-events-none"
+          variants={floatingAnimation}
+          animate="animate"
+        />
+        <motion.div 
+          className="absolute -left-3 -bottom-3 w-8 h-8 rounded-full bg-gradient-to-br from-purple-400/20 to-pink-500/20 z-0 pointer-events-none"
+          variants={floatingAnimation}
+          animate="animate"
+          transition={{ delay: 0.5 }}
+        />
+
         {/* Corner ribbon for new designs (less than 7 days old) */}
         {creationDate && (
           (new Date().getTime() - creationDate.getTime()) / (1000 * 3600 * 24) < 7 && (
-            <div className="absolute -top-1 -right-1 w-16 h-16 overflow-hidden">
-              <div className="absolute top-0 right-0 w-12 transform rotate-45 translate-y-2 translate-x-2 bg-gradient-to-r from-indigo-500 to-purple-500 text-white text-xs py-1 text-center font-bold shadow-md">
+            <div className="absolute -top-1 -right-1 w-16 h-16 overflow-hidden z-10">
+              <div className="absolute top-0 right-0 w-16 transform rotate-45 translate-y-2 translate-x-2 bg-gradient-to-r from-indigo-500 to-purple-500 text-white text-xs py-1 text-center font-bold shadow-md">
                 NEW
               </div>
             </div>
@@ -239,12 +171,12 @@ const DesignListItem: React.FC<DesignListItemProps> = ({
         )}
 
         {/* === Image Section === */}
-        <div className="w-full md:w-56 lg:w-64 h-48 md:h-auto relative overflow-hidden flex-shrink-0">
+        <div className="w-full h-44 sm:h-48 relative overflow-hidden flex-shrink-0">
           {isImageLoading && !showPlaceholder && (
-            <Skeleton className="absolute inset-0 w-full h-full bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 animate-pulse" />
+            <Skeleton className="absolute inset-0 w-full h-full bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 dark:from-gray-700 dark:via-gray-600 dark:to-gray-700 animate-pulse" />
           )}
           {showPlaceholder ? (
-            <div className="absolute inset-0 w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-indigo-50 to-blue-100 text-indigo-400">
+            <div className="absolute inset-0 w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-indigo-50 to-blue-100 dark:from-indigo-900/30 dark:to-blue-900/30 text-indigo-400 dark:text-indigo-300">
               <InfoIcon className="h-12 w-12 mb-2 opacity-50" />
               <span className="text-xs font-medium">Preview Unavailable</span>
             </div>
@@ -253,7 +185,7 @@ const DesignListItem: React.FC<DesignListItemProps> = ({
               src={design.imageUrl}
               alt={design.description || "Design preview"}
               className={cn(
-                "w-full h-[200px] object-cover transition-transform duration-500 ease-in-out",
+                "w-full h-full object-cover transition-transform duration-500 ease-in-out",
                 isImageLoading ? "opacity-0" : "opacity-100",
                 "group-hover:scale-105" // Scale on parent hover
               )}
@@ -262,137 +194,182 @@ const DesignListItem: React.FC<DesignListItemProps> = ({
               loading="lazy"
             />
           )}
-         
-         
+
+          {/* Hover Overlay with Quick Actions */}
+          <motion.div 
+            className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-3"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: isHovering ? 1 : 0 }}
+            transition={{ duration: 0.2 }}
+          >
+            <div className="flex gap-2 justify-end">
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <motion.button
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                      className="w-8 h-8 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center text-white hover:bg-white/30 transition-colors"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleNavigation(`/view-code/${design.uid}`, e);
+                      }}
+                    >
+                      <CodeIcon className="w-4 h-4" />
+                    </motion.button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p className="text-xs">View Code</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+              
+          
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <motion.button
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                      className="w-8 h-8 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center text-white hover:bg-red-500/70 transition-colors"
+                      onClick={(e) => handleDeleteClick(e, design.uid)}
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </motion.button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p className="text-xs">Delete Design</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            </div>
+          </motion.div>
         </div>
 
         {/* === Content Section === */}
-        <div className="flex-grow p-4 md:p-5 flex flex-col justify-between">
-          {/* Top Part: Title, Date, Stats */}
+        <div className="flex-grow p-4 flex flex-col justify-between">
+          {/* Title and Stats Section */}
           <div>
-            <div className="flex justify-between items-start mb-2">
-              <h2 className="text-lg font-semibold text-gray-800 tracking-tight line-clamp-2 mr-4 group-hover:text-indigo-700 transition-colors duration-300">
-                {design.description || "Untitled Design"}
-              </h2>
-              
-            </div>
+            <h2 className="text-base md:text-lg font-semibold text-gray-800 dark:text-gray-100 tracking-tight line-clamp-2 mr-4 group-hover:text-indigo-700 dark:group-hover:text-indigo-400 transition-colors duration-300">
+              {design.description || "Untitled Design"}
+            </h2>
 
-            {/* Creation date with fancy styling */}
-            {creationDate && (
-              <div className="flex items-center text-xs text-gray-500 mb-3">
-                <CalendarDays className="h-3.5 w-3.5 mr-1 text-indigo-400" />
-                <span>
-                  Created {creationDate.toLocaleDateString('en-US', { 
-                    year: 'numeric', 
-                    month: 'short', 
-                    day: 'numeric' 
-                  })}
-                </span>
-              </div>
-            )}
-
-
-            {/* Options Badges */}
-            <div className="flex flex-wrap gap-1.5 mb-4">
-              {design.options && design.options.length > 0 ? (
-                design.options.slice(0, 4).map(
-                  (option, idx) => (
-                    <Tooltip key={idx}>
-                      <TooltipTrigger>
-                        <Badge
-                          variant="outline"
-                          className="bg-indigo-50/80 backdrop-blur-sm text-indigo-700 border-indigo-200 cursor-default text-xs hover:bg-indigo-100 transition-colors duration-200"
-                        >
-                          {option.length > 15
-                            ? `${option.substring(0, 15)}...`
-                            : option}
-                        </Badge>
-                      </TooltipTrigger>
-                      {option.length > 15 && (
-                        <TooltipContent>{option}</TooltipContent>
-                      )}
-                    </Tooltip>
-                  )
-                )
-              ) : (
-                <span className="text-gray-400 italic text-xs">
-                  No specific options applied
-                </span>
-              )}
-              {design.options && design.options.length > 4 && (
-                <Tooltip>
-                  <TooltipTrigger>
-                    <Badge
-                      variant="secondary"
-                      className="text-xs cursor-default bg-gradient-to-r from-indigo-100 to-blue-100 text-indigo-600"
-                    >
-                      +{design.options.length - 4} more
-                    </Badge>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    Additional Options: {design.options.slice(4).join(", ")}
-                  </TooltipContent>
-                </Tooltip>
-              )}
-            </div>
+          
           </div>
 
-          {/* Stats Card - Toggle Display */}
-          <AnimatePresence>
-            {showStats && (
-              <motion.div 
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: 'auto' }}
-                exit={{ opacity: 0, height: 0 }}
-                className="overflow-hidden mb-4"
+          {/* Action Buttons */}
+          <div className="mt-4 ">
+        
+            <motion.button
+              className=" w-full p-2 rounded-md text-sm font-medium bg-gradient-to-r from-red-500 to-rose-600 hover:from-red-600 hover:to-rose-700 text-white shadow-md transition-all flex items-center justify-center gap-1 "
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={(e) => handleDeleteClick(e, design.uid)}
+            >
+              <Trash2 className="w-3.5 h-3.5 group-hover:rotate-12 transition-transform duration-300" />
+              Delete
+            </motion.button>
+          </div>
+          {deleteConfirm !== null && deleteConfirm === design.uid && (
+            <AnimatePresence>
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="absolute inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center z-20 rounded-xl overflow-hidden"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setDeleteConfirm(null);
+                }}
               >
-                <Card className="border border-indigo-100 bg-indigo-50/50 backdrop-blur-sm p-3">
-                  <CardContent className="p-0">
-                    <div className="grid grid-cols-3 gap-3 text-xs">
-                      <div className="flex flex-col items-center justify-center p-2 bg-white/80 rounded-md">
-                        <EyeIcon className="h-3.5 w-3.5 text-blue-500 mb-1" />
-                        <span className="font-semibold">{viewCount}</span>
-                        <span className="text-gray-500 text-[10px]">Views</span>
-                      </div>
-                      <div className="flex flex-col items-center justify-center p-2 bg-white/80 rounded-md">
-                        <CodeIcon className="h-3.5 w-3.5 text-purple-500 mb-1" />
-                        <span className="font-semibold">{Math.floor(Math.random() * 10)}</span>
-                        <span className="text-gray-500 text-[10px]">Clones</span>
-                      </div>
-                      <div className="flex flex-col items-center justify-center p-2 bg-white/80 rounded-md">
-                        <ThumbsUp className="h-3.5 w-3.5 text-green-500 mb-1" />
-                        <span className="font-semibold">{Math.floor(Math.random() * 100)}</span>
-                        <span className="text-gray-500 text-[10px]">Likes</span>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            )}
-          </AnimatePresence>
-
-          {/* Bottom Part: Action Buttons */}
-          <div className="border-t border-gray-100 pt-3 mt-auto flex justify-between items-center">
-           
-            {/* Copy Link Button */}
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <motion.button
-                  className=" w-full py-1.5 px-2 rounded-md text-sm font-medium bg-gradient-to-r from-red-500 to-rose-600 hover:from-red-600 hover:to-rose-700 text-white shadow-md transition-all flex items-center justify-center gap-1 group"
-                  whileHover={{ scale: 1.03 }}
-                  whileTap={{ scale: 0.97 }}
-                  onClick={(e) => handleDeleteClick(e, design.uid)}
+                <motion.div
+                  initial={{ scale: 0.8, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  exit={{ scale: 0.8, opacity: 0 }}
+                  transition={{
+                    type: "spring",
+                    damping: 25,
+                    stiffness: 300
+                  }}
+                  className="relative bg-white/90 dark:bg-gray-800/90 backdrop-blur-md rounded-xl p-4 w-[90%] shadow-[0_10px_30px_-10px_rgba(0,0,0,0.3)] border border-white/20 dark:border-gray-700/50"
+                  onClick={(e) => e.stopPropagation()}
                 >
-                  <Trash2 className="w-3.5 h-3.5 group-hover:rotate-12 transition-transform duration-300" />
-                  Delete
-                </motion.button>
-              </TooltipTrigger>
-              <TooltipContent>Copy shareable link</TooltipContent>
-            </Tooltip>
-          </div>
+                  {/* Decorative elements */}
+                  <div className="absolute -top-4 -left-4 w-16 h-16 bg-red-500/10 rounded-full blur-xl"></div>
+                  <div className="absolute -bottom-4 -right-4 w-16 h-16 bg-pink-500/10 rounded-full blur-xl"></div>
+
+                  <div className="relative text-center">
+                    <motion.div
+                      className="relative w-12 h-12 bg-gradient-to-br from-red-500 to-rose-700 rounded-full flex items-center justify-center mx-auto mb-2 overflow-hidden"
+                      initial={{ rotate: 0 }}
+                      animate={{
+                        rotate: [0, -5, 0, 5, 0],
+                        scale: [1, 1.05, 1, 1.05, 1]
+                      }}
+                      transition={{
+                        duration: 5,
+                        repeat: Infinity,
+                        repeatType: "reverse"
+                      }}
+                    >
+                      <div className="absolute inset-0 bg-gradient-to-tr from-red-600/40 to-transparent"></div>
+                      <AlertCircle className="w-6 h-6 text-white drop-shadow-lg" />
+                    </motion.div>
+
+                    <motion.div
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.2 }}
+                    >
+                      <h3 className="text-base font-bold mb-6 text-gray-900 dark:text-white  flex items-center justify-center gap-1">
+                        <ShieldAlert className="w-4 h-4 text-red-500" />
+                        Delete?
+                      </h3>
+
+                    </motion.div>
+
+                    <div className="flex justify-center gap-3">
+                      <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
+                        <Button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setDeleteConfirm(null);
+                          }}
+                          className="bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 px-3 py-1 text-xs rounded-lg shadow-sm transition-all duration-200"
+                        >
+                          Cancel
+                        </Button>
+                      </motion.div>
+
+                      <motion.div
+                        whileHover={{ scale: 1.03 }}
+                        whileTap={{ scale: 0.97 }}
+                        className="relative group"
+                      >
+                        <div className="absolute -inset-0.5 bg-gradient-to-r from-red-600 to-rose-600 rounded-lg blur opacity-60 group-hover:opacity-80 transition duration-200"></div>
+                        <Button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            confirmDelete(deleteConfirm as string);
+                          }}
+                          className="relative bg-gradient-to-r from-red-500 to-rose-600 hover:from-red-600 hover:to-rose-700 text-white px-3 py-1 text-xs rounded-lg shadow-md transition-all duration-200"
+                        >
+                          Delete
+                        </Button>
+                      </motion.div>
+                    </div>
+                  </div>
+                </motion.div>
+              </motion.div>
+            </AnimatePresence>
+          )}
+
         </div>
+
+        {/* Animated Delete Confirmation Modal */}
+        
       </motion.div>
-    </TooltipProvider>
+    </div>
   );
 };
 
@@ -400,17 +377,13 @@ const DesignListItem: React.FC<DesignListItemProps> = ({
 interface DesignsListProps {
   designs: Design[];
   onDelete: (uid: string) => Promise<void>;
-
 }
 
 const DesignsList: React.FC<DesignsListProps> = ({ designs, onDelete }) => {
-  const [filterMode, setFilterMode] = useState("all");
-  const [sortOrder, setSortOrder] = useState("newest");
-  const [searchTerm, setSearchTerm] = useState("");
-  const [isFiltering, setIsFiltering] = useState(false);
   const [localFavorites, setLocalFavorites] = useState<Record<string, boolean>>({});
   const [localViewCounts, setLocalViewCounts] = useState<Record<string, number>>({});
-  
+  const [sortOption, setSortOption] = useState<'date' | 'favorites' | 'views'>('date');
+
   // Initialize random view counts for each design
   useEffect(() => {
     if (designs && designs.length > 0) {
@@ -423,65 +396,8 @@ const DesignsList: React.FC<DesignsListProps> = ({ designs, onDelete }) => {
       setLocalViewCounts(viewCounts);
     }
   }, [designs]);
-  
-  // Filter and sort designs
-  const filteredDesigns = useMemo(() => {
-    if (!designs) return [];
-    
-    // First apply search term filter
-    let filtered = designs;
-    if (searchTerm.trim()) {
-      const term = searchTerm.toLowerCase();
-      filtered = designs.filter(design => 
-        (design.description?.toLowerCase().includes(term) || 
-        design.options?.some(opt => opt.toLowerCase().includes(term)))
-      );
-    }
-    
-    // Then apply category/type filter
-    if (filterMode !== "all") {
-      filtered = filtered.filter(design => {
-        switch(filterMode) {
-          case "favorites":
-            // Use our local favorites state
-            return design.uid && localFavorites[design.uid];
-          case "recent":
-            return design.createdAt && 
-              new Date(design.createdAt).getTime() > Date.now() - (7 * 24 * 60 * 60 * 1000);
-          case "popular":
-            // Use our local view counts
-            return design.uid && localViewCounts[design.uid] > 50;
-          default:
-            return true;
-        }
-      });
-    }
-    
-    // Finally apply sort
-    return [...filtered].sort((a, b) => {
-      switch(sortOrder) {
-        case "newest":
-          return new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime();
-        case "oldest":
-          return new Date(a.createdAt || 0).getTime() - new Date(b.createdAt || 0).getTime();
-        case "popular":
-          // Sort by our local view counts
-          const countA = (a.uid && localViewCounts[a.uid]) || 0;
-          const countB = (b.uid && localViewCounts[b.uid]) || 0;
-          return countB - countA;
-        default:
-          return 0;
-      }
-    });
-  }, [designs, filterMode, sortOrder, searchTerm, localFavorites, localViewCounts]);
 
-  // Toggle favorite for a design
-  const toggleFavorite = useCallback((uid: string) => {
-    setLocalFavorites(prev => ({
-      ...prev,
-      [uid]: !prev[uid]
-    }));
-  }, []);
+ 
 
   // Animation variants for container
   const containerVariants = {
@@ -494,22 +410,19 @@ const DesignsList: React.FC<DesignsListProps> = ({ designs, onDelete }) => {
     }
   };
 
-  
-
-
   if (!designs || designs.length === 0) {
     return (
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="max-w-4xl mx-auto p-8 text-center bg-gradient-to-b from-indigo-50/50 to-white rounded-xl shadow-lg border border-indigo-100"
+        className="max-w-4xl mx-auto p-8 text-center bg-gradient-to-b from-indigo-50/50 to-white dark:from-indigo-900/10 dark:to-gray-800/20 rounded-xl shadow-lg border border-indigo-100 dark:border-indigo-900/30"
       >
         <div className="relative">
           {/* Decorative elements */}
           <motion.div
-            className="absolute -top-4 -left-4 text-indigo-200 opacity-20"
-            animate={{ 
+            className="absolute -top-4 -left-4 text-indigo-200 dark:text-indigo-700 opacity-20"
+            animate={{
               rotate: [0, 15, 0, -15, 0],
               scale: [1, 1.1, 1, 1.1, 1]
             }}
@@ -517,10 +430,10 @@ const DesignsList: React.FC<DesignsListProps> = ({ designs, onDelete }) => {
           >
             <Sparkles className="h-20 w-20" />
           </motion.div>
-          
+
           <motion.div
-            className="absolute -bottom-4 -right-4 text-purple-200 opacity-20"
-            animate={{ 
+            className="absolute -bottom-4 -right-4 text-purple-200 dark:text-purple-700 opacity-20"
+            animate={{
               rotate: [0, -15, 0, 15, 0],
               scale: [1, 1.1, 1, 1.1, 1]
             }}
@@ -528,18 +441,17 @@ const DesignsList: React.FC<DesignsListProps> = ({ designs, onDelete }) => {
           >
             <Sparkles className="h-20 w-20" />
           </motion.div>
-        
-          <SparklesIcon className="h-16 w-16 mx-auto text-indigo-300 mb-4" />
-          <h3 className="text-2xl font-semibold mb-3 text-indigo-700 bg-clip-text text-transparent bg-gradient-to-r from-indigo-500 to-purple-600">
+
+          <SparklesIcon className="h-16 w-16 mx-auto text-indigo-300 dark:text-indigo-500 mb-4" />
+          <h3 className="text-2xl font-semibold mb-3 text-indigo-700 dark:text-indigo-400 bg-clip-text text-transparent bg-gradient-to-r from-indigo-500 to-purple-600">
             No Designs Yet
           </h3>
-          <p className="text-gray-600 mb-6">Start creating amazing designs, and they will appear here!</p>
+          <p className="text-gray-600 dark:text-gray-300 mb-6">Start creating amazing designs, and they will appear here!</p>
           
-          <Button 
-            className="bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white font-medium px-6 py-2 rounded-full shadow-md hover:shadow-lg transition-all duration-300"
-            onClick={() => window.location.href = '/create-design'}
+          <Button
+            className="bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white font-medium py-2 px-6 rounded-full shadow-md transition-all hover:shadow-lg"
+            onClick={() => window.location.href = '/'}
           >
-            <Palette className="h-4 w-4 mr-2" />
             Create Your First Design
           </Button>
         </div>
@@ -548,63 +460,71 @@ const DesignsList: React.FC<DesignsListProps> = ({ designs, onDelete }) => {
   }
 
   return (
-    <div className="max-w-5xl mx-auto space-y-6">
-      
-    
+    <div className="w-full">
+      {/* Sorting and View Options */}
+      <div className="flex flex-wrap items-center justify-between mb-6 gap-3">
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="text-sm font-medium text-gray-600 dark:text-gray-300">Sort by:</span>
+          <div className="flex p-1 bg-gray-100 dark:bg-gray-800 rounded-lg">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setSortOption('date')}
+              className={`text-xs px-3 py-1 rounded-md transition-all ${
+                sortOption === 'date' 
+                  ? 'bg-white dark:bg-gray-700 text-indigo-600 dark:text-indigo-400 shadow-sm' 
+                  : 'text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400'
+              }`}
+            >
+              <CalendarDays className="h-3.5 w-3.5 mr-1" />
+              Newest
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setSortOption('favorites')}
+              className={`text-xs px-3 py-1 rounded-md transition-all ${
+                sortOption === 'favorites' 
+                  ? 'bg-white dark:bg-gray-700 text-indigo-600 dark:text-indigo-400 shadow-sm' 
+                  : 'text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400'
+              }`}
+            >
+              <StarIcon className="h-3.5 w-3.5 mr-1" />
+              Favorites
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setSortOption('views')}
+              className={`text-xs px-3 py-1 rounded-md transition-all ${
+                sortOption === 'views' 
+                  ? 'bg-white dark:bg-gray-700 text-indigo-600 dark:text-indigo-400 shadow-sm' 
+                  : 'text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400'
+              }`}
+            >
+              <EyeIcon className="h-3.5 w-3.5 mr-1" />
+              Popular
+            </Button>
+          </div>
+        </div>
+      </div>
+
       {/* Designs Grid */}
       <motion.div
         variants={containerVariants}
         initial="hidden"
         animate="show"
-        className="space-y-5 p-4 sm:p-6 bg-gradient-to-b from-gray-50 to-white rounded-xl shadow-inner"
+        className="flex flex-wrap -mx-2"
       >
-        {filteredDesigns.length === 0 ? (
-          <div className="text-center p-8 text-gray-500">
-            <AlertTriangle className="h-10 w-10 mx-auto text-amber-400 mb-2" />
-            <h3 className="text-lg font-medium mb-1">No designs found</h3>
-            <p className="text-sm">Try adjusting your filters or search terms</p>
-          </div>
-        ) : (
-          filteredDesigns.map((design, index) => (
-            <DesignListItem
-              key={design.uid || index}
-              design={design}
-              index={index}
-              isFavorite={design.uid ? !!localFavorites[design.uid] : false}
-              viewCount={design.uid ? localViewCounts[design.uid] || 0 : 0}
-              onToggleFavorite={() => design.uid && toggleFavorite(design.uid)}
-            />
-          ))
-        )}
+        {designs.map((design, index) => (
+          <DesignListItem
+            key={design.uid || index}
+            design={design}
+            index={index}
+            onDelete={onDelete}
+          />
+        ))}
       </motion.div>
-      
-      {/* Quick Tips Section */}
-      <div className="bg-gradient-to-r from-indigo-50 to-blue-50 rounded-xl p-5 border border-indigo-100 shadow-sm">
-        <h3 className="flex items-center text-indigo-700 font-semibold mb-3">
-          <Sparkles className="h-4 w-4 mr-2 text-indigo-500" />
-          Pro Tips
-        </h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-          <div className="flex space-x-3">
-            <div className="flex-shrink-0 bg-white p-2 rounded-full shadow-sm">
-              <StarIcon className="h-5 w-5 text-amber-500" />
-            </div>
-            <div>
-              <span className="font-medium text-gray-800">Add to Favorites</span>
-              <p className="text-gray-600">Click the heart icon to keep track of your best designs</p>
-            </div>
-          </div>
-          <div className="flex space-x-3">
-            <div className="flex-shrink-0 bg-white p-2 rounded-full shadow-sm">
-              <BarChart3 className="h-5 w-5 text-green-500" />
-            </div>
-            <div>
-              <span className="font-medium text-gray-800">View Statistics</span>
-              <p className="text-gray-600">Click the chart icon to see detailed analytics about your design</p>
-            </div>
-          </div>
-        </div>
-      </div>
     </div>
   );
 };

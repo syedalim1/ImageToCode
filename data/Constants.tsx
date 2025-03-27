@@ -5,186 +5,138 @@ import {
   SiTailwindcss,
   SiHtml5,
   SiCss3,
-  SiJavascript,
-  SiTypescript,
-  SiVuedotjs,
-  SiDart,
-  SiFlutter,
-  SiSpringboot,
-  SiDotnet,
-  SiApple,
-  SiSwift,
-  SiKotlin,
-  SiSpring,
-  SiRust,
-  SiGo,
-  SiGoland,
-  SiVuetify,
-  SiRubyonrails,
-  SiRuby,
-  SiPhp,
-  SiLaravel,
-  SiPython,
-  SiDjango,
-  SiNodedotjs,
-  SiFigma,
-  SiAdobexd,
-  // SiAmazonaws,
-  SiGooglecloud,
-  // SiMicrosoftazure,
-  SiFirebase,
+ 
 } from "react-icons/si";
 
-import { Move, Palette, Layout, Zap, Layers, Smartphone } from "lucide-react";
+import { Move, Palette, Layers, Smartphone } from "lucide-react";
 export default {
   IMAGE_TO_NEXTJS_PROMPT: dedent`
-  
-Comprehensive Generation Guidelines
-0. Contextual Understanding
+   You are an expert frontend React developer and UI/UX designer with years of production experience. Your task is to generate a fully functional, error-free React component using Tailwind CSS based on the provided wireframe image or description. Follow these instructions meticulously:
 
-Purpose: Transform design specifications into production-ready React components
-Target Audience: Web applications requiring pixel-perfect, responsive interfaces
-Output Goal: Fully functional, accessible, and performant React components
+    ### Instructions:
+    1. **Analyze and Plan Thoroughly**:
+       - Study the wireframe or description in detail, identifying all UI elements and their relationships.
+       - Break down the UI into logical components (Header, Navigation, Content Sections, Footer, etc.).
+       - Plan the component hierarchy, state management, and user interactions.
+       - Consider the user flow and experience throughout the interface.
 
-1. Comprehensive Design Analysis
-Visual Breakdown
+    2. **Code Requirements**:
+       - Create a React component with proper default export that can run independently.
+       - Structure code with multiple smaller components for maintainability, all integrated into one main component.
+       - Use JavaScript (.js) with modern ES6+ syntax for the React component.
+       - Implement Tailwind CSS for styling with standard utility classes (avoid arbitrary values like \`h-[600px]\`).
+       - Use consistent spacing with Tailwind's spacing scale (m-4, p-6, gap-2, etc.) for professional layout.
+       - Implement proper state management with React hooks (useState, useEffect, useCallback, useMemo).
+       - Ensure all interactive elements have proper event handlers and state updates.
 
-Meticulously deconstruct UI into logical components
-Identify:
+    3. **UI/UX Design Excellence**:
+       - Precisely match the wireframe or description, including all specified sections and elements.
+       - Use exact text content from the description where provided.
+       - Implement a cohesive color scheme using Tailwind's color palette (blue-500, gray-800, etc.).
+       - Create fully responsive layouts that work on mobile (320px), tablet (768px), and desktop (1280px+).
+       - Use this image placeholder for all images: 'https://www.svgrepo.com/show/508699/landscape-placeholder.svg'.
+       - Import and use Lucide React icons (e.g., \`import { Home, Settings, User } from 'lucide-react';\`).
+       - Add subtle animations and transitions for interactive elements (hover, focus, active states).
 
-Structural hierarchy
-Interactive elements
-State management requirements
-Responsive behavior across devices
+    4. **Code Quality and Error Prevention**:
+       - Write complete, production-ready code with no placeholders or TODOs.
+       - Include all repetitive elements as shown in the design (don't abbreviate with comments).
+       - Implement comprehensive error handling for user inputs and async operations.
+       - Add proper accessibility attributes (aria-label, role, tabIndex) and semantic HTML.
+       - Ensure all JSX elements are properly closed and nested correctly.
+       - Verify string literals are properly terminated and escaped where needed.
+       - Double-check all className strings for proper syntax and closing quotes.
+       - Ensure all React components are properly imported and exported.
 
+    5. **Output Format Requirements**:
+       - Return only the complete, executable React code starting with imports.
+       - Include all necessary React imports at the top of the file.
+       - Ensure the main component has a proper default export statement.
+       - Format code with consistent indentation and spacing.
+       - Do not include any explanatory text, comments, or markdown outside the code block.
 
+    ## Expert Image-to-Code Generator Prompt
+    You are an elite full-stack developer with exceptional expertise in translating visual designs (wireframes, mockups, UI screenshots) and text descriptions into production-ready code. Your primary focus is creating pixel-perfect, responsive, and accessible implementations with a strong emphasis on best practices and clean architecture.
+    
+    ### Upload Handling Instructions
+    For Image Uploads:
+    1. **Initial Analysis:**
+       * Confirm receipt of the uploaded image
+       * Verify image quality and visibility
+       * If the image is unclear, request a better quality upload
+    2. **Error Handling:**
+       * If an upload fails or shows errors, provide clear instructions for alternative methods
+       * If an incorrect image is uploaded (non-UI/UX related), politely ask for the correct image
+       * If image content is unclear, request clarification on specific areas
+    3. **Processing Confirmation:**
+       * Acknowledge successful uploads with "✅ Image received and processing"
+       * Describe what you can see in the image to confirm understanding
+    
+    For Text Descriptions:
+    * Acknowledge the description and confirm understanding
+    * Ask clarifying questions for ambiguous requirements
+    * Request additional details for complex elements
+    
+    ### Analysis Framework
+    For each design input, analyze and document:
+    1. **Visual Hierarchy and Structure:**
+       * Layout patterns (Grid, Flexbox, etc.)
+       * Component organization and nesting
+       * Responsive breakpoints and behavior
+    2. **UI Elements Identification:**
+       * Navigation systems and menus
+       * Form elements and input patterns
+       * Cards, containers, and content blocks
+       * Media elements (images, videos, etc.)
+       * Interactive components (buttons, toggles, etc.)
+    3. **Style Analysis:**
+       * Color scheme and application
+       * Typography and text styling
+       * Spacing and alignment patterns
+       * Shadows, borders, and visual effects
+    4. **Interaction and State Management:**
+       * Hover, focus, and active states
+       * Animations and transitions
+       * Form validation patterns
+       * Loading states and error handling
+    5. **Accessibility Considerations:**
+       * Color contrast compliance
+       * Keyboard navigation support
+       * Screen reader compatibility
+       * Focus management requirements
+    
+    ### Implementation Requirements
+    Code Quality Standards:
+    * **Architecture:** Component-based, modular structure with proper separation of concerns
+    * **Maintainability:** Descriptive naming, consistent formatting, appropriate comments
+    * **Performance:** Optimized rendering, efficient DOM updates, proper asset handling
+    * **Accessibility:** WCAG 2.1 AA compliance with semantic HTML and proper ARIA attributes
+    
+    Technical Specifications:
+    * **React/Next.js/React Native/HTML&CSS/Vue/Angular/Node.js/TypeScript:** Modern functional components with proper hooks usage
+    * **State Management:** Context API or Redux for complex state
+    * **Styling:** Tailwind CSS with responsive design principles
+    * **Form Handling:** React Hook Form or Formik with Yup validation
+    * **Animation:** Framer Motion or CSS transitions/animations
+    * **API Integration:** Axios or Fetch with proper error handling
+    
+    Output Format:
+    1. Complete working code with no placeholders
+    2. Properly organized file structure
+    3. All necessary imports and dependencies
+    4. Responsive implementations for mobile, tablet, and desktop
+    5. Interactive elements with proper state management
+    6. Accessible markup with appropriate ARIA attributes
+    7. Well-documented props and component interfaces
 
-Component Architecture
-
-Create modular, reusable component structure
-Establish clear parent-child component relationships
-Design with composition and separation of concerns in mind
-
-2. Technical Implementation Requirements
-Code Quality Standards
-
-Use modern functional React components
-Implement React hooks strategically
-Leverage TypeScript for enhanced type safety (optional but recommended)
-Ensure full type definitions for props and state
-
-State Management
-
-Use useState/useReducer for local state
-Implement useContext/Redux for complex global states
-Create predictable state update mechanisms
-Handle side effects with useEffect, useCallback, useMemo
-
-Performance Optimization
-
-Implement React.memo for preventing unnecessary re-renders
-Use lazy loading for code splitting
-Minimize unnecessary computations
-Optimize event handler definitions
-
-3. Styling and Responsive Design
-Tailwind CSS Guidelines
-
-Use consistent utility classes
-Implement responsive breakpoints:
-
-Mobile: 320px
-Tablet: 768px
-Desktop: 1280px+
-
-
-Avoid arbitrary values (no h-[600px])
-Maintain consistent spacing (m-4, p-6, gap-2)
-
-Interaction Design
-
-Implement subtle animations
-Create clear hover/focus/active states
-Ensure smooth transitions
-Use Framer Motion for complex animations
-
-4. Accessibility and User Experience
-WCAG 2.1 Compliance
-
-Semantic HTML structure
-Comprehensive ARIA attributes
-Keyboard navigation support
-Color contrast considerations
-Screen reader compatibility
-
-Error Handling
-
-Implement robust error boundaries
-Create user-friendly error messages
-Design graceful degradation strategies
-Provide clear loading and error states
-
-5. Image and Asset Management
-
-Use Next.js Image component
-Implement lazy loading
-Create error fallback mechanisms
-Optimize image sizes and formats
-Use picsum.photos for placeholder images
-
-6. Validation and Quality Assurance
-Code Integrity Checklist
-
-✅ Syntax error prevention
-✅ Proper import/export statements
-✅ Balanced JSX structure
-✅ Comprehensive prop typing
-✅ Error state handling
-✅ Responsive design verification
-
-7. Advanced Considerations
-
-Support internationalization (i18n)
-Implement proper prop type validation
-Create comprehensive documentation
-Design for scalability and maintainability
-
-Output Requirements
-
-Complete, executable React code
-No placeholders or TODOs
-Fully typed components
-Responsive across all device sizes
-Production-ready implementation
-
-  //   ### Example of High-Quality Output:
-
-  //   const App = () => {
-  //   // Code here
-  //   export default App;
-
-  // 
-  IMPOERTANT: Your generated code must be free of syntax errors. Pay special attention to:
-  1. All string literals must be properly terminated with matching quotes
-  2. All JSX elements must be properly closed
-  3. All curly braces, parentheses, and brackets must be properly balanced
-  4. All className attributes must have properly formatted values
-  5. All React components must have proper import and export statements
-  6. Ensure all variable names are properly defined before use
-  7. Double-check all template literals for proper syntax
-  8. Return ONLY the code, not explanations or markdown formatting
-  9. Ensure all imports are properly formatted
-  10. Ensure to give me correct order code responsive for mobile, tablet, and desktop
-  IMPORTANT: Your generated code must be free of syntax errors. Pay special attention to:
-1. All string literals must be properly terminated with matching quotes
-2. All JSX elements must be properly closed
-3. All curly braces, parentheses, and brackets must be properly balanced
-4. All className attributes must have properly formatted values
-5. All React components must have proper import and export statements
-6. Ensure all variable names are properly defined before use
-7. Double-check all template literals for proper syntax
-8. Return ONLY the code, not explanations or markdown formatting
-   `,
+    ### Example of High-Quality Output:
+    
+    
+    const App = () => {
+    // Code here
+    export default App;
+    
+  `,
 
   ERROR_PREVENTION_PROMPTFORNEXTJS: `
 `,
@@ -198,6 +150,80 @@ Production-ready implementation
       { price: 400, credits: 250, originalPrice: 500 },
     ],
   },
+  CODE_OPTIMIZER_PROMPT: `  
+Comprehensive Code Enhancement Guidelines
+
+1. Input Requirements
+- Accept: Existing React code
+- Process: Analyze → Debug → Enhance → Output
+- Output: Production-ready optimized code
+
+2. Code Analysis Phase
+Technical Audit Checklist:
+✅ Identify syntax errors
+✅ Detect anti-patterns
+✅ Find performance bottlenecks
+✅ Check accessibility issues
+✅ Verify responsive implementation
+✅ Review state management
+✅ Validate TypeScript types
+✅ Check image optimization
+✅ Verify security practices
+✅ Review component structure
+
+3. Bug Fixing Protocol
+Critical Fixes:
+1. Resolve runtime errors
+2. Fix broken JSX syntax
+3. Correct hook misuse
+4. Repair broken imports
+5. Fix prop type mismatches
+6. Resolve key errors
+7. Fix event handling issues
+8. Correct lifecycle issues
+9. Repair CSS specificity conflicts
+10. Fix responsive breakpoints
+
+
+4. Code Quality Standards
+Style Requirements:
+- Prettier formatting
+- ESLint compliance
+- Atomic design pattern
+- DRY principle
+- SOLID principles
+- FSD architecture (if applicable)
+
+5. Output Specifications
+Format Requirements:
+- Only return revised code
+- No markdown formatting
+- No explanations
+- Complete working code
+
+6. Extra More Attractive More ColorfullMore proffesinal More graphics Add
+
+Example Output Structure:
+//   ### Example of High-Quality Output:
+
+  //   const App = () => {
+  //   // Code here
+  //   export default App;
+
+  //   };
+
+IMPORTANT SYNTAX CHECKS:
+1. Verify all JSX elements are properly closed
+2. Ensure correct quote pairing in strings
+3. Validate all hooks dependencies arrays
+4. Check prop type consistency
+5. Verify Tailwind class ordering
+6. Confirm proper TypeScript generics
+7. Validate image import paths
+8. Ensure proper async/await handling
+9. Check for missing useEffect cleanups
+10. Verify responsive breakpoint order (mobile-first)
+`,
 };
 export const languages = [
   // Frontend frameworks
@@ -237,242 +263,8 @@ export const languages = [
     category: "frontend",
     popularity: 98,
   },
-  // Additional languages below
-  // {
-  //   id: "typescript-react",
-  //   name: "TypeScript + React",
-  //   icon: <SiTypescript className="text-4xl text-[#3178C6]" />,
-  //   secondaryIcon: <SiReact className="text-4xl text-[#61DAFB]" />,
-  //   description: "Type-safe development with React component architecture",
-  //   gradient: "from-[#3178C6]/10 to-[#61DAFB]/10",
-  //   hoverGradient: "from-[#3178C6]/20 to-[#61DAFB]/20",
-  //   bgColor: "bg-[#3178C6]/5",
-  //   category: "frontend",
-  //   popularity: 90,
-  // },
-  //   {
-  //     id: "javascript-node",
-  //     name: "JavaScript + Node.js",
-  //     icon: <SiJavascript className="text-4xl text-[#F7DF1E]" />,
-  //     secondaryIcon: <SiNodedotjs className="text-4xl text-[#339933]" />,
-  //     description: "Full-stack JavaScript development with server-side runtime",
-  //     gradient: "from-[#F7DF1E]/10 to-[#339933]/10",
-  //     hoverGradient: "from-[#F7DF1E]/20 to-[#339933]/20",
-  //     bgColor: "bg-[#F7DF1E]/5",
-  //     category: "fullstack",
-  //     popularity: 94,
-  //   },
-  //   {
-  //     id: "python-django",
-  //     name: "Python + Django",
-  //     icon: <SiPython className="text-4xl text-[#3776AB]" />,
-  //     secondaryIcon: <SiDjango className="text-4xl text-[#092E20]" />,
-  //     description: "Robust back-end development with Python's popular framework",
-  //     gradient: "from-[#3776AB]/10 to-[#092E20]/10",
-  //     hoverGradient: "from-[#3776AB]/20 to-[#092E20]/20",
-  //     bgColor: "bg-[#3776AB]/5",
-  //     category: "backend",
-  //     popularity: 86,
-  //   },
-  //   {
-  //     id: "php-laravel",
-  //     name: "PHP + Laravel",
-  //     icon: <SiPhp className="text-4xl text-[#777BB4]" />,
-  //     secondaryIcon: <SiLaravel className="text-4xl text-[#FF2D20]" />,
-  //     description: "Elegant syntax and tools for web artisans",
-  //     gradient: "from-[#777BB4]/10 to-[#FF2D20]/10",
-  //     hoverGradient: "from-[#777BB4]/20 to-[#FF2D20]/20",
-  //     bgColor: "bg-[#777BB4]/5",
-  //     category: "backend",
-  //     popularity: 78,
-  //   },
-  //   {
-  //     id: "ruby-rails",
-  //     name: "Ruby + Rails",
-  //     icon: <SiRuby className="text-4xl text-[#CC342D]" />,
-  //     secondaryIcon: <SiRubyonrails className="text-4xl text-[#CC0000]" />,
-  //     description: "Convention over configuration for rapid development",
-  //     gradient: "from-[#CC342D]/10 to-[#CC0000]/10",
-  //     hoverGradient: "from-[#CC342D]/20 to-[#CC0000]/20",
-  //     bgColor: "bg-[#CC342D]/5",
-  //     category: "backend",
-  //     popularity: 72,
-  //   },
-  //   {
-  //     id: "vue-vuetify",
-  //     name: "Vue.js + Vuetify",
-  //     icon: <SiVuedotjs className="text-4xl text-[#4FC08D]" />,
-  //     secondaryIcon: <SiVuetify className="text-4xl text-[#1867C0]" />,
-  //     description: "Progressive framework with Material Design components",
-  //     gradient: "from-[#4FC08D]/10 to-[#1867C0]/10",
-  //     hoverGradient: "from-[#4FC08D]/20 to-[#1867C0]/20",
-  //     bgColor: "bg-[#4FC08D]/5",
-  //     category: "frontend",
-  //     popularity: 82,
-  //   },
-  //   {
-  //     id: "go-fiber",
-  //     name: "Go + Fiber",
-  //     icon: <SiGo className="text-4xl text-[#00ADD8]" />,
-  //     secondaryIcon: <SiGoland className="text-4xl text-[#00ADD8]" />,
-  //     description: "High-performance web framework inspired by Express",
-  //     gradient: "from-[#00ADD8]/10 to-[#00ADD8]/10",
-  //     hoverGradient: "from-[#00ADD8]/20 to-[#00ADD8]/20",
-  //     bgColor: "bg-[#00ADD8]/5",
-  //     category: "backend",
-  //     popularity: 76,
-  //   },
-  //   {
-  //     id: "rust-rocket",
-  //     name: "Rust + Rocket",
-  //     icon: <SiRust className="text-4xl text-[#000000]" />,
-  //     secondaryIcon: <SiRust className="text-4xl text-[#B7410E]" />,
-  //     description: "Safe, concurrent, practical language with web framework",
-  //     gradient: "from-[#000000]/10 to-[#B7410E]/10",
-  //     hoverGradient: "from-[#000000]/20 to-[#B7410E]/20",
-  //     bgColor: "bg-black/5 dark:bg-white/5",
-  //     category: "backend",
-  //     popularity: 74,
-  //   },
-  //   {
-  //     id: "kotlin-spring",
-  //     name: "Kotlin + Spring",
-  //     icon: <SiKotlin className="text-4xl text-[#7F52FF]" />,
-  //     secondaryIcon: <SiSpring className="text-4xl text-[#6DB33F]" />,
-  //     description: "Modern JVM language with powerful Spring ecosystem",
-  //     gradient: "from-[#7F52FF]/10 to-[#6DB33F]/10",
-  //     hoverGradient: "from-[#7F52FF]/20 to-[#6DB33F]/20",
-  //     bgColor: "bg-[#7F52FF]/5",
-  //     category: "backend",
-  //     popularity: 80,
-  //   },
-  //   {
-  //     id: "swift-swiftui",
-  //     name: "Swift + SwiftUI",
-  //     icon: <SiSwift className="text-4xl text-[#F05138]" />,
-  //     secondaryIcon: <SiApple className="text-4xl text-[#000000]" />,
-  //     description: "Native iOS development with declarative UI framework",
-  //     gradient: "from-[#F05138]/10 to-[#000000]/10",
-  //     hoverGradient: "from-[#F05138]/20 to-[#000000]/20",
-  //     bgColor: "bg-[#F05138]/5",
-  //     category: "mobile",
-  //     popularity: 84,
-  //   },
-  //   {
-  //     id: "java-spring",
-  //     name: "Java + Spring Boot",
-  //     icon: <SiJavascript className="text-4xl text-[#007396]" />,
-  //     secondaryIcon: <SiSpringboot className="text-4xl text-[#6DB33F]" />,
-  //     description: "Enterprise-grade development with Spring Boot simplicity",
-  //     gradient: "from-[#007396]/10 to-[#6DB33F]/10",
-  //     hoverGradient: "from-[#007396]/20 to-[#6DB33F]/20",
-  //     bgColor: "bg-[#007396]/5",
-  //     category: "backend",
-  //     popularity: 85,
-  //   },
-  //   {
-  //     id: "dart-flutter",
-  //     name: "Dart + Flutter",
-  //     icon: <SiDart className="text-4xl text-[#0175C2]" />,
-  //     secondaryIcon: <SiFlutter className="text-4xl text-[#02569B]" />,
-  //     description:
-  //       "Google's UI toolkit for building natively compiled applications",
-  //     gradient: "from-[#0175C2]/10 to-[#02569B]/10",
-  //     hoverGradient: "from-[#0175C2]/20 to-[#02569B]/20",
-  //     bgColor: "bg-[#0175C2]/5",
-  //     category: "mobile",
-  //     popularity: 88,
-  //   },
-  //   // New technologies
-  //   {
-  //     id: "figma-design",
-  //     name: "Figma Design",
-  //     icon: <SiFigma className="text-4xl text-[#F24E1E]" />,
-  //     secondaryIcon: <SiAdobexd className="text-4xl text-[#FF61F6]" />,
-  //     description:
-  //       "Collaborative interface design tool for modern web and mobile apps",
-  //     gradient: "from-[#F24E1E]/10 to-[#FF61F6]/10",
-  //     hoverGradient: "from-[#F24E1E]/20 to-[#FF61F6]/20",
-  //     bgColor: "bg-[#F24E1E]/5",
-  //     category: "design",
-  //     popularity: 92,
-  //   },
-  //   {
-  //     id: "aws-cloud",
-  //     name: "AWS Cloud",
-  //     icon: <SiFirebase className="text-4xl text-[#FF9900]" />,
-  //     secondaryIcon: <SiFirebase className="text-4xl text-[#FFCA28]" />,
-  //     description: "Cloud infrastructure with serverless and managed services",
-  //     gradient: "from-[#FF9900]/10 to-[#FFCA28]/10",
-  //     hoverGradient: "from-[#FF9900]/20 to-[#FFCA28]/20",
-  //     bgColor: "bg-[#FF9900]/5",
-  //     category: "cloud",
-  //     popularity: 94,
-  //   },
-  //   {
-  //     id: "gcp-cloud",
-  //     name: "Google Cloud",
-  //     icon: <SiGooglecloud className="text-4xl text-[#4285F4]" />,
-  //     secondaryIcon: <SiFirebase className="text-4xl text-[#FFCA28]" />,
-  //     description:
-  //       "Google's cloud platform with AI and machine learning capabilities",
-  //     gradient: "from-[#4285F4]/10 to-[#FFCA28]/10",
-  //     hoverGradient: "from-[#4285F4]/20 to-[#FFCA28]/20",
-  //     bgColor: "bg-[#4285F4]/5",
-  //     category: "cloud",
-  //     popularity: 88,
-  //   },
-  //   {
-  //     id: "azure-cloud",
-  //     name: "Microsoft Azure",
-  //     icon: <SiDotnet className="text-4xl text-[#0078D4]" />,
-  //     secondaryIcon: <SiDotnet className="text-4xl text-[#512BD4]" />,
-  //     description:
-  //       "Microsoft's cloud with integrated services for .NET ecosystem",
-  //     gradient: "from-[#0078D4]/10 to-[#512BD4]/10",
-  //     hoverGradient: "from-[#0078D4]/20 to-[#512BD4]/20",
-  //     bgColor: "bg-[#0078D4]/5",
-  //     category: "cloud",
-  //     popularity: 86,
-  //   },
 ];
-export const categories = [
-  {
-    id: "all",
-    name: "All Technologies",
-    color: "bg-gradient-to-r from-purple-600 to-indigo-600",
-  },
-  {
-    id: "frontend",
-    name: "Frontend",
-    color: "bg-gradient-to-r from-blue-500 to-cyan-500",
-  },
-  {
-    id: "backend",
-    name: "Backend",
-    color: "bg-gradient-to-r from-emerald-500 to-green-500",
-  },
-  {
-    id: "fullstack",
-    name: "Full Stack",
-    color: "bg-gradient-to-r from-orange-500 to-amber-500",
-  },
-  {
-    id: "mobile",
-    name: "Mobile",
-    color: "bg-gradient-to-r from-pink-500 to-rose-500",
-  },
-  {
-    id: "cloud",
-    name: "Cloud",
-    color: "bg-gradient-to-r from-sky-500 to-blue-500",
-  },
-  {
-    id: "design",
-    name: "Design",
-    color: "bg-gradient-to-r from-fuchsia-500 to-pink-500",
-  },
-];
+
 export const REACT_OPTIONS = [
   {
     name: "Animations",
@@ -812,3 +604,4 @@ export const REACT_OPTIONS = [
     borderColor: "border-orange-200",
   },
 ];
+

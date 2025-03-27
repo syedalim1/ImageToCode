@@ -12,8 +12,7 @@ import {
   Sparkles,
   BarChart2,
   FileCode2,
-  Zap,
-  Star,
+  
   Cpu,
   ArrowLeft,
 } from "lucide-react";
@@ -28,8 +27,8 @@ import DarkModeToggle from "../_components/DarkModeToggle";
 import SuccessConfetti from "../_components/SuccessConfetti";
 import ClientDate from "../_components/ClientDate";
 import { db } from "@/configs/db";
-import { usersTable } from "@/configs/schema";
-import { eq } from "drizzle-orm";
+import { imagetocodeTable, usersTable } from "@/configs/schema";
+import { desc, eq } from "drizzle-orm";
 
 interface CodeContent {
   content: string;
@@ -66,6 +65,20 @@ const Page: React.FC = () => {
   const [success, setSuccess] = useState("");
   const [regenerationCount, setRegenerationCount] = useState(0);
   const [showStats, setShowStats] = useState(false);
+  interface Design {
+    id: number;
+    uid: string;
+    model: string;
+    imageUrl: string;
+    description: string | null;
+    createdAt: string;
+    language: string;
+    options: string[];
+    code: {
+      content: string;
+    };
+  }
+  const [design, setDesign] = useState<Design | null>(null);
   const [codeStats, setCodeStats] = useState({
     lines: 0,
     characters: 0,
@@ -74,7 +87,36 @@ const Page: React.FC = () => {
   });
   const [showFloatingButton, setShowFloatingButton] = useState(true);
 
+  useEffect(() => {
 
+    const fetchDesign = async () => {
+      try {
+        setLoading(true);
+        setError("");
+
+        const result = await db
+          .select()
+          .from(imagetocodeTable)
+          .where(eq(imagetocodeTable.uid, uid ?? ""))
+          .orderBy(desc(imagetocodeTable.createdAt));
+
+        if (result.length > 0) {
+          setDesign(result[0] as Design);
+          console.log(result[0], "designs");
+        } else {
+          setError("No design found.");
+        }
+      } catch (err) {
+        setError("Failed to fetch design. Please try again later.");
+        console.error("Error fetching design:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchDesign();
+    console.log(design, "design");
+    
+  }, [uid]);
   // Handle success message timeout
   useEffect(() => {
     if (success) {
@@ -191,7 +233,7 @@ const Page: React.FC = () => {
       console.log('====================================');
       console.log(record, " record");
       console.log('====================================');
-      const res = await fetch("/api/ai-model", {
+      const res = await fetch("/api/image-to-code-ai", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
