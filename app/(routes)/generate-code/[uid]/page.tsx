@@ -1,20 +1,18 @@
 "use client";
 
 import axios from "axios";
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useUser } from "@clerk/nextjs";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import {
   Code,
   Home,
   ChevronRight,
   Sparkles,
-  BarChart2,
-  FileCode2,
   
-  Cpu,
   ArrowLeft,
+  Import,
 } from "lucide-react";
 
 // Components
@@ -25,7 +23,6 @@ import ImagePreview from "../_components/ImagePreview";
 import ActionButtons from "../_components/ActionButtons";
 import DarkModeToggle from "../_components/DarkModeToggle";
 import SuccessConfetti from "../_components/SuccessConfetti";
-import ClientDate from "../_components/ClientDate";
 import { db } from "@/configs/db";
 import { imagetocodeTable, usersTable } from "@/configs/schema";
 import { desc, eq } from "drizzle-orm";
@@ -64,7 +61,6 @@ const Page: React.FC = () => {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [regenerationCount, setRegenerationCount] = useState(0);
-  const [showStats, setShowStats] = useState(false);
   interface Design {
     id: number;
     uid: string;
@@ -79,16 +75,7 @@ const Page: React.FC = () => {
     };
   }
   const [design, setDesign] = useState<Design | null>(null);
-  const [codeStats, setCodeStats] = useState({
-    lines: 0,
-    characters: 0,
-    functions: 0,
-    quality: 0,
-  });
-  const [showFloatingButton, setShowFloatingButton] = useState(true);
-
   useEffect(() => {
-
     const fetchDesign = async () => {
       try {
         setLoading(true);
@@ -115,7 +102,6 @@ const Page: React.FC = () => {
     };
     fetchDesign();
     console.log(design, "design");
-    
   }, [uid]);
   // Handle success message timeout
   useEffect(() => {
@@ -228,11 +214,10 @@ const Page: React.FC = () => {
       setLoading(true);
       setResponse("");
       setError("");
-      setShowStats(false);
 
-      console.log('====================================');
+      console.log("====================================");
       console.log(record, " record");
-      console.log('====================================');
+      console.log("====================================");
       const res = await fetch("/api/image-to-code-ai", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -360,9 +345,26 @@ const Page: React.FC = () => {
   const navigateHome = () => {
     router.push("/");
   };
-
-
-
+  const Extraimproveai = async () => {
+    setLoading(true);
+    const improvecode = await fetch("/api/improve-extra-improve-ai", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ code: response }),
+    });
+    if (!improvecode.ok) {
+      const errorData = await improvecode.json();
+      throw new Error(errorData.error || "Request failed");
+    }
+    const optimizedCode = await improvecode.text();
+    console.log(optimizedCode, "code");
+    console.log("====================================");
+    optimizedCode;
+    setResponse(optimizedCode);
+    setLoading(false);
+  };
   return (
     <div className="min-h-screen transition-colors duration-300">
       {/* Background pattern */}
@@ -375,27 +377,6 @@ const Page: React.FC = () => {
 
       {/* Success confetti effect - moved to client component */}
       <SuccessConfetti trigger={!!success} />
-
-      {/* Floating action button */}
-      <AnimatePresence>
-        {showFloatingButton && response && (
-          <motion.button
-            onClick={() => setShowStats(!showStats)}
-            className="fixed bottom-6 right-6 p-3 rounded-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-lg z-50"
-            initial={{ scale: 0, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            exit={{ scale: 0, opacity: 0 }}
-            whileHover={{
-              scale: 1.1,
-              boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.1)",
-            }}
-            whileTap={{ scale: 0.95 }}
-            title="View code statistics"
-          >
-            <BarChart2 className="h-6 w-6" />
-          </motion.button>
-        )}
-      </AnimatePresence>
 
       <div className="p-4 max-w-6xl mx-auto">
         {/* Breadcrumb navigation */}
@@ -476,6 +457,21 @@ const Page: React.FC = () => {
             {record && (
               <div className="flex flex-wrap justify-between items-center gap-4">
                 {record.imageUrl && <ImagePreview imageUrl={record.imageUrl} />}
+                <motion.button
+                  onClick={Extraimproveai}
+                  className={`relative flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 rounded-lg shadow-lg transition-all`}
+                  whileHover={{
+                    scale: 1.05,
+                    boxShadow: "0 5px 15px rgba(0, 0, 0, 0.1)",
+                  }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  <Import className="h-5 w-5" />
+
+                  <span className="font-medium text-white">
+                    Extra Improve Code
+                  </span>
+                </motion.button>
                 <ActionButtons
                   onSave={handleUpdateCode}
                   onGenerate={() => generateCode(record)}
@@ -487,73 +483,6 @@ const Page: React.FC = () => {
                 />
               </div>
             )}
-
-            {/* Code statistics panel */}
-            <AnimatePresence>
-              {showStats && response && (
-                <motion.div
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: "auto" }}
-                  exit={{ opacity: 0, height: 0 }}
-                  transition={{ duration: 0.3 }}
-                  className="bg-gray-50 dark:bg-gray-900 rounded-xl p-4 border border-gray-200 dark:border-gray-700 overflow-hidden"
-                >
-                  <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-3 flex items-center">
-                    <BarChart2 className="h-5 w-5 mr-2 text-indigo-500" />
-                    Code Statistics
-                  </h3>
-
-                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                    <div className="bg-white dark:bg-gray-800 p-3 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
-                      <div className="flex items-center mb-1">
-                        <FileCode2 className="h-4 w-4 text-blue-500 mr-2" />
-                        <span className="text-sm text-gray-500 dark:text-gray-400">
-                          Lines of Code
-                        </span>
-                      </div>
-                      <p className="text-2xl font-bold text-gray-800 dark:text-gray-200">
-                        {codeStats.lines}
-                      </p>
-                    </div>
-
-                    <div className="bg-white dark:bg-gray-800 p-3 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
-                      <div className="flex items-center mb-1">
-                        <Code className="h-4 w-4 text-purple-500 mr-2" />
-                        <span className="text-sm text-gray-500 dark:text-gray-400">
-                          Characters
-                        </span>
-                      </div>
-                      <p className="text-2xl font-bold text-gray-800 dark:text-gray-200">
-                        {codeStats.characters}
-                      </p>
-                    </div>
-
-                    <div className="bg-white dark:bg-gray-800 p-3 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
-                      <div className="flex items-center mb-1">
-                        <Cpu className="h-4 w-4 text-green-500 mr-2" />
-                        <span className="text-sm text-gray-500 dark:text-gray-400">
-                          Functions
-                        </span>
-                      </div>
-                      <p className="text-2xl font-bold text-gray-800 dark:text-gray-200">
-                        {codeStats.functions}
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="mt-3 text-sm text-gray-500 dark:text-gray-400">
-                    <p>
-                      Generated with {record?.model || "AI"} on{" "}
-                      <ClientDate
-                        date={record?.createdAt || Date.now()}
-                        format="local"
-                        fallback="..."
-                      />
-                    </p>
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
 
             {/* Code editor */}
             <div className="h-full">

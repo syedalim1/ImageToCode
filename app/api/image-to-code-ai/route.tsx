@@ -54,7 +54,7 @@ export async function POST(req: NextRequest) {
     // } else if (language === "html-css") {
     // }
     const enhancedDescription =
-      Constants.IMAGE_TO_NEXTJS_PROMPT +
+      Constants.IMAGE_TO_REACTJS_PROMPT +
       Constants.ERROR_PREVENTION_PROMPTFORNEXTJS +
       description +
       "\n\n" +

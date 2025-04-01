@@ -169,30 +169,7 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
     setTimeout(() => setIsDownloaded(false), 2000);
   };
 
-  const Extraimproveai = async () => {
-    isLoading = true;
-    const response = await fetch("/api/improve-extra-improve-ai", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ code: "Hii " }),
-    });
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.error || "Request failed");
-    }
-    console.log("====================================");
-    console.log(response, "response");
-    console.log("====================================");
-    const optimizedCode = await response.text();
-    console.log("Optimized Code:", optimizedCode);
-    console.log("====================================");
-    console.log(optimizedCode, "code");
-    console.log("====================================");
-
-    isLoading = false;
-  };
+ 
   // Handle share functionality
   const handleShare = async () => {
     try {
@@ -329,23 +306,7 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
       {hasCode && (
         <>
           <div className="flex gap-4">
-            <motion.button
-              onClick={Extraimproveai}
-              className={`relative flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r ${
-                colorThemes[colorTheme as keyof typeof colorThemes].download
-              } text-white rounded-lg shadow-lg transition-all`}
-              variants={item}
-              whileHover={{
-                scale: 1.05,
-                boxShadow: "0 5px 15px rgba(0, 0, 0, 0.1)",
-              }}
-              whileTap={{ scale: 0.95 }}
-              disabled={isLoading}
-            >
-              <Import className="h-5 w-5" />
-
-              <span className="font-medium">Extra Improve Code</span>
-            </motion.button>
+            
             <motion.button
               onClick={handleDownload}
               className={`relative flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r ${

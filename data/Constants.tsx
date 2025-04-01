@@ -10,7 +10,7 @@ import {
 
 import { Move, Palette, Layers, Smartphone } from "lucide-react";
 export default {
-  IMAGE_TO_NEXTJS_PROMPT: dedent`
+  IMAGE_TO_REACTJS_PROMPT: dedent`
    You are an expert frontend React developer and UI/UX designer with years of production experience. Your task is to generate a fully functional, error-free React component using Tailwind CSS based on the provided wireframe image or description. Follow these instructions meticulously:
 
     ### Instructions:

@@ -6,7 +6,12 @@ export async function POST(request: NextRequest) {
   try {
     const { code } = await request.json();
     // +Constants.CODE_OPTIMIZER_PROMPT;
-    const prompt = code + "\n\n" + "response in English only";
+    const prompt =
+      code +
+      "\n\n" +
+      "response in English only" +
+      "\n\n" +
+      Constants.IMAGE_TO_REACTJS_PROMPT;
     const openai = new OpenAI({
       baseURL: "https://api.deepseek.com",
       apiKey: process.env.DEEPSEEK_API_KEY,
