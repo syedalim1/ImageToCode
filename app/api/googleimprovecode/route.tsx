@@ -28,26 +28,14 @@ const CONFIG = {
 };
 
 // Model selection helper
-function selectModelForGeneration(mode: string): string {
-  const modelMap = {
-    normal: "google/gemini-2.0-pro-exp-02-05:free",
-    export: "google/gemini-2.0-pro-exp-02-05:free",
-    // Add more modes and models as needed
-  };
-  return modelMap[mode as keyof typeof modelMap] || modelMap.normal;
-}
 
 export async function POST(req: NextRequest) {
   try {
     // Parse and validate input
     const {
-      description,
-      imageUrl,
-      mode,
-      model,
-      options,
+
       userEmail,
-      language,
+
       code,
     } = await req.json();
 
@@ -56,12 +44,6 @@ export async function POST(req: NextRequest) {
       throw new Error("OpenRouter API key is missing");
     }
 
-    const enhancedDescription =
-      Constants.IMAGE_TO_REACTJS_PROMPT +
-      Constants.ERROR_PREVENTION_PROMPTFORNEXTJS +
-      description +
-      "\n\n" +
-      (options || "");
     const codeimprove = code + "\n\n" + "Fix All The Bug Run Proper Code";
     // Fetch user and validate credits
     const [user] = await db
@@ -83,38 +65,23 @@ export async function POST(req: NextRequest) {
         { status: 403 }
       );
     }
-    if (imageUrl) {
-      modelName = "google/gemini-2.5-pro-exp-03-25:free";
-      payload = {
-        model: modelName,
-        messages: [
-          {
-            role: "user",
-            content: [
-              { type: "text", text: enhancedDescription },
-              { type: "image_url", image_url: { url: imageUrl } },
-            ],
-          },
-        ],
-        stream: false,
-        max_tokens: CONFIG.GENERATION.MAX_TOKENS,
-        timeout: CONFIG.GENERATION.TIMEOUT_MS / 14000,
-      };
-    } else if (code) {
-      modelName = "deepseek/deepseek-v3-base:free";
-      payload = {
-        model: modelName,
-        messages: [
-          {
-            role: "user",
-            content: [{ type: "text", text: codeimprove }],
-          },
-        ],
-        stream: false,
-        max_tokens: CONFIG.GENERATION.MAX_TOKENS,
-        timeout: CONFIG.GENERATION.TIMEOUT_MS / 14000,
-      };
-    }
+
+    modelName = "google/gemini-2.5-pro-exp-03-25:free";
+    payload = {
+      model: modelName,
+      messages: [
+        {
+          role: "user",
+          content: [
+            { type: "text", text: codeimprove },
+          ],
+        },
+      ],
+      stream: false,
+      max_tokens: CONFIG.GENERATION.MAX_TOKENS,
+      timeout: CONFIG.GENERATION.TIMEOUT_MS / 14000,
+    };
+
 
     // Enhanced API request with comprehensive error handling
     const controller = new AbortController();

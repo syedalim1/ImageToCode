@@ -10,7 +10,6 @@ import {
   Home,
   ChevronRight,
   Sparkles,
-  
   ArrowLeft,
   Import,
 } from "lucide-react";
@@ -26,6 +25,7 @@ import SuccessConfetti from "../_components/SuccessConfetti";
 import { db } from "@/configs/db";
 import { imagetocodeTable, usersTable } from "@/configs/schema";
 import { desc, eq } from "drizzle-orm";
+import Constants from "@/data/Constants";
 
 interface CodeContent {
   content: string;
@@ -185,11 +185,6 @@ const Page: React.FC = () => {
   };
 
   const generateCode = async (record: CodeRecord) => {
-    if (regenerationCount >= MAX_REGENERATIONS) {
-      setError("Maximum regenerations reached");
-      return;
-    }
-
     const userdatabase = await db
       .select()
       .from(usersTable)
@@ -215,9 +210,6 @@ const Page: React.FC = () => {
       setResponse("");
       setError("");
 
-      console.log("====================================");
-      console.log(record, " record");
-      console.log("====================================");
       const res = await fetch("/api/image-to-code-ai", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -231,6 +223,8 @@ const Page: React.FC = () => {
           userEmail: user?.primaryEmailAddress?.emailAddress,
         }),
       });
+
+      console.log(res, "res");
 
       if (!res.ok) throw new Error(await res.text());
 
@@ -246,10 +240,6 @@ const Page: React.FC = () => {
         if (done) break;
         const chunk = decoder.decode(value);
         generatedCode += chunk;
-
-        console.log("====================================");
-        console.log(chunk, "   chunk");
-        console.log("====================================");
 
         // Try to extract code from JSON if it looks like a JSON response
         try {
@@ -287,7 +277,7 @@ const Page: React.FC = () => {
       // Clean up code by removing markdown code blocks if present
       const cleanedCode = finalCode
         .replace(
-          /```javascript|```typescript|```typescrpt|```jsx|```tsx|```|js/g,
+          /```javascript|```typescript|```typescrpt|```jsx|```tsx|```/g,
           ""
         )
         .trim();
@@ -345,26 +335,100 @@ const Page: React.FC = () => {
   const navigateHome = () => {
     router.push("/");
   };
+
   const Extraimproveai = async () => {
     setLoading(true);
-    const improvecode = await fetch("/api/improve-extra-improve-ai", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ code: response }),
-    });
-    if (!improvecode.ok) {
-      const errorData = await improvecode.json();
-      throw new Error(errorData.error || "Request failed");
+    setError("");
+
+    try {
+      // Check if user is logged in first
+      if (!user || !user.primaryEmailAddress?.emailAddress) {
+        setError("User not found. Please log in to improve code.");
+        return;
+      }
+
+      // Get user credits from database
+      const userdatabase = await db
+        .select()
+        .from(usersTable)
+        .where(
+          eq(usersTable.email, user.primaryEmailAddress.emailAddress)
+        );
+
+      if (!userdatabase || userdatabase.length === 0) {
+        setError("User not found in database. Please log in again.");
+        return;
+      }
+
+      const currentCredits = userdatabase[0]?.credits ?? 0;
+
+      // Check if user has enough credits
+      if (currentCredits < Constants.CREDIT_COSTS.EXPERT_MODE) {
+        setError(`You need ${Constants.CREDIT_COSTS.EXPERT_MODE} credits to use Extra Improve AI. You have ${currentCredits} credits.`);
+        return;
+      }
+
+      // Call API to improve code
+      const improvecode = await fetch("/api/googleimprovecode", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          code: response,
+          userEmail: user.primaryEmailAddress.emailAddress
+        }),
+      });
+
+      if (!improvecode.ok) {
+        const errorData = await improvecode.json();
+        throw new Error(errorData.error || "Request failed");
+      }
+
+      // Process response
+      const responseData = await improvecode.text();
+      let optimizedCode = responseData;
+
+      // Try to parse as JSON if it looks like a JSON response
+      try {
+        if (
+          optimizedCode.trim().startsWith("{") &&
+          optimizedCode.includes('"message"')
+        ) {
+          const parsedData = JSON.parse(optimizedCode);
+          if (
+            parsedData.choices &&
+            parsedData.choices[0] &&
+            parsedData.choices[0].message &&
+            parsedData.choices[0].message.content
+          ) {
+            optimizedCode = parsedData.choices[0].message.content;
+          }
+        }
+      } catch (e) {
+        console.error("Failed to parse response as JSON:", e);
+      }
+
+      // Clean up code by removing markdown code blocks if present
+      optimizedCode = optimizedCode
+        .replace(
+          /```(javascript|typescript|jsx|tsx|typescrpt)?/g,
+          ""
+        )
+        .trim();
+
+      // Update state with improved code
+      setResponse(optimizedCode);
+      setSuccess("Code improved successfully with DeepSeek AI!");
+      setRegenerationCount((prev) => prev + 1);
+
+    } catch (err) {
+      handleError(err, "Error improving code with DeepSeek AI:");
+    } finally {
+      setLoading(false);
     }
-    const optimizedCode = await improvecode.text();
-    console.log(optimizedCode, "code");
-    console.log("====================================");
-    optimizedCode;
-    setResponse(optimizedCode);
-    setLoading(false);
   };
+
   return (
     <div className="min-h-screen transition-colors duration-300">
       {/* Background pattern */}
@@ -378,7 +442,7 @@ const Page: React.FC = () => {
       {/* Success confetti effect - moved to client component */}
       <SuccessConfetti trigger={!!success} />
 
-      <div className="p-4 max-w-6xl mx-auto">
+      <div className="p-4  mx-auto">
         {/* Breadcrumb navigation */}
         <nav className="flex items-center space-x-2 mb-6 text-sm">
           <button
@@ -457,21 +521,22 @@ const Page: React.FC = () => {
             {record && (
               <div className="flex flex-wrap justify-between items-center gap-4">
                 {record.imageUrl && <ImagePreview imageUrl={record.imageUrl} />}
-                <motion.button
-                  onClick={Extraimproveai}
-                  className={`relative flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 rounded-lg shadow-lg transition-all`}
-                  whileHover={{
-                    scale: 1.05,
-                    boxShadow: "0 5px 15px rgba(0, 0, 0, 0.1)",
-                  }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  <Import className="h-5 w-5" />
-
-                  <span className="font-medium text-white">
-                    Extra Improve Code
-                  </span>
-                </motion.button>
+                {response ? (
+                  <motion.button
+                    onClick={Extraimproveai}
+                    className={`relative flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 rounded-lg shadow-lg transition-all`}
+                    whileHover={{
+                      scale: 1.05,
+                      boxShadow: "0 5px 15px rgba(0, 0, 0, 0.1)",
+                    }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    <Import className="h-5 w-5" />
+                    <span className="font-medium text-white">
+                      Extra Improve Code
+                    </span>
+                  </motion.button>
+                ) : null}
                 <ActionButtons
                   onSave={handleUpdateCode}
                   onGenerate={() => generateCode(record)}
