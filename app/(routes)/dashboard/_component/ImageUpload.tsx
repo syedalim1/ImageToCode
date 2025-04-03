@@ -255,15 +255,14 @@ const ImageUpload = () => {
       <motion.button
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
-        className={`mt-6 px-8 py-3 rounded-lg font-medium transition-all duration-200 w-full sm:w-auto ${
-          canProceed()
+        className={`mt-6 px-8 py-3 rounded-lg font-medium transition-all duration-200 w-full sm:w-auto ${canProceed()
             ? selectedTheme === "dark"
               ? "bg-blue-600 hover:bg-blue-700 text-white"
               : "bg-blue-500 hover:bg-blue-600 text-white"
             : selectedTheme === "dark"
-            ? "bg-gray-700 text-gray-400 cursor-not-allowed"
-            : "bg-gray-300 text-gray-600 cursor-not-allowed"
-        }`}
+              ? "bg-gray-700 text-gray-400 cursor-not-allowed"
+              : "bg-gray-300 text-gray-600 cursor-not-allowed"
+          }`}
         onClick={canProceed() ? goToNextStep : undefined}
         disabled={!canProceed()}
       >
@@ -286,15 +285,14 @@ const ImageUpload = () => {
           {steps.map((step, index) => (
             <React.Fragment key={step}>
               <div
-                className={`w-6 h-6 rounded-full flex items-center justify-center cursor-pointer ${
-                  index <= currentStepIndex
+                className={`w-6 h-6 rounded-full flex items-center justify-center cursor-pointer ${index <= currentStepIndex
                     ? selectedTheme === "dark"
                       ? "bg-blue-600 text-white"
                       : "bg-blue-500 text-white"
                     : selectedTheme === "dark"
-                    ? "bg-gray-700 text-gray-400"
-                    : "bg-gray-300 text-gray-600"
-                }`}
+                      ? "bg-gray-700 text-gray-400"
+                      : "bg-gray-300 text-gray-600"
+                  }`}
                 onClick={() => {
                   if (index <= currentStepIndex) {
                     setActiveTab(steps[index]);
@@ -305,15 +303,14 @@ const ImageUpload = () => {
               </div>
               {index < steps.length - 1 && (
                 <div
-                  className={`w-10 h-1 ${
-                    index < currentStepIndex
+                  className={`w-10 h-1 ${index < currentStepIndex
                       ? selectedTheme === "dark"
                         ? "bg-blue-600"
                         : "bg-blue-500"
                       : selectedTheme === "dark"
-                      ? "bg-gray-700"
-                      : "bg-gray-300"
-                  }`}
+                        ? "bg-gray-700"
+                        : "bg-gray-300"
+                    }`}
                 />
               )}
             </React.Fragment>
@@ -328,11 +325,10 @@ const ImageUpload = () => {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.5 }}
-      className={`w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8 ${
-        selectedTheme === "dark"
+      className={`w-full  mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8 ${selectedTheme === "dark"
           ? "bg-gray-900 text-white"
           : "bg-gradient-to-br from-white to-blue-50"
-      }`}
+        }`}
       ref={containerRef}
     >
       {/* Step indicators */}
@@ -351,11 +347,10 @@ const ImageUpload = () => {
           {/* Image Upload Area */}
           {activeTab === "upload" && (
             <motion.div
-              className={`p-3 sm:p-4 md:p-6 lg:p-8 border-2 border-dashed rounded-xl ${
-                selectedTheme === "dark"
+              className={`p-3 sm:p-4 md:p-6 lg:p-8 border-2 border-dashed rounded-xl ${selectedTheme === "dark"
                   ? "bg-gradient-to-br from-gray-800 to-gray-700 border-gray-600"
                   : "bg-gradient-to-br from-purple-50 to-blue-50 border-blue-200"
-              } relative`}
+                } relative`}
               whileHover={{ scale: 1.01 }}
               transition={{ duration: 0.2 }}
             >
@@ -375,15 +370,14 @@ const ImageUpload = () => {
           {/* Options Area */}
           {activeTab === "options" && (
             <div className="">
-             
+
               <div className="space-y-4">
                 {/* Language Selector */}
                 <motion.div
-                  className={`p-4 rounded-lg shadow-sm w-full h-full ${
-                    selectedTheme === "dark"
+                  className={`p-4 rounded-lg shadow-sm w-full h-full ${selectedTheme === "dark"
                       ? "bg-gray-800 border-gray-700"
                       : "bg-white border border-gray-100"
-                  }`}
+                    }`}
                   whileHover={{ scale: 1.01 }}
                   transition={{ duration: 0.2 }}
                 >
@@ -393,63 +387,17 @@ const ImageUpload = () => {
                   />
                 </motion.div>
 
-                {/* Theme Selector - New Component */}
-                <motion.div
-                  className={`p-4 rounded-lg shadow-sm ${
-                    selectedTheme === "dark"
-                      ? "bg-gray-800 border-gray-700"
-                      : "bg-white border border-gray-100"
-                  }`}
-                  whileHover={{ scale: 1.01 }}
-                  transition={{ duration: 0.2 }}
-                >
-                  <h3
-                    className={`text-lg font-semibold mb-3 ${
-                      selectedTheme === "dark"
-                        ? "text-gray-200"
-                        : "text-gray-800"
-                    }`}
-                  >
-                    Theme
-                  </h3>
-                  <div className="flex space-x-4">
-                    <button
-                      className={`px-4 py-2 rounded-md ${
-                        selectedTheme === "light"
-                          ? "bg-blue-500 text-white"
-                          : selectedTheme === "dark"
-                          ? "bg-gray-700 text-gray-300"
-                          : "bg-gray-200 text-gray-700"
-                      }`}
-                      onClick={() => setSelectedTheme("light")}
-                    >
-                      Light
-                    </button>
-                    <button
-                      className={`px-4 py-2 rounded-md ${
-                        selectedTheme === "dark"
-                          ? "bg-blue-500 text-white"
-                          : selectedTheme === "dark"
-                          ? "bg-gray-700 text-gray-300"
-                          : "bg-gray-200 text-gray-700"
-                      }`}
-                      onClick={() => setSelectedTheme("dark")}
-                    >
-                      Dark
-                    </button>
-                  </div>
-                </motion.div>
+
               </div>
 
               {/* Right Column */}
               <div className="space-y-4">
                 {/* Mode Selector */}
                 <motion.div
-                  className={`p-4 rounded-lg shadow-sm ${
-                    selectedTheme === "dark"
+                  className={`p-4 rounded-lg shadow-sm ${selectedTheme === "dark"
                       ? "bg-gray-800 border-gray-700"
                       : "bg-white border border-gray-100"
-                  }`}
+                    }`}
                   whileHover={{ scale: 1.01 }}
                   transition={{ duration: 0.2 }}
                 >
@@ -461,11 +409,10 @@ const ImageUpload = () => {
 
                 {/* React Features */}
                 <motion.div
-                  className={`p-4 rounded-lg shadow-sm ${
-                    selectedTheme === "dark"
+                  className={`p-4 rounded-lg shadow-sm ${selectedTheme === "dark"
                       ? "bg-gray-800 border-gray-700"
                       : "bg-white border border-gray-100"
-                  }`}
+                    }`}
                   whileHover={{ scale: 1.01 }}
                   transition={{ duration: 0.2 }}
                 >
@@ -481,19 +428,17 @@ const ImageUpload = () => {
           {/* Description Input */}
           {activeTab === "description" && (
             <motion.div
-              className={`p-4 sm:p-6 rounded-lg shadow-sm w-full ${
-                selectedTheme === "dark"
+              className={`p-4 sm:p-6 rounded-lg shadow-sm w-full ${selectedTheme === "dark"
                   ? "bg-gray-800 border-gray-700"
                   : "bg-white border border-gray-100"
-              }`}
+                }`}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.3 }}
             >
               <h3
-                className={`text-lg font-semibold mb-3 ${
-                  selectedTheme === "dark" ? "text-gray-200" : "text-gray-800"
-                }`}
+                className={`text-lg font-semibold mb-3 ${selectedTheme === "dark" ? "text-gray-200" : "text-gray-800"
+                  }`}
               >
                 Describe Your Requirements
               </h3>
@@ -506,9 +451,8 @@ const ImageUpload = () => {
               {/* AI-powered suggestion chips */}
               <div className="mt-4">
                 <p
-                  className={`text-sm mb-2 ${
-                    selectedTheme === "dark" ? "text-gray-400" : "text-gray-600"
-                  }`}
+                  className={`text-sm mb-2 ${selectedTheme === "dark" ? "text-gray-400" : "text-gray-600"
+                    }`}
                 >
                   Suggested descriptions:
                 </p>
@@ -524,11 +468,10 @@ const ImageUpload = () => {
                       key={suggestion}
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
-                      className={`text-xs px-3 py-1 rounded-full ${
-                        selectedTheme === "dark"
+                      className={`text-xs px-3 py-1 rounded-full ${selectedTheme === "dark"
                           ? "bg-blue-900 text-blue-100 hover:bg-blue-800"
                           : "bg-blue-100 text-blue-800 hover:bg-blue-200"
-                      }`}
+                        }`}
                       onClick={() =>
                         setUserDescription((prev) =>
                           prev ? `${prev} ${suggestion}.` : suggestion
@@ -546,20 +489,18 @@ const ImageUpload = () => {
           {/* Preview Mode */}
           {activeTab === "preview" && (
             <motion.div
-              className={`p-4 sm:p-6 rounded-lg shadow-sm w-full ${
-                selectedTheme === "dark"
+              className={`p-4 sm:p-6 rounded-lg shadow-sm w-full ${selectedTheme === "dark"
                   ? "bg-gray-800 border-gray-700"
                   : "bg-white border border-gray-100"
-              }`}
+                }`}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.3 }}
             >
               <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4">
                 <h3
-                  className={`text-lg font-semibold mb-2 sm:mb-0 ${
-                    selectedTheme === "dark" ? "text-gray-200" : "text-gray-800"
-                  }`}
+                  className={`text-lg font-semibold mb-2 sm:mb-0 ${selectedTheme === "dark" ? "text-gray-200" : "text-gray-800"
+                    }`}
                 >
                   Preview Your Design
                 </h3>
@@ -569,15 +510,14 @@ const ImageUpload = () => {
                   {["mobile", "tablet", "desktop"].map((device) => (
                     <button
                       key={device}
-                      className={`px-3 py-1 rounded text-sm ${
-                        previewMode === device
+                      className={`px-3 py-1 rounded text-sm ${previewMode === device
                           ? selectedTheme === "dark"
                             ? "bg-blue-600 text-white"
                             : "bg-blue-500 text-white"
                           : selectedTheme === "dark"
-                          ? "bg-gray-700 text-gray-300"
-                          : "bg-gray-200 text-gray-700"
-                      }`}
+                            ? "bg-gray-700 text-gray-300"
+                            : "bg-gray-200 text-gray-700"
+                        }`}
                       onClick={() => setPreviewMode(device)}
                     >
                       {device.charAt(0).toUpperCase() + device.slice(1)}
@@ -589,13 +529,12 @@ const ImageUpload = () => {
               {/* Display preview image */}
               {preview && (
                 <div
-                  className={`mt-4 flex justify-center ${
-                    previewMode === "mobile"
+                  className={`mt-4 flex justify-center ${previewMode === "mobile"
                       ? "max-w-xs"
                       : previewMode === "tablet"
-                      ? "max-w-md"
-                      : "max-w-2xl"
-                  } mx-auto border rounded-lg overflow-hidden`}
+                        ? "max-w-md"
+                        : "max-w-2xl"
+                    } mx-auto border rounded-lg overflow-hidden`}
                 >
                   <img
                     src={preview}
@@ -607,16 +546,14 @@ const ImageUpload = () => {
 
               <div className="mt-6">
                 <h4
-                  className={`font-medium mb-2 ${
-                    selectedTheme === "dark" ? "text-gray-300" : "text-gray-700"
-                  }`}
+                  className={`font-medium mb-2 ${selectedTheme === "dark" ? "text-gray-300" : "text-gray-700"
+                    }`}
                 >
                   Summary of Selections
                 </h4>
                 <ul
-                  className={`list-disc pl-5 ${
-                    selectedTheme === "dark" ? "text-gray-400" : "text-gray-600"
-                  }`}
+                  className={`list-disc pl-5 ${selectedTheme === "dark" ? "text-gray-400" : "text-gray-600"
+                    }`}
                 >
                   <li>Language: {selectedLanguage}</li>
                   <li>Mode: {selectedMode}</li>
@@ -634,11 +571,10 @@ const ImageUpload = () => {
       {/* Progress Indicator */}
       {(isUploading || loading) && (
         <motion.div
-          className={`mt-6 ${
-            selectedTheme === "dark"
+          className={`mt-6 ${selectedTheme === "dark"
               ? "bg-gray-800 border-gray-700"
               : "bg-white border border-gray-100"
-          } p-4 rounded-lg shadow-sm`}
+            } p-4 rounded-lg shadow-sm`}
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
@@ -668,9 +604,8 @@ const ImageUpload = () => {
           className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50"
         >
           <motion.div
-            className={`${
-              selectedTheme === "dark" ? "bg-gray-800" : "bg-white"
-            } p-6 rounded-lg shadow-lg max-w-md w-full mx-4`}
+            className={`${selectedTheme === "dark" ? "bg-gray-800" : "bg-white"
+              } p-6 rounded-lg shadow-lg max-w-md w-full mx-4`}
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ type: "spring", stiffness: 300, damping: 25 }}
@@ -683,17 +618,15 @@ const ImageUpload = () => {
               </div>
 
               <h3
-                className={`text-xl font-semibold mb-2 ${
-                  selectedTheme === "dark" ? "text-white" : "text-gray-800"
-                }`}
+                className={`text-xl font-semibold mb-2 ${selectedTheme === "dark" ? "text-white" : "text-gray-800"
+                  }`}
               >
                 Generating Your Code
               </h3>
 
               <p
-                className={`${
-                  selectedTheme === "dark" ? "text-gray-300" : "text-gray-600"
-                } mb-4`}
+                className={`${selectedTheme === "dark" ? "text-gray-300" : "text-gray-600"
+                  } mb-4`}
               >
                 This may take a moment as we analyze your image and create
                 beautiful React components...
@@ -763,11 +696,10 @@ const ImageUpload = () => {
 
       {/* Floating help button */}
       <motion.button
-        className={`fixed bottom-6 right-6 p-4 rounded-full shadow-lg ${
-          selectedTheme === "dark"
+        className={`fixed bottom-6 right-6 p-4 rounded-full shadow-lg ${selectedTheme === "dark"
             ? "bg-blue-600 text-white hover:bg-blue-700"
             : "bg-blue-500 text-white hover:bg-blue-600"
-        } z-10`}
+          } z-10`}
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.9 }}
       >
