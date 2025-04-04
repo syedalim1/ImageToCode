@@ -210,80 +210,60 @@ const Page: React.FC = () => {
       setResponse("");
       setError("");
 
-      const res = await fetch("/api/image-to-code-ai", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          description: record.description,
-          imageUrl: record.imageUrl,
-          mode: record.mode,
-          options: record.options,
-          model: record.model,
-          language: record.Language,
-          userEmail: user?.primaryEmailAddress?.emailAddress,
-        }),
+      const res = await axios.post("/api/image-to-code-ai", {
+        description: record.description,
+        imageUrl: record.imageUrl,
+        mode: record.mode,
+        options: record.options,
+        model: record.model,
+        language: record.Language,
+        userEmail: user?.primaryEmailAddress?.emailAddress,
       });
 
-      console.log(res, "res");
+      
+      // if (!res.ok) throw new Error(await res.text());
+      
+      // const reader = res.body?.getReader();
+      // if (!reader) throw new Error("No response body");
+      
+      // console.log(reader, "response code");
+     
 
-      if (!res.ok) throw new Error(await res.text());
-
-      const reader = res.body?.getReader();
-      if (!reader) throw new Error("No response body");
-
-      const decoder = new TextDecoder();
-      let generatedCode = "";
-      let processedCode = "";
-
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        const chunk = decoder.decode(value);
-        generatedCode += chunk;
-
-        // Try to extract code from JSON if it looks like a JSON response
-        try {
-          if (
-            generatedCode.trim().startsWith("{") &&
-            generatedCode.includes('"message"')
-          ) {
-            const parsedData = JSON.parse(generatedCode);
-
-            if (
-              parsedData.choices &&
-              parsedData.choices[0] &&
-              parsedData.choices[0].message &&
-              parsedData.choices[0].message.content
-            ) {
-              processedCode = parsedData.choices[0].message.content;
-              setResponse(processedCode);
-            } else {
-              // If we can't extract the content, just use the raw response
-              setResponse((prev) => prev + chunk);
-            }
-          } else {
-            // Not JSON, just append the chunk
-            setResponse((prev) => prev + chunk);
-          }
-        } catch (e) {
-          // If JSON parsing fails, just append the chunk
-          setResponse((prev) => prev + chunk);
-        }
-      }
+    
 
       // Use the processed code if available, otherwise use the raw generated code
-      const finalCode = processedCode || generatedCode;
+      // const finalCode = res;
 
       // Clean up code by removing markdown code blocks if present
-      const cleanedCode = finalCode
-        .replace(
-          /```javascript|```typescript|```typescrpt|```jsx|```tsx|```/g,
-          ""
-        )
-        .trim();
+      // const cleanedCode = finalCode
+      //   .replace(
+      //     /```javascript|```typescript|```typescrpt|```jsx|```tsx|```/g,
+      //     ""
+      //   )
+      //   .trim();
 
+      console.log(res.data, "final code");
+      
+      // Extract the content from the response
+      let codeContent;
+      if (res.data && typeof res.data === 'object') {
+        // If response is an object with content property
+        if (res.data.content) {
+          codeContent = res.data.content;
+          setResponse(codeContent);
+        } else {
+          // If it's already the code object
+          codeContent = JSON.stringify(res.data);
+          setResponse(codeContent);
+        }
+      } else if (typeof res.data === 'string') {
+        // If response is a string
+        codeContent = res.data;
+        setResponse(codeContent);
+      }
+      
       await axios.put(`/api/codetoimage?uid=${uid}`, {
-        code: { content: cleanedCode },
+        code: { content: codeContent },
         model: record.model,
         email: user?.primaryEmailAddress?.emailAddress || "",
         options: record.options || {},

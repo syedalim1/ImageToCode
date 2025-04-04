@@ -1,10 +1,6 @@
-import Constants from "@/data/Constants";
-import { NextRequest, NextResponse } from "next/server";
-import { db } from "@/configs/db";
-import { usersTable } from "@/configs/schema";
-import { eq } from "drizzle-orm";
-import OpenAI from "openai";
+
 import AIPrompt from "@/data/AIPrompt";
+import { NextResponse } from "next/server";
 
 // Centralized configuration
 const CONFIG = {
@@ -29,7 +25,7 @@ const CONFIG = {
 };
 
 
-export async function POST(req: NextRequest) {
+export async function POST(req: Request) {
   try {
     // Parse and validate input
     const {
@@ -51,28 +47,27 @@ export async function POST(req: NextRequest) {
       "\n\n" +
       (options || "");
     // Fetch user and validate credits
-    const [user] = await db
-      .select()
-      .from(usersTable)
-      .where(eq(usersTable.email, userEmail));
+    // const [user] = await db
+    //   .select()
+    //   .from(usersTable)
+    //   .where(eq(usersTable.email, userEmail));
 
-    if (!user) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
-    }
-    let modelName;
-    let payload;
-    const currentCredits = user.credits ?? 0;
-    if (currentCredits < CONFIG.CREDITS.MINIMUM_BALANCE) {
-      return NextResponse.json(
-        {
-          error: `Insufficient credits. Minimum ${CONFIG.CREDITS.MINIMUM_BALANCE} credits required.`,
-        },
-        { status: 403 }
-      );
-    }
+    // if (!user) {
+    //   return NextResponse.json({ error: "User not found" }, { status: 404 });
+    // }
 
-    modelName = "google/gemini-2.5-pro-exp-03-25:free";
-    payload = {
+    // const currentCredits = user.credits ?? 0;
+    // if (currentCredits < CONFIG.CREDITS.MINIMUM_BALANCE) {
+    //   return NextResponse.json(
+    //     {
+    //       error: `Insufficient credits. Minimum ${CONFIG.CREDITS.MINIMUM_BALANCE} credits required.`,
+    //     },
+    //     { status: 403 }
+    //   );
+    // }
+
+    const modelName = "google/gemini-2.5-pro-exp-03-25:free";
+    const payload = {
       model: modelName,
       messages: [
         {
@@ -125,8 +120,25 @@ export async function POST(req: NextRequest) {
         data.choices[0].message.content
       ) {
         let codeContent = data.choices[0].message.content;
-
-        return new Response(codeContent);
+        console.log(codeContent, "code content");
+        
+        // Extract JSON from markdown code blocks if present
+        const jsonMatch = codeContent.match(/```(?:json)?(\n|\r\n|\r)([\s\S]*?)```/);
+        
+        if (jsonMatch && jsonMatch[2]) {
+          // If we found JSON in a code block, use that
+          try {
+            const extractedJson = jsonMatch[2].trim();
+            return NextResponse.json(JSON.parse(extractedJson));
+          } catch (parseError) {
+            console.error("JSON parsing error:", parseError);
+            // If parsing fails, return the raw content
+            return NextResponse.json({ content: codeContent });
+          }
+        } else {
+          // If no code block, return the raw content
+          return NextResponse.json({ content: codeContent });
+        }
       }
     } catch (apiError) {
       console.error("API Request Error:", apiError);

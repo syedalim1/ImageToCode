@@ -37,12 +37,20 @@ function DesignPage() {
   const [activeTab, setActiveTab] = useState<"preview" | "code">("preview");
   const [zoomImage, setZoomImage] = useState(false);
   const [Template, setTemplate] = useState<string>("");
-
+  const [code, setCode] = useState<string>("");
   useEffect(() => {
     if (uid) {
       fetchDesign();
     }
   }, [uid]);
+
+  useEffect(() => {
+    if (design?.code?.content) {
+      setCode(design.code.content);
+      // const result = JSON.parse(design.code.content);
+      console.log(code, "design code content");
+    }
+  }, [design]);
 
   const fetchDesign = async () => {
     try {
@@ -57,8 +65,7 @@ function DesignPage() {
 
       if (result.length > 0) {
         setDesign(result[0] as Design);
-        console.log(result[0], "designs");
-       }else {
+      } else {
         setError("No design found.");
       }
     } catch (err) {
@@ -81,6 +88,8 @@ function DesignPage() {
       return dateString;
     }
   };
+
+  // Code setting moved to useEffect
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 dark:from-gray-900 dark:via-indigo-950 dark:to-purple-950">
@@ -316,11 +325,10 @@ function DesignPage() {
               <div className="flex">
                 <button
                   onClick={() => setActiveTab("preview")}
-                  className={`px-8 py-4 text-sm font-medium flex items-center transition-all ${
-                    activeTab === "preview"
-                      ? "border-b-2 border-indigo-500 text-indigo-600 dark:text-indigo-400 bg-white dark:bg-gray-800"
-                      : "text-gray-600 hover:text-indigo-600 dark:text-gray-300 dark:hover:text-indigo-400 hover:bg-white/50 dark:hover:bg-gray-800/50"
-                  }`}
+                  className={`px-8 py-4 text-sm font-medium flex items-center transition-all ${activeTab === "preview"
+                    ? "border-b-2 border-indigo-500 text-indigo-600 dark:text-indigo-400 bg-white dark:bg-gray-800"
+                    : "text-gray-600 hover:text-indigo-600 dark:text-gray-300 dark:hover:text-indigo-400 hover:bg-white/50 dark:hover:bg-gray-800/50"
+                    }`}
                 >
                   <svg
                     className="w-5 h-5 mr-2"
@@ -339,11 +347,10 @@ function DesignPage() {
                 </button>
                 <button
                   onClick={() => setActiveTab("code")}
-                  className={`px-8 py-4 text-sm font-medium flex items-center transition-all ${
-                    activeTab === "code"
-                      ? "border-b-2 border-indigo-500 text-indigo-600 dark:text-indigo-400 bg-white dark:bg-gray-800"
-                      : "text-gray-600 hover:text-indigo-600 dark:text-gray-300 dark:hover:text-indigo-400 hover:bg-white/50 dark:hover:bg-gray-800/50"
-                  }`}
+                  className={`px-8 py-4 text-sm font-medium flex items-center transition-all ${activeTab === "code"
+                    ? "border-b-2 border-indigo-500 text-indigo-600 dark:text-indigo-400 bg-white dark:bg-gray-800"
+                    : "text-gray-600 hover:text-indigo-600 dark:text-gray-300 dark:hover:text-indigo-400 hover:bg-white/50 dark:hover:bg-gray-800/50"
+                    }`}
                 >
                   <svg
                     className="w-5 h-5 mr-2"
@@ -431,9 +438,8 @@ function DesignPage() {
                   </div>
                 </div>
                 <div
-                  className={`relative ${
-                    zoomImage ? "h-96 md:h-[500px]" : "h-64"
-                  } transition-all duration-300 bg-white dark:bg-gray-800 rounded-lg overflow-hidden shadow-md border border-gray-100 dark:border-gray-700 group`}
+                  className={`relative ${zoomImage ? "h-96 md:h-[500px]" : "h-64"
+                    } transition-all duration-300 bg-white dark:bg-gray-800 rounded-lg overflow-hidden shadow-md border border-gray-100 dark:border-gray-700 group`}
                 >
                   <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 to-pink-500/10 dark:from-purple-500/5 dark:to-pink-500/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
                   <img
@@ -446,63 +452,63 @@ function DesignPage() {
             )}
 
             {/* Sandpack */}
-            <div className="p-6">
-              
-                <SandpackProvider
-                  options={{
-                    externalResources: ["https://cdn.tailwindcss.com"],
-                    classes: {
-                      "sp-wrapper":
-                        "custom-wrapper rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700 shadow-lg",
-                      "sp-layout": "custom-layout",
-                      "sp-tab-button": "custom-tab",
-                    },
+            {/* <div className="p-6">
+
+              <SandpackProvider
+                options={{
+                  externalResources: ["https://cdn.tailwindcss.com"],
+                  classes: {
+                    "sp-wrapper":
+                      "custom-wrapper rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700 shadow-lg",
+                    "sp-layout": "custom-layout",
+                    "sp-tab-button": "custom-tab",
+                  },
+                }}
+                customSetup={{
+                  dependencies: {
+                    "react-markdown": "latest",
+                    "lucide-react": "latest",
+                  },
+                }}
+                files={{
+                  "/App.js": design.code.content,
+                }}
+                theme="auto"
+                template="react"
+              >
+                <SandpackLayout
+                  style={{
+                    width: "100%",
+                    height: activeTab === "preview" ? "700px" : "800px",
+                    borderRadius: "0.5rem",
                   }}
-                  customSetup={{
-                    dependencies: {
-                      "react-markdown": "latest",
-                      "lucide-react": "latest",
-                    },
-                  }}
-                  files={{
-                    "/App.js": design.code.content,
-                  }}
-                  theme="auto"
-                  template="react"
                 >
-                  <SandpackLayout
-                    style={{
-                      width: "100%",
-                      height: activeTab === "preview" ? "700px" : "800px",
-                      borderRadius: "0.5rem",
-                    }}
-                  >
-                    {activeTab === "code" && (
-                      <SandpackCodeEditor
-                        style={{
-                          height: "100%",
-                          minWidth: "100%",
-                        }}
-                        showLineNumbers
-                        showTabs
-                        readOnly
-                      />
-                    )}
-                    {activeTab === "preview" && (
-                      <SandpackPreview
-                        style={{
-                          height: "100%",
-                          minWidth: "100%",
-                          display: "flex",
-                          flexDirection: "column",
-                          overflow: "auto",
-                        }}
-                      />
-                    )}
-                  </SandpackLayout>
-                </SandpackProvider>
-              
-            </div>
+                  {activeTab === "code" && (
+                    <SandpackCodeEditor
+                      style={{
+                        height: "100%",
+                        minWidth: "100%",
+                      }}
+                      showLineNumbers
+                      showTabs
+                      readOnly
+                    />
+                  )}
+                  {activeTab === "preview" && (
+                    <SandpackPreview
+                      style={{
+                        height: "100%",
+                        minWidth: "100%",
+                        display: "flex",
+                        flexDirection: "column",
+                        overflow: "auto",
+                      }}
+                    />
+                  )}
+                </SandpackLayout>
+              </SandpackProvider>
+
+            </div> */}
 
             {/* Actions */}
             <div className="p-6 bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-900/80 border-t border-gray-200 dark:border-gray-700 flex flex-wrap gap-4 justify-between items-center">
@@ -514,7 +520,7 @@ function DesignPage() {
               </div>
 
               <div className="flex flex-wrap gap-3">
-                
+
                 <button
                   onClick={() => window.print()}
                   className="flex items-center px-5 py-2.5 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 rounded-lg transition-all shadow-sm hover:shadow border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700"
@@ -537,7 +543,7 @@ function DesignPage() {
               </div>
             </div>
           </div>
-        ) :null}
+        ) : null}
       </div>
     </div>
   );
@@ -550,3 +556,5 @@ export default function Page() {
     </div>
   );
 }
+
+

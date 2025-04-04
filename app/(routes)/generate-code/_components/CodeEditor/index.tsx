@@ -5,36 +5,29 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   SandpackProvider,
   SandpackLayout,
-  SandpackCodeEditor,
   SandpackPreview,
-  useActiveCode,
   SandpackConsole,
   SandpackFiles,
-  SandpackFileExplorer,
-  useSandpack,
-  SandpackStack,
-  SandpackThemeProp
+  SandpackThemeProp,
 } from "@codesandbox/sandpack-react";
+import { RefreshCw, AlertTriangle } from "lucide-react";
+import AILookup from "@/data/AILookup";
+import ClientOnly from "../ClientOnly";
 
+// Import our custom components
+import CodeEditorToolbar from "./CodeEditorToolbar";
+import EnhancedFileExplorer from "./EnhancedFileExplorer";
+import CodeEditorWithCapture from "./CodeEditorWithCapture";
+import PerformanceAnalyzer from "./PerformanceAnalyzer";
+import EditorSettings from "./EditorSettings";
 
-import {
-  Copy,
-  Code,
-  Eye,
-  Download,
-  Check,
-  Moon,
-  Sun,
-  RefreshCw,
-  Terminal,
-  AlertTriangle,
-  FolderTree,
-  Maximize,
-  Minimize,
-  Share2
-} from "lucide-react";
-import ClientOnly from "./ClientOnly";
-import AILookup from "@/data/AILookup"
+// Available themes for the editor
+const availableThemes: Record<string, SandpackThemeProp> = {
+  light: "light",
+  dark: "dark",
+  
+};
+
 interface EnhancedCodeEditorProps {
   code: string;
   onCodeChange?: (code: string | { content: string }) => void;
@@ -46,37 +39,6 @@ interface SandpackProject {
   explanation?: string;
   files: Record<string, { code: string }>;
   generatedFiles?: string[];
-}
-
-// Custom hook to capture code changes
-function CodeEditorWithCapture({
-  setCode,
-  readOnly = false,
-  style,
-}: {
-  setCode: (code: string) => void;
-  readOnly?: boolean;
-  style?: React.CSSProperties;
-}) {
-  const { code, updateCode } = useActiveCode();
-
-  // Update the parent component's state when code changes
-  useEffect(() => {
-    setCode(code);
-  }, [code, setCode]);
-
-  return (
-    <SandpackCodeEditor
-      style={{
-        minWidth: "100%",
-        height: "600px",
-        ...style,
-      }}
-      showLineNumbers
-      showTabs
-      readOnly={readOnly}
-    />
-  );
 }
 
 // Function to ensure code is a valid React component
@@ -133,7 +95,6 @@ const determineEntryFile = (files: SandpackFiles): string => {
     }
   }
 
-
   // If no standard entry is found, return the first .jsx or .js file found
   const firstJsxFile = Object.keys(files).find(file => file.endsWith('.jsx'));
   if (firstJsxFile) return firstJsxFile;
@@ -145,38 +106,13 @@ const determineEntryFile = (files: SandpackFiles): string => {
   return Object.keys(files)[0];
 };
 
-// Custom component for file explorer with enhanced styling
-const EnhancedFileExplorer = () => {
-  const { sandpack } = useSandpack();
-
-  return (
-    <div className="flex flex-col h-full">
-      <div className="p-2 bg-gray-100 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
-        <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center">
-          <FolderTree className="w-4 h-4 mr-2" />
-          Project Files
-        </h3>
-      </div>
-      <SandpackFileExplorer className="flex-grow overflow-auto" />
-    </div>
-  );
-};
-
-// Available themes for the editor
-const availableThemes: Record<string, SandpackThemeProp> = {
-  light: "light",
-  dark: "dark",
-
-};
-
 const EnhancedCodeEditor: React.FC<EnhancedCodeEditorProps> = ({
   code,
   onCodeChange,
   isLoading = false,
 }) => {
-  const [activeTab, setActiveTab] = useState<"code" | "preview" | "console" | "explorer">(
-    "preview"
-  );
+  // Core state
+  const [activeTab, setActiveTab] = useState<"code" | "preview" | "console" | "explorer" | "settings" | "performance">("preview");
   const [currentCode, setCurrentCode] = useState(code);
   const [processedCode, setProcessedCode] = useState("");
   const [sandpackFiles, setSandpackFiles] = useState<SandpackFiles | null>(null);
@@ -187,9 +123,17 @@ const EnhancedCodeEditor: React.FC<EnhancedCodeEditorProps> = ({
   const [hasError, setHasError] = useState(false);
   const [isMultiFile, setIsMultiFile] = useState(false);
   const [isCopied, setIsCopied] = useState(false);
-  const [showThemeSelector, setShowThemeSelector] = useState(false);
+  
+  // Editor settings
+  const [fontSize, setFontSize] = useState(14);
+  const [lineHeight, setLineHeight] = useState(1.5);
+  const [wordWrap, setWordWrap] = useState(true);
+  const [showLineNumbers, setShowLineNumbers] = useState(true);
+  const [tabSize, setTabSize] = useState(2);
+  const [autoSave, setAutoSave] = useState(true);
+  const [formatOnSave, setFormatOnSave] = useState(true);
 
-
+  // Process code on initial load and when code prop changes
   useEffect(() => {
     let processedCode = code;
     setHasError(false);
@@ -264,7 +208,6 @@ const EnhancedCodeEditor: React.FC<EnhancedCodeEditorProps> = ({
     // Set the processed code for single-file mode
     setCurrentCode(processedCode);
 
-    
     // Ensure the code is a valid React component for the preview
     try {
       const validReactCode = ensureValidReactComponent(processedCode);
@@ -420,185 +363,76 @@ export default function ErrorFallback() {
   return (
     <ClientOnly>
       <div className="my-4">
-        {/* Project title and explanation */}
+        {/* Project title and explanation with improved styling */}
         {isMultiFile && projectData?.projectTitle && (
-          <div className="mb-4 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
-            <h2 className="text-xl font-bold text-gray-800 dark:text-white mb-2">
+          <div className="mb-4 p-4 bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-700 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md transition-shadow duration-300">
+            <h2 className="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400 mb-2">
               {projectData.projectTitle}
             </h2>
             {projectData.explanation && (
-              <p className="text-gray-600 dark:text-gray-300 text-sm">
+              <p className="text-gray-600 dark:text-gray-300 text-sm leading-relaxed">
                 {projectData.explanation}
               </p>
             )}
           </div>
         )}
 
-        {/* Editor container */}
-        <div className={`rounded-xl overflow-hidden shadow-lg ${isFullscreen ? 'fixed inset-0 z-50 p-4 bg-white dark:bg-gray-900' : ''}`}>
-          {/* Tabs navigation */}
-          <div className="flex items-center justify-between bg-slate-800 text-white p-2">
-            <div className="flex space-x-1">
-              {isMultiFile && (
-                <button
-                  onClick={() => setActiveTab("explorer")}
-                  className={`flex items-center px-3 py-1.5 rounded-md ${activeTab === "explorer"
-                    ? "bg-blue-600"
-                    : "hover:bg-slate-700"
-                    }`}
-                >
-                  <FolderTree size={16} className="mr-1.5" />
-                  <span>Files</span>
-                </button>
-              )}
-              <button
-                onClick={() => setActiveTab("code")}
-                className={`flex items-center px-3 py-1.5 rounded-md ${activeTab === "code"
-                  ? "bg-blue-600"
-                  : "hover:bg-slate-700"
-                  }`}
-              >
-                <Code size={16} className="mr-1.5" />
-                <span>Code</span>
-              </button>
-              <button
-                onClick={() => setActiveTab("preview")}
-                className={`flex items-center px-3 py-1.5 rounded-md ${activeTab === "preview"
-                  ? "bg-blue-600"
-                  : "hover:bg-slate-700"
-                  }`}
-              >
-                <Eye size={16} className="mr-1.5" />
-                <span>Preview</span>
-              </button>
-              <button
-                onClick={() => setActiveTab("console")}
-                className={`flex items-center px-3 py-1.5 rounded-md ${activeTab === "console"
-                  ? "bg-blue-600"
-                  : "hover:bg-slate-700"
-                  }`}
-              >
-                <Terminal size={16} className="mr-1.5" />
-                <span>Console</span>
-              </button>
-            </div>
+        {/* Editor container with responsive design */}
+        <div 
+          className={`rounded-xl overflow-hidden shadow-xl border border-gray-200 dark:border-gray-700 
+            ${isFullscreen 
+              ? 'fixed inset-0 z-50 p-4 bg-white dark:bg-gray-900' 
+              : 'transition-all duration-300 hover:shadow-2xl'}`
+          }
+        >
+          {/* Toolbar */}
+          <CodeEditorToolbar
+            activeTab={activeTab}
+            setActiveTab={setActiveTab}
+            isMultiFile={isMultiFile}
+            currentTheme={currentTheme}
+            setCurrentTheme={setCurrentTheme}
+            isFullscreen={isFullscreen}
+            toggleFullscreen={toggleFullscreen}
+            handleCopyCode={handleCopyCode}
+            handleShareCode={handleShareCode}
+            downloadCode={downloadCode}
+            isCopied={isCopied}
+          />
 
-            <div className="flex space-x-2">
-              {/* Theme selector */}
-              <div className="relative">
-                <button
-                  onClick={() => setShowThemeSelector(!showThemeSelector)}
-                  className="p-1.5 rounded-md hover:bg-slate-700 relative group"
-                  aria-label="Change theme"
-                >
-                  {currentTheme.includes('dark') ? (
-                    <Moon size={18} className="text-blue-300" />
-                  ) : (
-                    <Sun size={18} className="text-yellow-300" />
-                  )}
-                  <span className="absolute bottom-full mb-2 left-1/2 transform -translate-x-1/2 px-2 py-1 text-xs bg-gray-900 text-white rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                    Change theme
-                  </span>
-                </button>
-
-                {showThemeSelector && (
-                  <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-md shadow-lg z-50 border border-gray-200 dark:border-gray-700">
-                    <div className="py-1">
-                      {Object.entries(availableThemes).map(([name, theme]) => (
-                        <button
-                          key={name}
-                          className={`block w-full text-left px-4 py-2 text-sm ${currentTheme === name
-                            ? "bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300"
-                            : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
-                            }`}
-                          onClick={() => {
-                            setCurrentTheme(name);
-                            setShowThemeSelector(false);
-                          }}
-                        >
-                          {name.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              {/* Share button */}
-              <button
-                onClick={handleShareCode}
-                className="p-1.5 rounded-md hover:bg-slate-700 relative group"
-                aria-label="Share code"
-              >
-                <Share2 size={18} />
-                <span className="absolute bottom-full mb-2 left-1/2 transform -translate-x-1/2 px-2 py-1 text-xs bg-gray-900 text-white rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                  Share code
-                </span>
-              </button>
-
-              {/* Copy code button */}
-              <button
-                onClick={handleCopyCode}
-                className="p-1.5 rounded-md hover:bg-slate-700 relative group"
-                aria-label="Copy code"
-              >
-                {isCopied ? <Check size={18} className="text-green-400" /> : <Copy size={18} />}
-                <span className="absolute bottom-full mb-2 left-1/2 transform -translate-x-1/2 px-2 py-1 text-xs bg-gray-900 text-white rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                  {isCopied ? "Copied!" : "Copy code"}
-                </span>
-              </button>
-
-              {/* Download button */}
-              <button
-                onClick={downloadCode}
-                className="p-1.5 rounded-md hover:bg-slate-700 relative group"
-                aria-label="Download code"
-              >
-                <Download size={18} />
-                <span className="absolute bottom-full mb-2 left-1/2 transform -translate-x-1/2 px-2 py-1 text-xs bg-gray-900 text-white rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                  Download {isMultiFile ? "project" : "code"}
-                </span>
-              </button>
-
-              {/* Fullscreen toggle */}
-              <button
-                onClick={toggleFullscreen}
-                className="p-1.5 rounded-md hover:bg-slate-700 relative group"
-                aria-label={isFullscreen ? "Exit fullscreen" : "Enter fullscreen"}
-              >
-                {isFullscreen ? (
-                  <Minimize size={18} />
-                ) : (
-                  <Maximize size={18} />
-                )}
-                <span className="absolute bottom-full mb-2 left-1/2 transform -translate-x-1/2 px-2 py-1 text-xs bg-gray-900 text-white rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                  {isFullscreen ? "Exit fullscreen" : "Fullscreen"}
-                </span>
-              </button>
-            </div>
-          </div>
-
-          {/* Loading indicator */}
+          {/* Loading indicator with improved animation */}
           {isLoading && (
-            <div className="flex items-center justify-center p-4 bg-white dark:bg-gray-900">
-              <RefreshCw className="animate-spin text-blue-500" size={24} />
-              <span className="ml-2 text-gray-600 dark:text-gray-300">
-                Loading code...
-              </span>
+            <div className="flex items-center justify-center p-6 bg-white dark:bg-gray-900">
+              <div className="flex items-center space-x-4">
+                <RefreshCw className="animate-spin text-blue-500" size={24} />
+                <div className="flex flex-col">
+                  <span className="text-lg font-medium text-gray-700 dark:text-gray-300">
+                    Loading code...
+                  </span>
+                  <span className="text-sm text-gray-500 dark:text-gray-400">
+                    Preparing your coding experience
+                  </span>
+                </div>
+              </div>
             </div>
           )}
 
-          {/* Error indicator */}
+          {/* Error indicator with improved styling */}
           {hasError && !isLoading && (
-            <div className="flex items-center bg-red-50 text-red-600 p-2 border-b border-red-200">
-              <AlertTriangle size={16} className="mr-2" />
-              <span className="text-sm font-medium">
-                There are errors in the code that may affect rendering
-              </span>
+            <div className="flex items-center bg-red-50 text-red-600 p-3 border-b border-red-200 dark:bg-red-900/20 dark:border-red-800 dark:text-red-400">
+              <AlertTriangle size={18} className="mr-2 flex-shrink-0" />
+              <div>
+                <span className="text-sm font-medium">
+                  There are errors in the code that may affect rendering
+                </span>
+                <p className="text-xs mt-0.5 text-red-500 dark:text-red-300">
+                  Check the console tab for more details
+                </p>
+              </div>
             </div>
           )}
 
-          {/* Sandpack editor */}
+          {/* Sandpack editor with responsive design */}
           <AnimatePresence mode="wait">
             <motion.div
               key={activeTab + (isMultiFile ? "multi" : "single") + currentTheme}
@@ -606,10 +440,41 @@ export default function ErrorFallback() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.15 }}
-              className="h-[1000px]"
+              className="h-[1000px] overflow-hidden"
+              style={{ 
+                maxHeight: isFullscreen ? 'calc(100vh - 120px)' : '1000px',
+                height: isFullscreen ? 'calc(100vh - 120px)' : '1000px'
+              }}
             >
-              {isMultiFile && sandpackFiles ? (
-                // Multi-file Sandpack setup
+              {/* Performance Analysis Tab */}
+              {activeTab === "performance" && (
+                <PerformanceAnalyzer code={currentCode} />
+              )}
+
+              {/* Settings Tab */}
+              {activeTab === "settings" && (
+                <EditorSettings
+                  fontSize={fontSize}
+                  setFontSize={setFontSize}
+                  lineHeight={lineHeight}
+                  setLineHeight={setLineHeight}
+                  wordWrap={wordWrap}
+                  setWordWrap={setWordWrap}
+                  showLineNumbers={showLineNumbers}
+                  setShowLineNumbers={setShowLineNumbers}
+                  tabSize={tabSize}
+                  setTabSize={setTabSize}
+                  theme={currentTheme}
+                  setTheme={setCurrentTheme}
+                  autoSave={autoSave}
+                  setAutoSave={setAutoSave}
+                  formatOnSave={formatOnSave}
+                  setFormatOnSave={setFormatOnSave}
+                />
+              )}
+
+              {/* Multi-file Sandpack setup */}
+              {isMultiFile && sandpackFiles && activeTab !== "performance" && activeTab !== "settings" && (
                 <SandpackProvider
                   theme={availableThemes[currentTheme]}
                   template="react"
@@ -619,26 +484,26 @@ export default function ErrorFallback() {
                       ...AILookup.DEPENDANCY
                     },
                     entry: entryFile
-                  }}                  
-                                  >
-                  <SandpackLayout>
+                  }}
+                >
+                  <SandpackLayout className="h-full">
                     {activeTab === "explorer" && (
-                      <SandpackStack style={{ height: "100%", overflow: "auto" }}>
-                        <EnhancedFileExplorer />
-                      </SandpackStack>
+                      <div className="h-full" style={{ width: '250px' }}>
+                        <EnhancedFileExplorer showFileInfo />
+                      </div>
                     )}
-                    <SandpackFileExplorer />
+                    
                     {activeTab === "code" && (
-                      <SandpackCodeEditor
-                        showTabs
-                        showLineNumbers
-                        showInlineErrors
-                        wrapContent
-                        closableTabs
+                      <CodeEditorWithCapture
+                        setCode={handleCodeChange}
+                        fontSize={fontSize}
+                        lineHeight={lineHeight}
+                        showLineNumbers={showLineNumbers}
+                        wrapContent={wordWrap}
                         style={{ height: "100%", overflow: "auto" }}
                       />
-
                     )}
+                    
                     {activeTab === "preview" && (
                       <SandpackPreview
                         showOpenInCodeSandbox
@@ -646,11 +511,16 @@ export default function ErrorFallback() {
                         style={{ height: "100%", overflow: "auto" }}
                       />
                     )}
-                    {activeTab === "console" && <SandpackConsole />}
+                    
+                    {activeTab === "console" && (
+                      <SandpackConsole className="h-full" />
+                    )}
                   </SandpackLayout>
                 </SandpackProvider>
-              ) : (
-                // Single file Sandpack setup
+              )}
+
+              {/* Single file Sandpack setup */}
+              {(!isMultiFile || !sandpackFiles) && activeTab !== "performance" && activeTab !== "settings" && (
                 <SandpackProvider
                   theme={availableThemes[currentTheme]}
                   template="react"
@@ -664,32 +534,62 @@ export default function ErrorFallback() {
                       ...AILookup.DEPENDANCY
                     }
                   }}
-
                 >
-                  <SandpackLayout>
-
+                  <SandpackLayout className="h-full">
                     {activeTab === "code" && (
-                      <div className="flex flex-col">
-                        <SandpackFileExplorer />
-                        <CodeEditorWithCapture
-                          setCode={handleCodeChange}
-
-                        />
-                      </div>
-
+                      <CodeEditorWithCapture
+                        setCode={handleCodeChange}
+                        fontSize={fontSize}
+                        lineHeight={lineHeight}
+                        showLineNumbers={showLineNumbers}
+                        wrapContent={wordWrap}
+                        style={{ height: "100%", overflow: "auto" }}
+                      />
                     )}
+                    
                     {activeTab === "preview" && (
                       <SandpackPreview
                         showOpenInCodeSandbox
                         showRefreshButton
+                        style={{ height: "100%", overflow: "auto" }}
                       />
                     )}
-                    {activeTab === "console" && <SandpackConsole />}
+                    
+                    {activeTab === "console" && (
+                      <SandpackConsole className="h-full" />
+                    )}
                   </SandpackLayout>
                 </SandpackProvider>
               )}
             </motion.div>
           </AnimatePresence>
+          
+          {/* Animated decorative elements */}
+          <div className="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 opacity-70"></div>
+        </div>
+        
+        {/* Additional features info */}
+        <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-100 dark:border-blue-800">
+            <h3 className="text-sm font-medium text-blue-700 dark:text-blue-300">Code Explanation</h3>
+            <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
+              Analyze code structure, complexity, and patterns in the Performance tab
+            </p>
+          </div>
+          
+          <div className="p-3 bg-purple-50 dark:bg-purple-900/20 rounded-lg border border-purple-100 dark:border-purple-800">
+            <h3 className="text-sm font-medium text-purple-700 dark:text-purple-300">Export Options</h3>
+            <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
+              Export your code in multiple formats: JS, TS, JSX, TSX, HTML, or as a project
+            </p>
+          </div>
+          
+          <div className="p-3 bg-pink-50 dark:bg-pink-900/20 rounded-lg border border-pink-100 dark:border-pink-800">
+            <h3 className="text-sm font-medium text-pink-700 dark:text-pink-300">Responsive Preview</h3>
+            <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
+              Preview your code in different screen sizes and responsive breakpoints
+            </p>
+          </div>
         </div>
       </div>
     </ClientOnly>
