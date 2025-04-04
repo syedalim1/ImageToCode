@@ -9,7 +9,17 @@ import {
   SandpackPreview,
   useActiveCode,
   SandpackConsole,
+  SandpackFiles,
+  SandpackFileExplorer,
+  useSandpack,
+  SandpackStack,
+  SandpackCodeViewer,
+  UnstyledOpenInCodeSandboxButton,
+  SandpackThemeProp,
+  SANDPACK_THEMES
 } from "@codesandbox/sandpack-react";
+
+
 import {
   Copy,
   Code,
@@ -21,9 +31,15 @@ import {
   RefreshCw,
   Terminal,
   AlertTriangle,
+  FileCode,
+  FolderTree,
+  ExternalLink,
+  Maximize,
+  Minimize,
+  Share2
 } from "lucide-react";
 import ClientOnly from "./ClientOnly";
-
+import AILookup from "@/data/AILookup"
 interface EnhancedCodeEditorProps {
   code: string;
   onCodeChange?: (code: string | { content: string }) => void;
@@ -32,6 +48,13 @@ interface EnhancedCodeEditorProps {
 
 interface CodeContent {
   content: string;
+}
+
+interface SandpackProject {
+  projectTitle?: string;
+  explanation?: string;
+  files: Record<string, { code: string }>;
+  generatedFiles?: string[];
 }
 
 // Custom hook to capture code changes
@@ -67,7 +90,7 @@ function CodeEditorWithCapture({
 
 // Function to ensure code is a valid React component
 const ensureValidReactComponent = (code: string): string => {
-  // If code doesn't contain export default or export const App, wrap it
+  // If code doesn't contain export default or export function, wrap it
   if (
     !code.includes("export default") &&
     !code.includes("export function") &&
@@ -84,34 +107,120 @@ const ensureValidReactComponent = (code: string): string => {
   return code;
 };
 
+// Convert the JSON project format to Sandpack files format
+const convertToSandpackFiles = (files: Record<string, { code: string }>): SandpackFiles => {
+  const sandpackFiles: SandpackFiles = {};
+
+  Object.entries(files).forEach(([path, { code }]) => {
+    // Ensure path starts with a slash
+    const normalizedPath = path.startsWith('/') ? path : `/${path}`;
+    sandpackFiles[normalizedPath] = { code };
+  });
+
+  return sandpackFiles;
+};
+
+// Function to determine the entry file for the Sandpack preview
+const determineEntryFile = (files: SandpackFiles): string => {
+  // Priority order for entry files
+  const possibleEntries = [
+    '/src/main.jsx',
+    '/src/main.tsx',
+    '/src/index.jsx',
+    '/src/index.tsx',
+    '/src/App.jsx',
+    '/src/App.tsx',
+    '/src/App.js',
+    '/src/App.ts',
+    '/index.jsx',
+    '/index.js',
+  ];
+
+  for (const entry of possibleEntries) {
+    if (files[entry]) {
+      return entry;
+    }
+  }
+
+
+  // If no standard entry is found, return the first .jsx or .js file found
+  const firstJsxFile = Object.keys(files).find(file => file.endsWith('.jsx'));
+  if (firstJsxFile) return firstJsxFile;
+
+  const firstJsFile = Object.keys(files).find(file => file.endsWith('.js'));
+  if (firstJsFile) return firstJsFile;
+
+  // Default to the first file as a last resort
+  return Object.keys(files)[0];
+};
+
+// Custom component for file explorer with enhanced styling
+const EnhancedFileExplorer = () => {
+  const { sandpack } = useSandpack();
+
+  return (
+    <div className="flex flex-col h-full">
+      <div className="p-2 bg-gray-100 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+        <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center">
+          <FolderTree className="w-4 h-4 mr-2" />
+          Project Files
+        </h3>
+      </div>
+      <SandpackFileExplorer className="flex-grow overflow-auto" />
+    </div>
+  );
+};
+
+// Available themes for the editor
+const availableThemes: Record<string, SandpackThemeProp> = {
+  light: "light",
+  dark: "dark",
+
+};
+
 const EnhancedCodeEditor: React.FC<EnhancedCodeEditorProps> = ({
   code,
   onCodeChange,
   isLoading = false,
 }) => {
-  const [activeTab, setActiveTab] = useState<"code" | "preview" | "console">(
+  const [activeTab, setActiveTab] = useState<"code" | "preview" | "console" | "explorer">(
     "preview"
   );
   const [currentCode, setCurrentCode] = useState(code);
   const [processedCode, setProcessedCode] = useState("");
-  const [isDarkMode, setIsDarkMode] = useState(false);
-
+  const [sandpackFiles, setSandpackFiles] = useState<SandpackFiles | null>(null);
+  const [projectData, setProjectData] = useState<SandpackProject | null>(null);
+  const [entryFile, setEntryFile] = useState<string>("/src/App.js");
+  const [currentTheme, setCurrentTheme] = useState<string>("light");
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [hasError, setHasError] = useState(false);
+  const [isMultiFile, setIsMultiFile] = useState(false);
+  const [isCopied, setIsCopied] = useState(false);
+  const [showThemeSelector, setShowThemeSelector] = useState(false);
+  const [file, setFile] = useState(AILookup?.DEFAULT_FILE)
+
 
   useEffect(() => {
     let processedCode = code;
     setHasError(false);
+    setIsMultiFile(false);
 
-    // Try to parse the code if it's a JSON string containing AI response
+    // Try to parse the code if it's a JSON string
     try {
-      // Check if the code starts with a JSON object pattern
-      if (
-        typeof code === "string" &&
-        code.trim().startsWith("{") &&
-        code.includes('"message"')
-      ) {
+      // Check if the code is a JSON string
+      if (typeof code === "string" && code.trim().startsWith("{")) {
         const parsedData = JSON.parse(code);
+
+        // Check if this is a Sandpack project format
+        if (parsedData.files && typeof parsedData.files === "object") {
+          setProjectData(parsedData);
+          const files = convertToSandpackFiles(parsedData.files);
+          setSandpackFiles(files);
+          const entry = determineEntryFile(files);
+          setEntryFile(entry);
+          setIsMultiFile(true);
+          return; // Exit early since we've handled the multi-file case
+        }
 
         // Check if this is an AI response with content
         if (
@@ -122,6 +231,29 @@ const EnhancedCodeEditor: React.FC<EnhancedCodeEditorProps> = ({
         ) {
           // Extract the actual code from the AI response
           processedCode = parsedData.choices[0].message.content;
+
+          // Check if the extracted content might be a JSON project
+          try {
+            if (processedCode.includes('"files"') && processedCode.includes('"code"')) {
+              // Try to find JSON within markdown code blocks
+              const jsonMatch = processedCode.match(/```(?:json)?\s*(\{[\s\S]*?\})\s*```/);
+              if (jsonMatch && jsonMatch[1]) {
+                const projectJson = JSON.parse(jsonMatch[1]);
+                if (projectJson.files && typeof projectJson.files === "object") {
+                  setProjectData(projectJson);
+                  const files = convertToSandpackFiles(projectJson.files);
+                  setSandpackFiles(files);
+                  const entry = determineEntryFile(files);
+                  setEntryFile(entry);
+                  setIsMultiFile(true);
+                  return; // Exit early
+                }
+              }
+            }
+          } catch (innerError) {
+            // If nested parsing fails, continue with the extracted content
+            console.error("Failed to parse nested JSON:", innerError);
+          }
         }
       }
     } catch (e) {
@@ -139,9 +271,10 @@ const EnhancedCodeEditor: React.FC<EnhancedCodeEditorProps> = ({
         .trim();
     }
 
-    // Set the processed code
+    // Set the processed code for single-file mode
     setCurrentCode(processedCode);
 
+    
     // Ensure the code is a valid React component for the preview
     try {
       const validReactCode = ensureValidReactComponent(processedCode);
@@ -150,12 +283,11 @@ const EnhancedCodeEditor: React.FC<EnhancedCodeEditorProps> = ({
       console.error("Error processing code:", e);
       setHasError(true);
       setProcessedCode(
-        `// Error: Invalid code format\n// ${
-          e instanceof Error ? e.message : String(e)
+        `// Error: Invalid code format\n// ${e instanceof Error ? e.message : String(e)
         }`
       );
     }
-  }, []);
+  }, [code]);
 
   const handleCodeChange = (newCode: string) => {
     setCurrentCode(newCode);
@@ -164,16 +296,87 @@ const EnhancedCodeEditor: React.FC<EnhancedCodeEditorProps> = ({
     }
   };
 
+  // Handle copying code
+  const handleCopyCode = () => {
+    if (typeof navigator !== "undefined") {
+      if (isMultiFile && projectData) {
+        // For multi-file, stringify the project JSON
+        navigator.clipboard.writeText(JSON.stringify(projectData, null, 2));
+      } else {
+        // For single file
+        navigator.clipboard.writeText(currentCode);
+      }
+      setIsCopied(true);
+      setTimeout(() => setIsCopied(false), 2000);
+    }
+  };
+
+  // Share code as URL
+  const handleShareCode = () => {
+    if (typeof window !== "undefined") {
+      try {
+        const codeToShare = isMultiFile && projectData
+          ? JSON.stringify(projectData)
+          : currentCode;
+
+        const encodedCode = encodeURIComponent(codeToShare);
+        const shareUrl = `${window.location.origin}/shared-code?code=${encodedCode}`;
+
+        navigator.clipboard.writeText(shareUrl);
+        alert("Share URL copied to clipboard!");
+      } catch (error) {
+        console.error("Error sharing code:", error);
+        alert("Failed to generate share URL");
+      }
+    }
+  };
+
   // Download operation should only run on client
   const downloadCode = () => {
     if (typeof document !== "undefined") {
-      const element = document.createElement("a");
-      const file = new Blob([currentCode], { type: "text/javascript" });
-      element.href = URL.createObjectURL(file);
-      element.download = "App.js";
-      document.body.appendChild(element);
-      element.click();
-      document.body.removeChild(element);
+      if (isMultiFile && projectData) {
+        // For multi-file projects, create a zip file
+        import('jszip').then((JSZip) => {
+          const { default: JSZipModule } = JSZip;
+          const zip = new JSZipModule();
+
+          // Add all files to the zip
+          Object.entries(projectData.files).forEach(([path, { code }]) => {
+            const filePath = path.startsWith('/') ? path.substring(1) : path;
+            zip.file(filePath, code);
+          });
+
+          // Add README with project information
+          let readmeContent = `# ${projectData.projectTitle || 'Generated Project'}\n\n`;
+          if (projectData.explanation) {
+            readmeContent += `${projectData.explanation}\n\n`;
+          }
+          readmeContent += `## Files\n${Object.keys(projectData.files).map(f => `- ${f}`).join('\n')}`;
+          zip.file('README.md', readmeContent);
+
+          // Generate the zip file
+          zip.generateAsync({ type: 'blob' }).then((blob) => {
+            const element = document.createElement('a');
+            element.href = URL.createObjectURL(blob);
+            element.download = `${projectData.projectTitle || 'generated-project'}.zip`;
+            document.body.appendChild(element);
+            element.click();
+            document.body.removeChild(element);
+          });
+        }).catch(err => {
+          console.error('Error creating zip file:', err);
+          alert('Failed to download project. JSZip module could not be loaded.');
+        });
+      } else {
+        // For single files
+        const element = document.createElement("a");
+        const file = new Blob([currentCode], { type: "text/javascript" });
+        element.href = URL.createObjectURL(file);
+        element.download = "App.js";
+        document.body.appendChild(element);
+        element.click();
+        document.body.removeChild(element);
+      }
     }
   };
 
@@ -200,7 +403,6 @@ export default function ErrorFallback() {
       alignItems: 'center'
     }}>
       <svg 
-        xmlns="http://www.w3.org/2000/svg" 
         width="64" 
         height="64" 
         viewBox="0 0 24 24" 
@@ -209,233 +411,296 @@ export default function ErrorFallback() {
         strokeWidth="2" 
         strokeLinecap="round" 
         strokeLinejoin="round"
-        style={{ marginBottom: '16px' }}
       >
         <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
         <line x1="12" y1="9" x2="12" y2="13"></line>
         <line x1="12" y1="17" x2="12.01" y2="17"></line>
       </svg>
-      <h2 style={{ marginBottom: '8px', fontSize: '24px' }}>Preview Error</h2>
-      <p style={{ marginBottom: '16px', color: '#718096' }}>
-        There was an error rendering this component.
+      <h2 style={{ marginTop: '20px', fontWeight: 'bold' }}>Code Error</h2>
+      <p style={{ marginTop: '10px' }}>
+        There are errors in the code that prevent it from rendering correctly.
       </p>
-      <p style={{ fontSize: '14px', color: '#718096' }}>
+      <p style={{ marginTop: '5px', fontSize: '0.9em' }}>
         Check the console tab for more details.
       </p>
     </div>
   );
-}
-`;
+}`;
 
   return (
-    <motion.div
-      className={`rounded-xl overflow-hidden shadow-lg border border-gray-200 dark:border-gray-700 ${
-        isFullscreen ? "fixed inset-0 z-50 p-4 bg-white dark:bg-gray-900" : ""
-      }`}
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
-    >
-      {/* Toolbar */}
-      <div className="bg-gradient-to-r from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-700 p-3 flex flex-wrap justify-between items-center">
-        <div className="flex space-x-2">
-          <button
-            onClick={() => setActiveTab("code")}
-            className={`px-3 py-1.5 rounded-md flex items-center text-sm font-medium transition-all ${
-              activeTab === "code"
-                ? "bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300"
-                : "text-gray-600 hover:bg-gray-200 dark:text-gray-300 dark:hover:bg-gray-700"
-            }`}
-          >
-            <Code className="h-4 w-4 mr-1.5" />
-            Code
-          </button>
-          <button
-            onClick={() => setActiveTab("preview")}
-            className={`px-3 py-1.5 rounded-md flex items-center text-sm font-medium transition-all ${
-              activeTab === "preview"
-                ? "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300"
-                : "text-gray-600 hover:bg-gray-200 dark:text-gray-300 dark:hover:bg-gray-700"
-            }`}
-          >
-            <Eye className="h-4 w-4 mr-1.5" />
-            Preview
-          </button>
-          <button
-            onClick={() => setActiveTab("console")}
-            className={`px-3 py-1.5 rounded-md flex items-center text-sm font-medium transition-all ${
-              activeTab === "console"
-                ? "bg-purple-100 text-purple-700 dark:bg-purple-900 dark:text-purple-300"
-                : "text-gray-600 hover:bg-gray-200 dark:text-gray-300 dark:hover:bg-gray-700"
-            }`}
-          >
-            <Terminal className="h-4 w-4 mr-1.5" />
-            Console
-          </button>
-        </div>
-
-        <div className="flex space-x-2 mt-2 sm:mt-0">
-          <motion.button
-            onClick={() => setIsDarkMode(!isDarkMode)}
-            className="p-1.5 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 rounded-md flex items-center hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            title={isDarkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
-          >
-            {isDarkMode ? (
-              <Sun className="h-4 w-4" />
-            ) : (
-              <Moon className="h-4 w-4" />
-            )}
-          </motion.button>
-        </div>
-      </div>
-
-      {/* Loading Indicator */}
-      <AnimatePresence>
-        {isLoading && (
-          <motion.div
-            className="absolute inset-0 bg-white/80 dark:bg-gray-900/80 flex items-center justify-center z-10"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-          >
-            <motion.div
-              animate={{ rotate: 360 }}
-              transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-            >
-              <RefreshCw className="h-10 w-10 text-blue-600" />
-            </motion.div>
-            <p className="ml-3 text-lg font-medium text-blue-800 dark:text-blue-300">
-              Processing your code...
-            </p>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Warning for JSON data */}
-      {currentCode && currentCode.trim().startsWith("{") && (
-        <div className="bg-yellow-50 dark:bg-yellow-900/30 border-l-4 border-yellow-400 p-4">
-          <div className="flex">
-            <div className="flex-shrink-0">
-              <AlertTriangle className="h-5 w-5 text-yellow-400" />
-            </div>
-            <div className="ml-3">
-              <p className="text-sm text-yellow-700 dark:text-yellow-200">
-                The received data appears to be in JSON format instead of code.
-                Attempting to extract code content.
+    <ClientOnly>
+      <div className="my-4">
+        {/* Project title and explanation */}
+        {isMultiFile && projectData?.projectTitle && (
+          <div className="mb-4 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+            <h2 className="text-xl font-bold text-gray-800 dark:text-white mb-2">
+              {projectData.projectTitle}
+            </h2>
+            {projectData.explanation && (
+              <p className="text-gray-600 dark:text-gray-300 text-sm">
+                {projectData.explanation}
               </p>
+            )}
+          </div>
+        )}
+
+        {/* Editor container */}
+        <div className={`rounded-xl overflow-hidden shadow-lg ${isFullscreen ? 'fixed inset-0 z-50 p-4 bg-white dark:bg-gray-900' : ''}`}>
+          {/* Tabs navigation */}
+          <div className="flex items-center justify-between bg-slate-800 text-white p-2">
+            <div className="flex space-x-1">
+              {isMultiFile && (
+                <button
+                  onClick={() => setActiveTab("explorer")}
+                  className={`flex items-center px-3 py-1.5 rounded-md ${activeTab === "explorer"
+                    ? "bg-blue-600"
+                    : "hover:bg-slate-700"
+                    }`}
+                >
+                  <FolderTree size={16} className="mr-1.5" />
+                  <span>Files</span>
+                </button>
+              )}
+              <button
+                onClick={() => setActiveTab("code")}
+                className={`flex items-center px-3 py-1.5 rounded-md ${activeTab === "code"
+                  ? "bg-blue-600"
+                  : "hover:bg-slate-700"
+                  }`}
+              >
+                <Code size={16} className="mr-1.5" />
+                <span>Code</span>
+              </button>
+              <button
+                onClick={() => setActiveTab("preview")}
+                className={`flex items-center px-3 py-1.5 rounded-md ${activeTab === "preview"
+                  ? "bg-blue-600"
+                  : "hover:bg-slate-700"
+                  }`}
+              >
+                <Eye size={16} className="mr-1.5" />
+                <span>Preview</span>
+              </button>
+              <button
+                onClick={() => setActiveTab("console")}
+                className={`flex items-center px-3 py-1.5 rounded-md ${activeTab === "console"
+                  ? "bg-blue-600"
+                  : "hover:bg-slate-700"
+                  }`}
+              >
+                <Terminal size={16} className="mr-1.5" />
+                <span>Console</span>
+              </button>
+            </div>
+
+            <div className="flex space-x-2">
+              {/* Theme selector */}
+              <div className="relative">
+                <button
+                  onClick={() => setShowThemeSelector(!showThemeSelector)}
+                  className="p-1.5 rounded-md hover:bg-slate-700 relative group"
+                  aria-label="Change theme"
+                >
+                  {currentTheme.includes('dark') ? (
+                    <Moon size={18} className="text-blue-300" />
+                  ) : (
+                    <Sun size={18} className="text-yellow-300" />
+                  )}
+                  <span className="absolute bottom-full mb-2 left-1/2 transform -translate-x-1/2 px-2 py-1 text-xs bg-gray-900 text-white rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                    Change theme
+                  </span>
+                </button>
+
+                {showThemeSelector && (
+                  <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-md shadow-lg z-50 border border-gray-200 dark:border-gray-700">
+                    <div className="py-1">
+                      {Object.entries(availableThemes).map(([name, theme]) => (
+                        <button
+                          key={name}
+                          className={`block w-full text-left px-4 py-2 text-sm ${currentTheme === name
+                            ? "bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300"
+                            : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                            }`}
+                          onClick={() => {
+                            setCurrentTheme(name);
+                            setShowThemeSelector(false);
+                          }}
+                        >
+                          {name.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Share button */}
+              <button
+                onClick={handleShareCode}
+                className="p-1.5 rounded-md hover:bg-slate-700 relative group"
+                aria-label="Share code"
+              >
+                <Share2 size={18} />
+                <span className="absolute bottom-full mb-2 left-1/2 transform -translate-x-1/2 px-2 py-1 text-xs bg-gray-900 text-white rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                  Share code
+                </span>
+              </button>
+
+              {/* Copy code button */}
+              <button
+                onClick={handleCopyCode}
+                className="p-1.5 rounded-md hover:bg-slate-700 relative group"
+                aria-label="Copy code"
+              >
+                {isCopied ? <Check size={18} className="text-green-400" /> : <Copy size={18} />}
+                <span className="absolute bottom-full mb-2 left-1/2 transform -translate-x-1/2 px-2 py-1 text-xs bg-gray-900 text-white rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                  {isCopied ? "Copied!" : "Copy code"}
+                </span>
+              </button>
+
+              {/* Download button */}
+              <button
+                onClick={downloadCode}
+                className="p-1.5 rounded-md hover:bg-slate-700 relative group"
+                aria-label="Download code"
+              >
+                <Download size={18} />
+                <span className="absolute bottom-full mb-2 left-1/2 transform -translate-x-1/2 px-2 py-1 text-xs bg-gray-900 text-white rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                  Download {isMultiFile ? "project" : "code"}
+                </span>
+              </button>
+
+              {/* Fullscreen toggle */}
+              <button
+                onClick={toggleFullscreen}
+                className="p-1.5 rounded-md hover:bg-slate-700 relative group"
+                aria-label={isFullscreen ? "Exit fullscreen" : "Enter fullscreen"}
+              >
+                {isFullscreen ? (
+                  <Minimize size={18} />
+                ) : (
+                  <Maximize size={18} />
+                )}
+                <span className="absolute bottom-full mb-2 left-1/2 transform -translate-x-1/2 px-2 py-1 text-xs bg-gray-900 text-white rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                  {isFullscreen ? "Exit fullscreen" : "Fullscreen"}
+                </span>
+              </button>
             </div>
           </div>
-        </div>
-      )}
 
-      {/* Sandpack Editor - Wrapped in ClientOnly to prevent hydration issues */}
-      <ClientOnly>
-        <div className="relative">
-          <SandpackProvider
-            options={{
-              externalResources: ["https://cdn.tailwindcss.com"],
-              classes: {
-                "sp-wrapper":
-                  "custom-wrapper rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700",
-                "sp-layout": "custom-layout",
-                "sp-tab-button": "custom-tab",
-              },
-            }}
-            customSetup={{
-              dependencies: {
-                react: "^18.0.0",
-                "react-dom": "^18.0.0",
-                "react-markdown": "latest",
-                "lucide-react": "latest",
-              },
-              entry: "/index.js",
-            }}
-            files={{
-              "/App.js": hasError ? fallbackCode : processedCode,
-              "/index.js": `
-import React, { StrictMode } from "react";
-import { createRoot } from "react-dom/client";
-import App from "./App";
+          {/* Loading indicator */}
+          {isLoading && (
+            <div className="flex items-center justify-center p-4 bg-white dark:bg-gray-900">
+              <RefreshCw className="animate-spin text-blue-500" size={24} />
+              <span className="ml-2 text-gray-600 dark:text-gray-300">
+                Loading code...
+              </span>
+            </div>
+          )}
 
-const rootElement = document.getElementById("root");
-const root = createRoot(rootElement);
+          {/* Error indicator */}
+          {hasError && !isLoading && (
+            <div className="flex items-center bg-red-50 text-red-600 p-2 border-b border-red-200">
+              <AlertTriangle size={16} className="mr-2" />
+              <span className="text-sm font-medium">
+                There are errors in the code that may affect rendering
+              </span>
+            </div>
+          )}
 
-try {
-  root.render(
-    <StrictMode>
-      <App />
-    </StrictMode>
-  );
-} catch (error) {
-  console.error("Error rendering component:", error);
-  root.render(
-    <div style={{ 
-      padding: '20px', 
-      color: 'red', 
-      fontFamily: 'system-ui, sans-serif',
-      textAlign: 'center' 
-    }}>
-      <h2>Error Rendering Component</h2>
-      <p>{error.message}</p>
-    </div>
-  );
-}
-`,
-            }}
-            theme={isDarkMode ? "dark" : "light"}
-            template="react"
-          >
-            <SandpackLayout
-              style={{
-                width: "100%",
-                height: "800px",
-                borderRadius: "0",
-              }}
+          {/* Sandpack editor */}
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={activeTab + (isMultiFile ? "multi" : "single") + currentTheme}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.15 }}
+              className="h-[600px]"
             >
-              {activeTab === "code" && (
-                <CodeEditorWithCapture
-                  style={{
-                    height: "100%",
-                    minWidth: "100%",
-                    display: "flex",
-                    flexDirection: "column",
-                    overflow: "auto",
+              {isMultiFile && sandpackFiles ? (
+                // Multi-file Sandpack setup
+                <SandpackProvider
+                  theme={availableThemes[currentTheme]}
+                  template="react"
+                  files={sandpackFiles}
+                  customSetup={{
+                    dependencies: {
+                      ...AILookup.DEPENDANCY
+                    },
+                    entry: entryFile
                   }}
-                  setCode={handleCodeChange}
-                  readOnly={false}
-                />
-              )}
-              {activeTab === "preview" && (
-                <SandpackPreview
-                  style={{
-                    height: "100%",
-                    minWidth: "100%",
-                    display: "flex",
-                    flexDirection: "column",
-                    overflow: "auto",
+                >
+                  <SandpackLayout>
+                    {activeTab === "explorer" && (
+                      <SandpackStack style={{ height: "100%", overflow: "auto" }}>
+                        <EnhancedFileExplorer />
+                      </SandpackStack>
+                    )}
+                    <SandpackFileExplorer />
+                    {activeTab === "code" && (
+                      <SandpackCodeEditor
+                        showTabs
+                        showLineNumbers
+                        showInlineErrors
+                        wrapContent
+                        closableTabs
+                      />
+
+                    )}
+                    {activeTab === "preview" && (
+                      <SandpackPreview
+                        showOpenInCodeSandbox
+                        showRefreshButton
+                      />
+                    )}
+                    {activeTab === "console" && <SandpackConsole />}
+                  </SandpackLayout>
+                </SandpackProvider>
+              ) : (
+                // Single file Sandpack setup
+                <SandpackProvider
+                  theme={availableThemes[currentTheme]}
+                  template="react"
+                  files={{
+                    "/App.js": {
+                      code: hasError ? fallbackCode : processedCode,
+                    },
                   }}
-                  showNavigator
-                  showRefreshButton
-                />
-              )}
-              {activeTab === "console" && (
-                <SandpackConsole
-                  style={{
-                    height: "100%",
-                    minWidth: "100%",
-                    display: "flex",
-                    flexDirection: "column",
-                    overflow: "auto",
+                  customSetup={{
+                    dependencies: {
+                      ...AILookup.DEPENDANCY
+                    }
                   }}
-                />
+
+                >
+                  <SandpackLayout>
+
+                    {activeTab === "code" && (
+                      <div className="flex flex-col">
+                        <SandpackFileExplorer />
+                        <CodeEditorWithCapture
+                          setCode={handleCodeChange}
+
+                        />
+                      </div>
+
+                    )}
+                    {activeTab === "preview" && (
+                      <SandpackPreview
+                        showOpenInCodeSandbox
+                        showRefreshButton
+                      />
+                    )}
+                    {activeTab === "console" && <SandpackConsole />}
+                  </SandpackLayout>
+                </SandpackProvider>
               )}
-            </SandpackLayout>
-          </SandpackProvider>
+            </motion.div>
+          </AnimatePresence>
         </div>
-      </ClientOnly>
-    </motion.div>
+      </div>
+    </ClientOnly>
   );
 };
 

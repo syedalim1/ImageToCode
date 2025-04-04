@@ -4,6 +4,7 @@ import { db } from "@/configs/db";
 import { usersTable } from "@/configs/schema";
 import { eq } from "drizzle-orm";
 import OpenAI from "openai";
+import AIPrompt from "@/data/AIPrompt";
 
 // Centralized configuration
 const CONFIG = {
@@ -22,20 +23,11 @@ const CONFIG = {
     MINIMUM_BALANCE: 10,
   },
   GENERATION: {
-    MAX_TOKENS: 100000,
+    MAX_TOKENS: 10000,
     TIMEOUT_MS: 4000,
   },
 };
 
-// Model selection helper
-function selectModelForGeneration(mode: string): string {
-  const modelMap = {
-    normal: "google/gemini-2.0-pro-exp-02-05:free",
-    export: "google/gemini-2.0-pro-exp-02-05:free",
-    // Add more modes and models as needed
-  };
-  return modelMap[mode as keyof typeof modelMap] || modelMap.normal;
-}
 
 export async function POST(req: NextRequest) {
   try {
@@ -43,12 +35,9 @@ export async function POST(req: NextRequest) {
     const {
       description,
       imageUrl,
-      mode,
-      model,
       options,
       userEmail,
-      language,
-      code,
+
     } = await req.json();
 
     // Verify API configuration
@@ -57,12 +46,10 @@ export async function POST(req: NextRequest) {
     }
 
     const enhancedDescription =
-      Constants.IMAGE_TO_REACTJS_PROMPT +
-      Constants.ERROR_PREVENTION_PROMPTFORNEXTJS +
+      AIPrompt.CODE_GEN_PROMPT +
       description +
       "\n\n" +
       (options || "");
-    const codeimprove = code + "\n\n" + "Fix All The Bug Run Proper Code";
     // Fetch user and validate credits
     const [user] = await db
       .select()
@@ -83,38 +70,24 @@ export async function POST(req: NextRequest) {
         { status: 403 }
       );
     }
-    if (imageUrl) {
-      modelName = "google/gemini-2.5-pro-exp-03-25:free";
-      payload = {
-        model: modelName,
-        messages: [
-          {
-            role: "user",
-            content: [
-              { type: "text", text: enhancedDescription },
-              { type: "image_url", image_url: { url: imageUrl } },
-            ],
-          },
-        ],
-        stream: false,
-        max_tokens: CONFIG.GENERATION.MAX_TOKENS,
-        timeout: CONFIG.GENERATION.TIMEOUT_MS / 14000,
-      };
-    } else if (code) {
-      modelName = "deepseek/deepseek-v3-base:free";
-      payload = {
-        model: modelName,
-        messages: [
-          {
-            role: "user",
-            content: [{ type: "text", text: codeimprove }],
-          },
-        ],
-        stream: false,
-        max_tokens: CONFIG.GENERATION.MAX_TOKENS,
-        timeout: CONFIG.GENERATION.TIMEOUT_MS / 14000,
-      };
-    }
+
+    modelName = "google/gemini-2.5-pro-exp-03-25:free";
+    payload = {
+      model: modelName,
+      messages: [
+        {
+          role: "user",
+          content: [
+            { type: "text", text: enhancedDescription },
+            { type: "image_url", image_url: { url: imageUrl } },
+          ],
+        },
+      ],
+      stream: false,
+      max_tokens: CONFIG.GENERATION.MAX_TOKENS,
+      timeout: CONFIG.GENERATION.TIMEOUT_MS / 14000,
+    };
+
 
     // Enhanced API request with comprehensive error handling
     const controller = new AbortController();
@@ -152,11 +125,6 @@ export async function POST(req: NextRequest) {
         data.choices[0].message.content
       ) {
         let codeContent = data.choices[0].message.content;
-
-        // Remove markdown code blocks if present
-        codeContent = codeContent
-          .replace(/```javascript|```typescript|```jsx|```tsx|```/g, "")
-          .trim();
 
         return new Response(codeContent);
       }
