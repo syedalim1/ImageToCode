@@ -452,7 +452,7 @@ function DesignPage() {
             )}
 
             {/* Sandpack */}
-            {/* <div className="p-6">
+            <div className="p-6">
 
               <SandpackProvider
                 options={{
@@ -508,7 +508,7 @@ function DesignPage() {
                 </SandpackLayout>
               </SandpackProvider>
 
-            </div> */}
+            </div>
 
             {/* Actions */}
             <div className="p-6 bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-900/80 border-t border-gray-200 dark:border-gray-700 flex flex-wrap gap-4 justify-between items-center">

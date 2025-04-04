@@ -220,28 +220,6 @@ const Page: React.FC = () => {
         userEmail: user?.primaryEmailAddress?.emailAddress,
       });
 
-      
-      // if (!res.ok) throw new Error(await res.text());
-      
-      // const reader = res.body?.getReader();
-      // if (!reader) throw new Error("No response body");
-      
-      // console.log(reader, "response code");
-     
-
-    
-
-      // Use the processed code if available, otherwise use the raw generated code
-      // const finalCode = res;
-
-      // Clean up code by removing markdown code blocks if present
-      // const cleanedCode = finalCode
-      //   .replace(
-      //     /```javascript|```typescript|```typescrpt|```jsx|```tsx|```/g,
-      //     ""
-      //   )
-      //   .trim();
-
       console.log(res.data, "final code");
       
       // Extract the content from the response

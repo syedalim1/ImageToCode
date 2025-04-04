@@ -11,11 +11,9 @@ import {
   SandpackConsole,
   SandpackFiles,
   SandpackFileExplorer,
-  useSandpack,
-  SandpackStack,
+ 
   SandpackThemeProp
 } from "@codesandbox/sandpack-react";
-
 
 import {
   Copy,
@@ -35,6 +33,7 @@ import {
 } from "lucide-react";
 import ClientOnly from "./ClientOnly";
 import AILookup from "@/data/AILookup"
+
 interface EnhancedCodeEditorProps {
   code: string;
   onCodeChange?: (code: string | { content: string }) => void;
@@ -133,7 +132,6 @@ const determineEntryFile = (files: SandpackFiles): string => {
     }
   }
 
-
   // If no standard entry is found, return the first .jsx or .js file found
   const firstJsxFile = Object.keys(files).find(file => file.endsWith('.jsx'));
   if (firstJsxFile) return firstJsxFile;
@@ -145,28 +143,10 @@ const determineEntryFile = (files: SandpackFiles): string => {
   return Object.keys(files)[0];
 };
 
-// Custom component for file explorer with enhanced styling
-const EnhancedFileExplorer = () => {
-  const { sandpack } = useSandpack();
-
-  return (
-    <div className="flex flex-col h-full">
-      <div className="p-2 bg-gray-100 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
-        <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center">
-          <FolderTree className="w-4 h-4 mr-2" />
-          Project Files
-        </h3>
-      </div>
-      <SandpackFileExplorer className="flex-grow overflow-auto" />
-    </div>
-  );
-};
-
 // Available themes for the editor
 const availableThemes: Record<string, SandpackThemeProp> = {
   light: "light",
   dark: "dark",
-
 };
 
 const EnhancedCodeEditor: React.FC<EnhancedCodeEditorProps> = ({
@@ -188,7 +168,6 @@ const EnhancedCodeEditor: React.FC<EnhancedCodeEditorProps> = ({
   const [isMultiFile, setIsMultiFile] = useState(false);
   const [isCopied, setIsCopied] = useState(false);
   const [showThemeSelector, setShowThemeSelector] = useState(false);
-
 
   useEffect(() => {
     let processedCode = code;
@@ -264,7 +243,6 @@ const EnhancedCodeEditor: React.FC<EnhancedCodeEditorProps> = ({
     // Set the processed code for single-file mode
     setCurrentCode(processedCode);
 
-    
     // Ensure the code is a valid React component for the preview
     try {
       const validReactCode = ensureValidReactComponent(processedCode);
@@ -439,18 +417,6 @@ export default function ErrorFallback() {
           {/* Tabs navigation */}
           <div className="flex items-center justify-between bg-slate-800 text-white p-2">
             <div className="flex space-x-1">
-              {isMultiFile && (
-                <button
-                  onClick={() => setActiveTab("explorer")}
-                  className={`flex items-center px-3 py-1.5 rounded-md ${activeTab === "explorer"
-                    ? "bg-blue-600"
-                    : "hover:bg-slate-700"
-                    }`}
-                >
-                  <FolderTree size={16} className="mr-1.5" />
-                  <span>Files</span>
-                </button>
-              )}
               <button
                 onClick={() => setActiveTab("code")}
                 className={`flex items-center px-3 py-1.5 rounded-md ${activeTab === "code"
@@ -481,6 +447,18 @@ export default function ErrorFallback() {
                 <Terminal size={16} className="mr-1.5" />
                 <span>Console</span>
               </button>
+              {isMultiFile && (
+                <button
+                  onClick={() => setActiveTab("explorer")}
+                  className={`flex items-center px-3 py-1.5 rounded-md ${activeTab === "explorer"
+                    ? "bg-blue-600"
+                    : "hover:bg-slate-700"
+                    }`}
+                >
+                  <FolderTree size={16} className="mr-1.5" />
+                  <span>Files</span>
+                </button>
+              )}
             </div>
 
             <div className="flex space-x-2">
@@ -606,7 +584,7 @@ export default function ErrorFallback() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.15 }}
-              className="h-[1000px]"
+              className="w-full h-full bg-white"
             >
               {isMultiFile && sandpackFiles ? (
                 // Multi-file Sandpack setup
@@ -619,15 +597,10 @@ export default function ErrorFallback() {
                       ...AILookup.DEPENDANCY
                     },
                     entry: entryFile
-                  }}                  
-                                  >
+                  }}
+                >
                   <SandpackLayout>
-                    {activeTab === "explorer" && (
-                      <SandpackStack style={{ height: "100%", overflow: "auto" }}>
-                        <EnhancedFileExplorer />
-                      </SandpackStack>
-                    )}
-                    <SandpackFileExplorer />
+                    {activeTab === "explorer" && <SandpackFileExplorer style={{ height: '600px' }} />}
                     {activeTab === "code" && (
                       <SandpackCodeEditor
                         showTabs
@@ -635,18 +608,17 @@ export default function ErrorFallback() {
                         showInlineErrors
                         wrapContent
                         closableTabs
-                        style={{ height: "100%", overflow: "auto" }}
+                        style={{ height: '600px' }}
                       />
-
                     )}
                     {activeTab === "preview" && (
                       <SandpackPreview
                         showOpenInCodeSandbox
                         showRefreshButton
-                        style={{ height: "100%", overflow: "auto" }}
+                        style={{ height: '600px' }}
                       />
                     )}
-                    {activeTab === "console" && <SandpackConsole />}
+                    {activeTab === "console" && <SandpackConsole style={{ height: '600px' }} />}
                   </SandpackLayout>
                 </SandpackProvider>
               ) : (
@@ -664,27 +636,24 @@ export default function ErrorFallback() {
                       ...AILookup.DEPENDANCY
                     }
                   }}
-
                 >
                   <SandpackLayout>
-
                     {activeTab === "code" && (
-                      <div className="flex flex-col">
-                        <SandpackFileExplorer />
-                        <CodeEditorWithCapture
-                          setCode={handleCodeChange}
-
-                        />
-                      </div>
-
+                      <CodeEditorWithCapture
+                        setCode={handleCodeChange}
+                        style={{ height: '600px' }}
+                      />
                     )}
                     {activeTab === "preview" && (
                       <SandpackPreview
                         showOpenInCodeSandbox
                         showRefreshButton
+                        style={{ height: '600px' }}
                       />
                     )}
-                    {activeTab === "console" && <SandpackConsole />}
+                    {activeTab === "console" && (
+                      <SandpackConsole style={{ height: '600px' }} />
+                    )}
                   </SandpackLayout>
                 </SandpackProvider>
               )}

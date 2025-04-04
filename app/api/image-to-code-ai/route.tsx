@@ -1,4 +1,3 @@
-
 import AIPrompt from "@/data/AIPrompt";
 import { NextResponse } from "next/server";
 
@@ -33,7 +32,6 @@ export async function POST(req: Request) {
       imageUrl,
       options,
       userEmail,
-
     } = await req.json();
 
     // Verify API configuration
@@ -46,25 +44,6 @@ export async function POST(req: Request) {
       description +
       "\n\n" +
       (options || "");
-    // Fetch user and validate credits
-    // const [user] = await db
-    //   .select()
-    //   .from(usersTable)
-    //   .where(eq(usersTable.email, userEmail));
-
-    // if (!user) {
-    //   return NextResponse.json({ error: "User not found" }, { status: 404 });
-    // }
-
-    // const currentCredits = user.credits ?? 0;
-    // if (currentCredits < CONFIG.CREDITS.MINIMUM_BALANCE) {
-    //   return NextResponse.json(
-    //     {
-    //       error: `Insufficient credits. Minimum ${CONFIG.CREDITS.MINIMUM_BALANCE} credits required.`,
-    //     },
-    //     { status: 403 }
-    //   );
-    // }
 
     const modelName = "google/gemini-2.5-pro-exp-03-25:free";
     const payload = {
@@ -121,15 +100,22 @@ export async function POST(req: Request) {
       ) {
         let codeContent = data.choices[0].message.content;
         console.log(codeContent, "code content");
-        
+
         // Extract JSON from markdown code blocks if present
         const jsonMatch = codeContent.match(/```(?:json)?(\n|\r\n|\r)([\s\S]*?)```/);
-        
+
         if (jsonMatch && jsonMatch[2]) {
           // If we found JSON in a code block, use that
           try {
             const extractedJson = jsonMatch[2].trim();
-            return NextResponse.json(JSON.parse(extractedJson));
+            // Sanitize the JSON string before parsing
+            const sanitizedJson = extractedJson
+              .replace(/(\r\n|\n|\r)/gm, '') // Remove line breaks
+              .replace(/,\s*}/g, '}')        // Remove trailing commas
+              .replace(/,\s*]/g, ']');       // Remove trailing commas in arrays
+
+            // Safety check before parsing
+            return NextResponse.json(JSON.parse(sanitizedJson));
           } catch (parseError) {
             console.error("JSON parsing error:", parseError);
             // If parsing fails, return the raw content
@@ -140,6 +126,12 @@ export async function POST(req: Request) {
           return NextResponse.json({ content: codeContent });
         }
       }
+
+      // If we reach here, there was no valid content in the response
+      return NextResponse.json(
+        { error: "No valid content in API response" },
+        { status: 500 }
+      );
     } catch (apiError) {
       console.error("API Request Error:", apiError);
       return NextResponse.json(
