@@ -124,35 +124,40 @@ const Page: React.FC = () => {
         `/api/codetoimage?uid=${uid}`
       );
 
-      console.log(data, "data");
+      let code=data.code;
+      let codeee = code?.content?.files;
+      setFile(codeee);
 
-      const normalizedRecord: CodeRecord = {
-        ...data,
-        code:
-          typeof data.code === "string" ? { content: data.code } : data.code,
-      };
 
-      setRecord(normalizedRecord);
+      // const normalizedRecord: CodeRecord = {
+      //   ...data,
+      //   code:
+      //     typeof data.code === "string" ? { content: data.code } : data.code,
+      // };
+
+      // setRecord(normalizedRecord);
 
       // Get the raw code content
-      let codeContent =
-        typeof data.code === "string" ? data.code : data.code?.content || "";
+      // let codeContent =
+      //   typeof data.code === "string" ? data.code : data.code?.content || "";
 
       // Clean up the code content - remove markdown code blocks
-      setResponse(
-        codeContent
-          .replace(
-            /```javascript|```typescript|```typescrpt|```jsx|```tsx|```/g,
-            ""
-          )
-          .trim() || ""
-      );
+      // setResponse(
+      //   codeContent
+      //     .replace(
+      //       /```javascript|```typescript|```typescrpt|```jsx|```tsx|```/g,
+      //       ""
+      //     )
+      //     .trim() || ""
+      // );
     } catch (err) {
       handleError(err, "Error fetching record:");
     } finally {
       setLoading(false);
     }
   };
+
+ console.log(file, "file code");
 
   const handleError = (error: unknown, context: string) => {
     console.error(context, error);
@@ -199,27 +204,26 @@ const Page: React.FC = () => {
         userEmail: user?.primaryEmailAddress?.emailAddress,
       });
 
-      console.log(res.data, "final code");
-
       // Extract the content from the response
-      const codeContent = res.data;
-      console.log(codeContent?.files, "files");
+      let codeContent = res.data;
+      setFile(codeContent?.file);
 
-      // if (res.data && typeof res.data === 'object') {
-      //   // If response is an object with content property
-      //   if (res.data.content) {
-      //     codeContent = res.data.content;
-      //     setResponse(codeContent);
-      //   } else {
-      //     // If it's already the code object
-      //     codeContent = JSON.stringify(res.data);
-      //     setResponse(codeContent);
-      //   }
-      // } else if (typeof res.data === 'string') {
-      //   // If response is a string
-      //   codeContent = res.data;
-      //   setResponse(codeContent);
-      // }
+      if (res.data && typeof res.data === 'object') {
+        // If response is an object with content property
+        if (res.data.content) {
+          codeContent = res.data.content;
+          setResponse(codeContent);
+        } else {
+          // If it's already the code object
+          codeContent = JSON.stringify(res.data);
+          setResponse(codeContent);
+        }
+      } else if (typeof res.data === 'string') {
+        // If response is a string
+        codeContent = res.data;
+        setResponse(codeContent);
+
+      }
 
       await axios.put(`/api/codetoimage?uid=${uid}`, {
         code: { content: codeContent },
@@ -235,7 +239,7 @@ const Page: React.FC = () => {
       setLoading(false);
     }
   };
-
+  console.log(response, "response file");
   const handleUpdateCode = async () => {
     try {
       setLoading(true);
@@ -486,14 +490,14 @@ const Page: React.FC = () => {
 
             {/* Code editor */}
             <div className="h-full">
-              {response ? (
+              {file ? (
                 <motion.div
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ duration: 0.5 }}
                 >
                   <EnhancedCodeEditor
-                    code={response}
+                    code={file}
                     onCodeChange={handleCodeChange}
                     isLoading={loading}
                   />
