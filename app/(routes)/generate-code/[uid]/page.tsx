@@ -61,6 +61,7 @@ const Page: React.FC = () => {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [regenerationCount, setRegenerationCount] = useState(0);
+  const [file, setFile] = useState();
   interface Design {
     id: number;
     uid: string;
@@ -123,6 +124,8 @@ const Page: React.FC = () => {
         `/api/codetoimage?uid=${uid}`
       );
 
+      console.log(data, "data");
+
       const normalizedRecord: CodeRecord = {
         ...data,
         code:
@@ -134,30 +137,6 @@ const Page: React.FC = () => {
       // Get the raw code content
       let codeContent =
         typeof data.code === "string" ? data.code : data.code?.content || "";
-
-      // Try to parse the code if it's a JSON string containing AI response
-      try {
-        if (
-          codeContent.trim().startsWith("{") &&
-          codeContent.includes('"message"')
-        ) {
-          const parsedData = JSON.parse(codeContent);
-
-          // Check if this is an AI response with content
-          if (
-            parsedData.choices &&
-            parsedData.choices[0] &&
-            parsedData.choices[0].message &&
-            parsedData.choices[0].message.content
-          ) {
-            // Extract the actual code from the AI response
-            codeContent = parsedData.choices[0].message.content;
-          }
-        }
-      } catch (e) {
-        console.error("Failed to parse code as JSON:", e);
-        // If parsing fails, continue with the original code
-      }
 
       // Clean up the code content - remove markdown code blocks
       setResponse(
@@ -221,25 +200,27 @@ const Page: React.FC = () => {
       });
 
       console.log(res.data, "final code");
-      
+
       // Extract the content from the response
-      let codeContent;
-      if (res.data && typeof res.data === 'object') {
-        // If response is an object with content property
-        if (res.data.content) {
-          codeContent = res.data.content;
-          setResponse(codeContent);
-        } else {
-          // If it's already the code object
-          codeContent = JSON.stringify(res.data);
-          setResponse(codeContent);
-        }
-      } else if (typeof res.data === 'string') {
-        // If response is a string
-        codeContent = res.data;
-        setResponse(codeContent);
-      }
-      
+      const codeContent = res.data;
+      console.log(codeContent?.files, "files");
+
+      // if (res.data && typeof res.data === 'object') {
+      //   // If response is an object with content property
+      //   if (res.data.content) {
+      //     codeContent = res.data.content;
+      //     setResponse(codeContent);
+      //   } else {
+      //     // If it's already the code object
+      //     codeContent = JSON.stringify(res.data);
+      //     setResponse(codeContent);
+      //   }
+      // } else if (typeof res.data === 'string') {
+      //   // If response is a string
+      //   codeContent = res.data;
+      //   setResponse(codeContent);
+      // }
+
       await axios.put(`/api/codetoimage?uid=${uid}`, {
         code: { content: codeContent },
         model: record.model,
@@ -309,9 +290,7 @@ const Page: React.FC = () => {
       const userdatabase = await db
         .select()
         .from(usersTable)
-        .where(
-          eq(usersTable.email, user.primaryEmailAddress.emailAddress)
-        );
+        .where(eq(usersTable.email, user.primaryEmailAddress.emailAddress));
 
       if (!userdatabase || userdatabase.length === 0) {
         setError("User not found in database. Please log in again.");
@@ -322,7 +301,9 @@ const Page: React.FC = () => {
 
       // Check if user has enough credits
       if (currentCredits < Constants.CREDIT_COSTS.EXPERT_MODE) {
-        setError(`You need ${Constants.CREDIT_COSTS.EXPERT_MODE} credits to use Extra Improve AI. You have ${currentCredits} credits.`);
+        setError(
+          `You need ${Constants.CREDIT_COSTS.EXPERT_MODE} credits to use Extra Improve AI. You have ${currentCredits} credits.`
+        );
         return;
       }
 
@@ -334,7 +315,7 @@ const Page: React.FC = () => {
         },
         body: JSON.stringify({
           code: response,
-          userEmail: user.primaryEmailAddress.emailAddress
+          userEmail: user.primaryEmailAddress.emailAddress,
         }),
       });
 
@@ -369,17 +350,13 @@ const Page: React.FC = () => {
 
       // Clean up code by removing markdown code blocks if present
       optimizedCode = optimizedCode
-        .replace(
-          /```(javascript|typescript|jsx|tsx|typescrpt)?/g,
-          ""
-        )
+        .replace(/```(javascript|typescript|jsx|tsx|typescrpt)?/g, "")
         .trim();
 
       // Update state with improved code
       setResponse(optimizedCode);
       setSuccess("Code improved successfully with DeepSeek AI!");
       setRegenerationCount((prev) => prev + 1);
-
     } catch (err) {
       handleError(err, "Error improving code with DeepSeek AI:");
     } finally {

@@ -3,7 +3,6 @@
 import { FloatingIcons } from "./_components/FloatingIcons";
 import { HeroSection } from "./_components/HeroSection";
 import { ProductPreview } from "./_components/ProductPreview";
-import { FeaturesSection } from "./_components/FeaturesSection";
 
 export default function ComingSoon() {
   return (
@@ -19,7 +18,6 @@ export default function ComingSoon() {
       </div>
 
       {/* Features Section */}
-      <FeaturesSection />
     </div>
   );
 }

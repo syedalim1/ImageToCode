@@ -1,20 +1,14 @@
+import axios from "axios";
 import React from "react";
 
-interface User {
-  id: number;
-  name: string;
-  email: string;
-  credits: number;
-}
 
-async function fetchUsers(): Promise<User[]> {
-  // Use absolute URL with the NEXT_PUBLIC_SITE_URL environment variable or fallback to relative URL for client-side
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || '';
-  const response = await fetch(`${baseUrl}/api/admin/users`);
-  if (!response.ok) {
-    throw new Error("Failed to fetch users");
-  }
-  return response.json();
+
+const  fetchUsers = async()=>{
+  const response= await axios.get("/api/users");
+  
+  console.log(response.data,"response");
+  
+  return response.data;
 }
 
 export default async function UserList() {
@@ -33,14 +27,14 @@ export default async function UserList() {
           </tr>
         </thead>
         <tbody>
-          {users.map((user) => (
+          {/* {users.map((user) => (
             <tr key={user.id}>
               <td>{user.id}</td>
               <td>{user.name}</td>
               <td>{user.email}</td>
               <td>{user.credits}</td>
             </tr>
-          ))}
+          ))} */}
         </tbody>
       </table>
     </div>

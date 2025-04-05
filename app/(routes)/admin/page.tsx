@@ -1,7 +1,9 @@
+// import UserList from "@/app/_components/UserList";
+
 import UserList from "@/app/_components/UserList";
 
 // Add dynamic export to prevent prerendering
-export const dynamic = 'force-dynamic';
+// export const dynamic = 'force-dynamic';
 
 export default function AdminDashboard() {
   return (
