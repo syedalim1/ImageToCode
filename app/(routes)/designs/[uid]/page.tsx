@@ -1,17 +1,39 @@
 "use client";
+
+import React, { useState, useEffect } from "react";
+import { useParams, useRouter } from "next/navigation";
+import { useUser } from "@clerk/nextjs";
+import { motion, AnimatePresence } from "framer-motion";
+import Link from "next/link";
+import {
+  Code,
+  Home,
+  ChevronRight,
+  Sparkles,
+  ArrowLeft,
+  Download,
+  ExternalLink,
+  Maximize,
+  Minimize,
+  Eye,
+  Share2,
+  FileCode,
+  Copy,
+  Check
+} from "lucide-react";
+
+// Components
+import EnhancedCodeEditor from "../../generate-code/_components/EnhancedCodeEditor";
+import StatusNotification from "../../generate-code/_components/StatusNotification";
+import DarkModeToggle from "../../generate-code/_components/DarkModeToggle";
+import SuccessConfetti from "../../generate-code/_components/SuccessConfetti";
 import { db } from "@/configs/db";
 import { imagetocodeTable } from "@/configs/schema";
-import {
-  Sandpack,
-  SandpackCodeEditor,
-  SandpackLayout,
-  SandpackPreview,
-  SandpackProvider,
-} from "@codesandbox/sandpack-react";
 import { desc, eq } from "drizzle-orm";
-import { useParams } from "next/navigation";
-import React, { useEffect, useState } from "react";
-import Link from "next/link";
+
+interface CodeContent {
+  content: string;
+}
 
 interface Design {
   id: number;
@@ -22,22 +44,35 @@ interface Design {
   createdAt: string;
   language: string;
   options: string[];
-  code: {
-    content: string;
-  };
+  code: CodeContent;
 }
 
-function DesignPage() {
+// Format date function
+const formatDate = (dateString: string): string => {
+  if (!dateString) return "";
+  const options: Intl.DateTimeFormatOptions = {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  };
+  return new Date(dateString).toLocaleDateString("en-US", options);
+};
+
+const DesignPage: React.FC = () => {
   const params = useParams();
+  const router = useRouter();
+  const { user } = useUser();
   const uid = Array.isArray(params.uid) ? params.uid[0] : params.uid;
 
   const [design, setDesign] = useState<Design | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [activeTab, setActiveTab] = useState<"preview" | "code">("preview");
-  const [zoomImage, setZoomImage] = useState(false);
-  const [Template, setTemplate] = useState<string>("");
+  const [success, setSuccess] = useState("");
   const [code, setCode] = useState<string>("");
+  const [zoomImage, setZoomImage] = useState(false);
+  const [copiedToClipboard, setCopiedToClipboard] = useState(false);
   useEffect(() => {
     if (uid) {
       fetchDesign();
@@ -89,107 +124,155 @@ function DesignPage() {
     }
   };
 
-  // Code setting moved to useEffect
+  // Functions for handling user actions
+  const navigateHome = () => {
+    router.push("/");
+  };
+
+  const handleCodeChange = (newCode: string | { content: string }) => {
+    if (typeof newCode === "string") {
+      setCode(newCode);
+    } else if (
+      typeof newCode === "object" &&
+      newCode !== null &&
+      "content" in newCode
+    ) {
+      setCode(newCode.content);
+    }
+  };
+
+  const handleCopyCode = () => {
+    if (!code) return;
+    
+    navigator.clipboard.writeText(code);
+    setCopiedToClipboard(true);
+    setSuccess("Code copied to clipboard!");
+    
+    setTimeout(() => {
+      setCopiedToClipboard(false);
+      setSuccess("");
+    }, 3000);
+  };
+  
+  const handleDownloadCode = () => {
+    if (!code) return;
+    
+    const blob = new Blob([code], { type: "text/plain" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${design?.description || "design"}.html`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+
+    setSuccess("Code downloaded successfully!");
+    setTimeout(() => setSuccess(""), 3000);
+  };
+  
+  const handleShareDesign = () => {
+    if (!design) return;
+    
+    const url = window.location.href;
+    navigator.clipboard.writeText(url);
+    
+    setSuccess("Design URL copied to clipboard! Ready to share.");
+    setTimeout(() => setSuccess(""), 3000);
+  };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 dark:from-gray-900 dark:via-indigo-950 dark:to-purple-950">
-      {/* Animated background shapes */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
-        <div className="absolute -top-24 -left-24 w-96 h-96 bg-pink-400 dark:bg-pink-600 rounded-full mix-blend-multiply dark:mix-blend-overlay filter blur-3xl opacity-20 animate-blob"></div>
-        <div className="absolute top-96 -right-24 w-96 h-96 bg-yellow-400 dark:bg-yellow-600 rounded-full mix-blend-multiply dark:mix-blend-overlay filter blur-3xl opacity-20 animate-blob animation-delay-2000"></div>
-        <div className="absolute -bottom-24 left-96 w-96 h-96 bg-blue-400 dark:bg-blue-600 rounded-full mix-blend-multiply dark:mix-blend-overlay filter blur-3xl opacity-20 animate-blob animation-delay-4000"></div>
+    <div className="min-h-screen transition-colors duration-300">
+      {/* Background pattern */}
+      <div className="fixed inset-0 bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-gray-900 dark:to-indigo-950 -z-10">
+        <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
       </div>
 
-      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header with breadcrumbs */}
-        <div className="mb-8">
-          <nav className="flex items-center text-sm font-medium text-gray-600 dark:text-gray-300">
-            <Link
-              href="/"
-              className="flex items-center hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
-            >
-              <svg
-                className="w-5 h-5 mr-1"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
-                />
-              </svg>
-              Home
-            </Link>
-            <svg
-              className="mx-2 h-5 w-5 text-gray-400"
-              fill="currentColor"
-              viewBox="0 0 20 20"
-            >
-              <path
-                fillRule="evenodd"
-                d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
-                clipRule="evenodd"
-              />
-            </svg>
-            <Link
-              href="/designs"
-              className="flex items-center hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
-            >
-              <svg
-                className="w-5 h-5 mr-1"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
-                />
-              </svg>
-              Designs
-            </Link>
-            <svg
-              className="mx-2 h-5 w-5 text-gray-400"
-              fill="currentColor"
-              viewBox="0 0 20 20"
-            >
-              <path
-                fillRule="evenodd"
-                d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
-                clipRule="evenodd"
-              />
-            </svg>
-            <span className="text-gray-800 dark:text-gray-200 font-semibold">
-              {design?.description || "Design Details"}
-            </span>
-          </nav>
-        </div>
+      {/* Theme toggle button */}
+      <DarkModeToggle />
 
-        {loading ? (
-          <div className="flex flex-col items-center justify-center min-h-[400px] bg-white/80 dark:bg-gray-800/80 rounded-xl shadow-xl backdrop-blur-sm">
-            <div className="relative w-20 h-20">
-              <div className="absolute inset-0 rounded-full border-4 border-indigo-200 dark:border-indigo-900 opacity-25"></div>
-              <div className="absolute inset-0 rounded-full border-4 border-t-indigo-500 animate-spin"></div>
-              <div className="absolute inset-2 rounded-full border-4 border-t-violet-500 animate-spin animation-delay-300"></div>
-              <div className="absolute inset-4 rounded-full border-4 border-t-purple-500 animate-spin animation-delay-600"></div>
-            </div>
-            <p className="mt-6 text-lg font-medium bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400 bg-clip-text text-transparent animate-pulse">
-              Loading design...
-            </p>
-          </div>
-        ) : error ? (
-          <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-xl shadow-xl overflow-hidden border-l-4 border-red-500">
-            <div className="p-6 text-center">
-              <div className="flex justify-center mb-4">
-                <div className="relative">
-                  <div className="w-16 h-16 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center">
+      {/* Success confetti effect */}
+      <SuccessConfetti trigger={!!success} />
+
+      <div className="p-4 mx-auto">
+        {/* Breadcrumb navigation */}
+        <nav className="flex items-center space-x-2 mb-6 text-sm">
+          <button
+            onClick={navigateHome}
+            className="flex items-center text-gray-600 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
+          >
+            <Home className="h-4 w-4 mr-1" />
+            <span>Home</span>
+          </button>
+          <ChevronRight className="h-4 w-4 text-gray-400" />
+          <Link
+            href="/designs"
+            className="text-gray-600 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
+          >
+            Designs
+          </Link>
+          <ChevronRight className="h-4 w-4 text-gray-400" />
+          <span className="text-indigo-600 dark:text-indigo-400 font-medium">
+            {design?.description || "Design Details"}
+          </span>
+        </nav>
+
+        {/* Back button */}
+        <motion.button
+          onClick={() => router.back()}
+          className="flex items-center mb-4 text-gray-600 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
+          whileHover={{ x: -5 }}
+        >
+          <ArrowLeft className="h-4 w-4 mr-1" />
+          <span>Back</span>
+        </motion.button>
+
+        {/* Main content */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="bg-white dark:bg-gray-800 rounded-xl shadow-xl overflow-hidden border border-gray-200 dark:border-gray-700"
+        >
+          {/* Header with animated gradient border */}
+          <div className="relative">
+            <div className="absolute inset-x-0 bottom-0 h-1 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500"></div>
+            <div className="p-6">
+              <div className="relative bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600 p-8 text-white rounded-lg overflow-hidden">
+                {/* Animated background patterns */}
+                <div className="absolute inset-0 overflow-hidden opacity-20">
+                  <svg
+                    className="absolute top-0 left-0 w-full h-full"
+                    viewBox="0 0 100 100"
+                    preserveAspectRatio="none"
+                  >
+                    <defs>
+                      <pattern
+                        id="grid"
+                        width="10"
+                        height="10"
+                        patternUnits="userSpaceOnUse"
+                      >
+                        <path
+                          d="M 10 0 L 0 0 0 10"
+                          fill="none"
+                          stroke="rgba(255,255,255,0.1)"
+                          strokeWidth="0.5"
+                        />
+                      </pattern>
+                    </defs>
+                    <rect width="100" height="100" fill="url(#grid)" />
+                  </svg>
+                  <div className="absolute -bottom-24 right-0 w-64 h-64 bg-white opacity-10 rounded-full blur-3xl"></div>
+                </div>
+
+                <h1 className="text-3xl font-extrabold mb-3 relative z-10 bg-clip-text text-transparent bg-gradient-to-r from-white to-purple-100">
+                  {design?.description || "Untitled Design"}
+                </h1>
+                <div className="flex flex-wrap gap-4 text-sm relative z-10 mt-4">
+                  <div className="flex items-center bg-white/10 backdrop-blur-sm rounded-lg px-4 py-2">
                     <svg
-                      className="w-10 h-10 text-red-500"
+                      className="w-5 h-5 mr-2 text-pink-300"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -198,54 +281,230 @@ function DesignPage() {
                         strokeLinecap="round"
                         strokeLinejoin="round"
                         strokeWidth={2}
-                        d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                        d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
                       />
                     </svg>
+                    <span>Created: {formatDate(design?.createdAt || "")}</span>
                   </div>
-                  <div className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full animate-ping opacity-75"></div>
+                  <div className="flex items-center bg-white/10 backdrop-blur-sm rounded-lg px-4 py-2">
+                    <svg
+                      className="w-5 h-5 mr-2 text-yellow-300"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
+                      />
+                    </svg>
+                    <span>Model: {design?.model}</span>
+                  </div>
+                  <div className="flex items-center bg-white/10 backdrop-blur-sm rounded-lg px-4 py-2">
+                    <svg
+                      className="w-5 h-5 mr-2 text-blue-300"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                      />
+                    </svg>
+                    <span>Language: {design?.language || "HTML/CSS"}</span>
+                  </div>
                 </div>
               </div>
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">
-                Error Loading Design
-              </h2>
-              <p className="text-gray-600 dark:text-gray-300 mb-6">{error}</p>
-              <button
-                onClick={fetchDesign}
-                className="px-6 py-3 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white rounded-lg transition-all shadow-md hover:shadow-lg transform hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50"
-              >
-                <span className="flex items-center justify-center">
-                  <svg
-                    className="w-5 h-5 mr-2"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
-                    />
-                  </svg>
-                  Try Again
-                </span>
-              </button>
             </div>
           </div>
-        ) : design ? (
-          <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-xl shadow-xl overflow-hidden border border-gray-100 dark:border-gray-700 transition-all duration-300 hover:shadow-2xl">
-            {/* Design header */}
-            <div className="relative bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600 p-8 text-white rounded-t-xl overflow-hidden">
-              {/* Animated background patterns */}
-              <div className="absolute inset-0 overflow-hidden opacity-20">
-                <svg
-                  className="absolute top-0 left-0 w-full h-full"
-                  viewBox="0 0 100 100"
-                  preserveAspectRatio="none"
+
+          <div className="p-6 space-y-6">
+            {/* Notifications */}
+            <div className="space-y-2">
+              <StatusNotification
+                type="loading"
+                title="Loading design..."
+                message="Please wait while we load your design"
+                visible={loading}
+              />
+
+              <StatusNotification
+                type="error"
+                title="Error"
+                message={error}
+                onAction={fetchDesign}
+                actionLabel="Try Again"
+                visible={!!error}
+              />
+
+              <StatusNotification
+                type="success"
+                title="Success"
+                message={success}
+                visible={!!success}
+              />
+            </div>
+
+            {/* Design content */}
+            {!loading && !error && design && (
+              <div className="grid lg:grid-cols-2 gap-6">
+                {/* Code preview */}
+                <div>
+                  <div className="flex items-center justify-between mb-4">
+                    <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-200 flex items-center gap-2">
+                      <Code className="h-5 w-5 text-indigo-500" />
+                      <span className="bg-clip-text text-transparent bg-gradient-to-r from-indigo-500 to-purple-500">Generated Code</span>
+                    </h2>
+                    
+                    <div className="flex space-x-2">
+                      <motion.button
+                        onClick={handleCopyCode}
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        className="p-2 bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 rounded-lg hover:bg-indigo-200 dark:hover:bg-indigo-800/40 transition-colors"
+                        title="Copy code"
+                      >
+                        {copiedToClipboard ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+                      </motion.button>
+                      
+                      <motion.button
+                        onClick={handleDownloadCode}
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        className="p-2 bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 rounded-lg hover:bg-indigo-200 dark:hover:bg-indigo-800/40 transition-colors"
+                        title="Download code"
+                      >
+                        <Download className="h-4 w-4" />
+                      </motion.button>
+                      
+                      <motion.button
+                        onClick={handleShareDesign}
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        className="p-2 bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 rounded-lg hover:bg-indigo-200 dark:hover:bg-indigo-800/40 transition-colors"
+                        title="Share design"
+                      >
+                        <Share2 className="h-4 w-4" />
+                      </motion.button>
+                    </div>
+                  </div>
+                  
+                  <div className="relative">
+                    {/* Floating particles effect */}
+                    <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                      <div className="absolute top-5 left-10 w-3 h-3 bg-blue-500 rounded-full opacity-30 animate-float"></div>
+                      <div className="absolute top-20 right-10 w-2 h-2 bg-purple-500 rounded-full opacity-30 animate-float animation-delay-300"></div>
+                      <div className="absolute bottom-10 left-1/4 w-4 h-4 bg-pink-500 rounded-full opacity-30 animate-float animation-delay-700"></div>
+                    </div>
+                    
+                    <EnhancedCodeEditor 
+                      code={code}
+                      isLoading={loading}
+                    />
+                  </div>
+                  
+                  {/* Code explanation area */}
+                  <div className="mt-4 p-4 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg border border-indigo-100 dark:border-indigo-800">
+                    <h3 className="text-sm font-medium flex items-center gap-2 text-indigo-700 dark:text-indigo-300 mb-2">
+                      <Sparkles className="h-4 w-4" />
+                      Code Details
+                    </h3>
+                    <div className="text-xs text-gray-600 dark:text-gray-300 space-y-1">
+                      <p><span className="font-medium">Model:</span> {design?.model || 'AI Generator'}</p>
+                      <p><span className="font-medium">Language:</span> {design?.language || 'HTML/CSS'}</p>
+                      <p><span className="font-medium">Created:</span> {formatDate(design?.createdAt || '')}</p>
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Image preview */}
+                <div>
+                  <div className="flex items-center justify-between mb-4">
+                    <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-200 flex items-center gap-2">
+                      <Eye className="h-5 w-5 text-indigo-500" />
+                      <span className="bg-clip-text text-transparent bg-gradient-to-r from-indigo-500 to-purple-500">Design Image</span>
+                    </h2>
+                    
+                    <motion.button
+                      onClick={() => setZoomImage(!zoomImage)}
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      className="p-2 bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 rounded-lg hover:bg-indigo-200 dark:hover:bg-indigo-800/40 transition-colors"
+                      title={zoomImage ? "Minimize" : "Maximize"}
+                    >
+                      {zoomImage ? <Minimize className="h-4 w-4" /> : <Maximize className="h-4 w-4" />}
+                    </motion.button>
+                  </div>
+                  
+                  <motion.div 
+                    className="relative rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 shadow-md hover:shadow-lg transition-shadow"
+                    whileHover={{ boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)' }}
+                  >
+                    <div className="relative aspect-auto overflow-auto max-h-[600px]">
+                      {design?.imageUrl && (
+                        <img
+                          src={design.imageUrl}
+                          alt={design?.description || "Design image"}
+                          className="w-full h-auto object-contain"
+                        />
+                      )}
+                    </div>
+                  </motion.div>
+                  
+                  {/* Image information */}
+                  <div className="mt-4 p-4 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg border border-indigo-100 dark:border-indigo-800">
+                    <h3 className="text-sm font-medium flex items-center gap-2 text-indigo-700 dark:text-indigo-300 mb-2">
+                      <FileCode className="h-4 w-4" />
+                      Design Information
+                    </h3>
+                    <p className="text-xs text-gray-600 dark:text-gray-300">
+                      This design was created using {design?.model || 'AI'} to generate code from the image. 
+                      You can view, modify, and download the generated code using the tools provided.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )
+            
+            {/* Full screen image preview */}
+            {zoomImage && design && design.imageUrl && (
+              <motion.div 
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4"
+              >
+                <motion.button
+                  onClick={() => setZoomImage(false)}
+                  className="absolute top-4 right-4 p-2 bg-white/10 rounded-full hover:bg-white/20 transition-colors text-white"
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
                 >
-                  <defs>
-                    <pattern
-                      id="grid"
+                  <Minimize className="h-6 w-6" />
+                </motion.button>
+                <motion.img
+                  initial={{ scale: 0.9, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  transition={{ duration: 0.3 }}
+                  src={design.imageUrl}
+                  alt={design?.description || "Design image"}
+                  className="max-w-full max-h-full object-contain"
+                />
+              </motion.div>
+            )}
+          </div>
+        </motion.div>
+      </div>
+    </div>
+  );
+};
+
+export default DesignPage;
                       width="10"
                       height="10"
                       patternUnits="userSpaceOnUse"
