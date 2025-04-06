@@ -231,7 +231,7 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
         initial="hidden"
         animate="show"
       >
-        {hasCode && (
+        {/* {hasCode && (
           <motion.button
             onClick={handleSave}
             className={`relative flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r ${
@@ -266,9 +266,9 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
               </motion.div>
             )}
           </motion.button>
-        )}
+        )} */}
 
-        {onGenerate && (!hasCode || regenerationCount < maxRegenerations) && (
+        {onGenerate && !hasCode && (
           <motion.button
             onClick={onGenerate}
             className={`relative flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r ${
@@ -305,7 +305,7 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
       </motion.div>
       {hasCode && (
         <>
-          <div className="flex gap-4">
+          {/* <div className="flex gap-4">
             
             <motion.button
               onClick={handleDownload}
@@ -414,10 +414,10 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
                 </motion.div>
               )}
             </motion.button>
-          </div>
+          </div> */}
 
           {/* New Format Code button */}
-          {onFormatCode && (
+          {/* {onFormatCode && (
             <motion.button
               onClick={onFormatCode}
               className={`relative flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r ${
@@ -445,10 +445,10 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
                 </motion.div>
               )}
             </motion.button>
-          )}
+          )} */}
 
           {/* New Preview Code button */}
-          {onPreviewCode && (
+          {/* {onPreviewCode && (
             <motion.button
               onClick={onPreviewCode}
               className={`relative flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r ${
@@ -476,7 +476,7 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
                 </motion.div>
               )}
             </motion.button>
-          )}
+          )} */}
         </>
       )}
 

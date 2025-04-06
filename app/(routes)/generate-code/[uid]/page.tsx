@@ -476,7 +476,7 @@ const Page: React.FC = () => {
             {record && (
               <div className="flex flex-wrap justify-between items-center gap-4">
                 {record.imageUrl && <ImagePreview imageUrl={record.imageUrl} />}
-                {response ? (
+                {/* {response ? (
                   <motion.button
                     onClick={Extraimproveai}
                     className={`relative flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 rounded-lg shadow-lg transition-all`}
@@ -491,7 +491,7 @@ const Page: React.FC = () => {
                       Extra Improve Code
                     </span>
                   </motion.button>
-                ) : null}
+                ) : null} */}
                 <ActionButtons
                   onSave={handleUpdateCode}
                   onGenerate={() => generateCode(record)}

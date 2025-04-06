@@ -421,18 +421,106 @@ export default function ErrorFallback() {
   return (
     <ClientOnly>
       <div className="my-4">
-        {/* Project title and explanation */}
+        {/* Enhanced Project title and explanation */}
         {isMultiFile && projectData?.projectTitle && (
-          <div className="mb-4 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
-            <h2 className="text-xl font-bold text-gray-800 dark:text-white mb-2">
-              {projectData.projectTitle}
-            </h2>
-            {projectData.explanation && (
-              <p className="text-gray-600 dark:text-gray-300 text-sm">
-                {projectData.explanation}
-              </p>
-            )}
-          </div>
+          <motion.div 
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="mb-6 relative overflow-hidden"
+          >
+            <div className="relative z-10 p-6 bg-gradient-to-br from-white/90 to-white/70 dark:from-gray-800/90 dark:to-gray-900/70 backdrop-blur-sm rounded-xl border border-gray-200/50 dark:border-gray-700/50 shadow-lg">
+              {/* Decorative elements */}
+              <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-blue-500/20 via-purple-500/20 to-pink-500/20 blur-2xl rounded-full -mr-10 -mt-10 z-0"></div>
+              <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-amber-500/20 via-yellow-500/20 to-emerald-500/20 blur-xl rounded-full -ml-10 -mb-10 z-0"></div>
+              
+              {/* Floating animated dots */}
+              <div className="absolute inset-0 overflow-hidden">
+                {[...Array(5)].map((_, i) => (
+                  <motion.div
+                    key={i}
+                    className="absolute w-2 h-2 rounded-full bg-indigo-500/30 dark:bg-indigo-400/30"
+                    initial={{ 
+                      x: Math.random() * 100 + '%', 
+                      y: Math.random() * 100 + '%' 
+                    }}
+                    animate={{ 
+                      x: [Math.random() * 100 + '%', Math.random() * 100 + '%', Math.random() * 100 + '%'],
+                      y: [Math.random() * 100 + '%', Math.random() * 100 + '%', Math.random() * 100 + '%']
+                    }}
+                    transition={{ 
+                      duration: 10 + Math.random() * 20, 
+                      repeat: Infinity,
+                      ease: "linear"
+                    }}
+                  />
+                ))}
+              </div>
+              
+              {/* Title with decorative underline */}
+              <div className="relative">
+                <div className="flex items-center mb-1">
+                  <motion.div 
+                    initial={{ scale: 0.8, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    transition={{ delay: 0.2, duration: 0.5 }}
+                    className="mr-2 p-1.5 bg-gradient-to-br from-blue-500 to-indigo-600 dark:from-blue-400 dark:to-indigo-500 rounded-lg text-white"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                  </motion.div>
+                  <h2 className="text-2xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 dark:from-blue-400 dark:via-indigo-400 dark:to-purple-400">
+                    {projectData.projectTitle}
+                  </h2>
+                </div>
+                
+                <div className="h-1 w-16 bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-500 rounded-full mb-4"></div>
+              </div>
+              
+              {/* Project stats */}
+              <div className="grid grid-cols-3 gap-4 mb-4">
+                <div className="text-center p-2 bg-blue-50 dark:bg-blue-900/30 rounded-lg">
+                  <div className="text-xs uppercase text-blue-500 dark:text-blue-300 font-semibold">Files</div>
+                  <div className="text-lg font-bold text-blue-700 dark:text-blue-200">
+                    {Object.keys(projectData.files || {}).length}
+                  </div>
+                </div>
+                <div className="text-center p-2 bg-purple-50 dark:bg-purple-900/30 rounded-lg">
+                  <div className="text-xs uppercase text-purple-500 dark:text-purple-300 font-semibold">Components</div>
+                  <div className="text-lg font-bold text-purple-700 dark:text-purple-200">
+                    {Math.max(1, Math.floor(Object.keys(projectData.files || {}).length / 2))}
+                  </div>
+                </div>
+                <div className="text-center p-2 bg-pink-50 dark:bg-pink-900/30 rounded-lg">
+                  <div className="text-xs uppercase text-pink-500 dark:text-pink-300 font-semibold">Complexity</div>
+                  <div className="text-lg font-bold text-pink-700 dark:text-pink-200">
+                    {Object.keys(projectData.files || {}).length > 3 ? 'Advanced' : 'Basic'}
+                  </div>
+                </div>
+              </div>
+              
+              {/* Explanation with enhanced styling */}
+              {projectData.explanation && (
+                <motion.div 
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.3, duration: 0.5 }}
+                  className="relative"
+                >
+                  <div className="absolute left-0 top-0 w-1 h-full bg-gradient-to-b from-indigo-500/50 to-transparent rounded-full"></div>
+                  <div className="pl-4">
+                    <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-200 mb-2">Project Overview</h3>
+                    <p className="text-gray-600 dark:text-gray-300 text-sm leading-relaxed">
+                      {projectData.explanation}
+                    </p>
+                  </div>
+                </motion.div>
+              )}
+              
+
+            </div>
+          </motion.div>
         )}
 
         {/* Editor container */}
