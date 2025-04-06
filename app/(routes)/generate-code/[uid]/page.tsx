@@ -398,36 +398,38 @@ const Page: React.FC = () => {
       <SuccessConfetti trigger={!!success} />
 
       <div className="p-4  mx-auto">
-        {/* Breadcrumb navigation */}
-        <nav className="flex items-center space-x-2 mb-6 text-sm">
+        {/* Enhanced Breadcrumb navigation */}
+        <nav className="flex items-center space-x-2 mb-6">
           <button
             onClick={navigateHome}
-            className="flex items-center text-gray-600 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
+            className="flex items-center px-3 py-1.5 rounded-md bg-gradient-to-r from-blue-500 to-indigo-600 text-white hover:from-blue-600 hover:to-indigo-700 shadow-sm transition-all duration-300 text-sm font-medium"
           >
-            <Home className="h-4 w-4 mr-1" />
+            <Home className="h-4 w-4 mr-2" />
             <span>Home</span>
           </button>
-          <ChevronRight className="h-4 w-4 text-gray-400" />
+          <ChevronRight className="h-4 w-4 text-indigo-400" />
           <button
             onClick={() => router.push("/designs")}
-            className="text-gray-600 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
+            className="flex items-center px-3 py-1.5 rounded-md bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:from-purple-600 hover:to-pink-600 shadow-sm transition-all duration-300 text-sm font-medium"
           >
-            Designs
+            <span>Designs</span>
           </button>
-          <ChevronRight className="h-4 w-4 text-gray-400" />
-          <span className="text-indigo-600 dark:text-indigo-400 font-medium">
+          <ChevronRight className="h-4 w-4 text-indigo-400" />
+          <span className="px-3 py-1.5 rounded-md bg-gradient-to-r from-indigo-600 to-blue-500 text-white shadow-md font-medium text-sm flex items-center">
+            <Code className="h-4 w-4 mr-2" />
             Generating Code
           </span>
         </nav>
 
-        {/* Back button */}
+        {/* Enhanced Back button with animation */}
         <motion.button
           onClick={() => router.back()}
-          className="flex items-center mb-4 text-gray-600 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
-          whileHover={{ x: -5 }}
+          className="flex items-center mb-6 px-4 py-2 rounded-full bg-white dark:bg-gray-800 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-gray-700 shadow-md transition-all duration-300"
+          whileHover={{ x: -5, scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
         >
-          <ArrowLeft className="h-4 w-4 mr-1" />
-          <span>Back</span>
+          <ArrowLeft className="h-5 w-5 mr-2 text-indigo-500" />
+          <span className="font-medium">Back</span>
         </motion.button>
 
         {/* Main content */}
@@ -437,12 +439,21 @@ const Page: React.FC = () => {
           transition={{ duration: 0.5 }}
           className="bg-white dark:bg-gray-800 rounded-xl shadow-xl overflow-hidden border border-gray-200 dark:border-gray-700"
         >
-          {/* Header with animated gradient border */}
-          <div className="relative">
-            <div className="absolute inset-x-0 bottom-0 h-1 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500"></div>
-            <div className="p-6">
-              <CodeHeader {...record} />
-            </div>
+          {/* Header with enhanced animated gradient border */}
+          <div className="relative rounded-lg shadow-lg mb-6 overflow-hidden">
+            {/* Animated gradient border that shifts colors */}
+            <div
+              className="absolute inset-0 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500"
+              style={{
+                backgroundSize: "200% 200%",
+                animation: "gradient-shift 8s ease infinite",
+              }}
+            ></div>
+          </div>
+
+          {/* Inner content area with slight padding for border visibility */}
+          <div className="relative m-0.5 bg-white dark:bg-gray-800 p-6 rounded-md">
+            <CodeHeader {...record} />
           </div>
 
           <div className="p-6 space-y-6">
@@ -476,22 +487,6 @@ const Page: React.FC = () => {
             {record && (
               <div className="flex flex-wrap justify-between items-center gap-4">
                 {record.imageUrl && <ImagePreview imageUrl={record.imageUrl} />}
-                {/* {response ? (
-                  <motion.button
-                    onClick={Extraimproveai}
-                    className={`relative flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 rounded-lg shadow-lg transition-all`}
-                    whileHover={{
-                      scale: 1.05,
-                      boxShadow: "0 5px 15px rgba(0, 0, 0, 0.1)",
-                    }}
-                    whileTap={{ scale: 0.95 }}
-                  >
-                    <Import className="h-5 w-5" />
-                    <span className="font-medium text-white">
-                      Extra Improve Code
-                    </span>
-                  </motion.button>
-                ) : null} */}
                 <ActionButtons
                   onSave={handleUpdateCode}
                   onGenerate={() => generateCode(record)}
@@ -596,6 +591,17 @@ const Page: React.FC = () => {
               rgba(255, 255, 255, 0.05) 1px,
               transparent 1px
             );
+          @keyframes gradient-shift {
+            0% {
+              background-position: 0% 50%;
+            }
+            50% {
+              background-position: 100% 50%;
+            }
+            100% {
+              background-position: 0% 50%;
+            }
+          }
         }
       `}</style>
     </div>

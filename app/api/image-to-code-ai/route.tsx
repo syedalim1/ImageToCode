@@ -23,16 +23,10 @@ const CONFIG = {
   },
 };
 
-
 export async function POST(req: Request) {
   try {
     // Parse and validate input
-    const {
-      description,
-      imageUrl,
-      options,
-      userEmail,
-    } = await req.json();
+    const { description, imageUrl, options, userEmail } = await req.json();
 
     // Verify API configuration
     if (!CONFIG.API.KEY) {
@@ -40,10 +34,7 @@ export async function POST(req: Request) {
     }
 
     const enhancedDescription =
-      AIPrompt.CODE_GEN_PROMPT +
-      description +
-      "\n\n" +
-      (options || "");
+      AIPrompt.CODE_GEN_PROMPT + description + "\n\n" + (options || "");
 
     const modelName = "google/gemini-2.5-pro-exp-03-25:free";
     const payload = {
@@ -61,7 +52,6 @@ export async function POST(req: Request) {
       max_tokens: CONFIG.GENERATION.MAX_TOKENS,
       timeout: CONFIG.GENERATION.TIMEOUT_MS / 14000,
     };
-
 
     // Enhanced API request with comprehensive error handling
     const controller = new AbortController();
@@ -102,17 +92,16 @@ export async function POST(req: Request) {
         console.log(codeContent, "code content");
 
         // Extract JSON from markdown code blocks if present
-        const jsonMatch = codeContent.match(/```(?:json)?(\n|\r\n|\r)([\s\S]*?)```/);
+        const jsonMatch = codeContent.match(
+          /```(?:json)?(\n|\r\n|\r)([\s\S]*?)```/
+        );
 
         if (jsonMatch && jsonMatch[2]) {
           // If we found JSON in a code block, use that
           try {
             const extractedJson = jsonMatch[2].trim();
             // Sanitize the JSON string before parsing
-            const sanitizedJson = extractedJson
-              .replace(/(\r\n|\n|\r)/gm, '') // Remove line breaks
-              .replace(/,\s*}/g, '}')        // Remove trailing commas
-              .replace(/,\s*]/g, ']');       // Remove trailing commas in arrays
+            const sanitizedJson = extractedJson;
 
             // Safety check before parsing
             return NextResponse.json(JSON.parse(sanitizedJson));

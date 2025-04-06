@@ -32,6 +32,7 @@ import {
 } from "lucide-react";
 import ClientOnly from "./ClientOnly";
 import AILookup from "@/data/AILookup";
+import Constants from "@/data/Constants";
 
 interface EnhancedCodeEditorProps {
   code: string;
@@ -92,7 +93,10 @@ const ensureValidReactComponent = (code: string): string => {
       // Just return the code as a snippet
       return `// Code snippet:\n${code}`;
     }
-  } else if (!code.includes("import './index.css'") && !code.includes("import './index.css';")) {
+  } else if (
+    !code.includes("import './index.css'") &&
+    !code.includes("import './index.css';")
+  ) {
     // If it has export but no CSS import, add the CSS import
     return `import './index.css';\n${code}`;
   }
@@ -265,7 +269,8 @@ const EnhancedCodeEditor: React.FC<EnhancedCodeEditorProps> = ({
       console.error("Error processing code:", e);
       setHasError(true);
       setProcessedCode(
-        `// Error: Invalid code format\n// ${e instanceof Error ? e.message : String(e)
+        `// Error: Invalid code format\n// ${
+          e instanceof Error ? e.message : String(e)
         }`
       );
     }
@@ -331,8 +336,9 @@ const EnhancedCodeEditor: React.FC<EnhancedCodeEditorProps> = ({
             });
 
             // Add README with project information
-            let readmeContent = `# ${projectData.projectTitle || "Generated Project"
-              }\n\n`;
+            let readmeContent = `# ${
+              projectData.projectTitle || "Generated Project"
+            }\n\n`;
             if (projectData.explanation) {
               readmeContent += `${projectData.explanation}\n\n`;
             }
@@ -345,8 +351,9 @@ const EnhancedCodeEditor: React.FC<EnhancedCodeEditorProps> = ({
             zip.generateAsync({ type: "blob" }).then((blob) => {
               const element = document.createElement("a");
               element.href = URL.createObjectURL(blob);
-              element.download = `${projectData.projectTitle || "generated-project"
-                }.zip`;
+              element.download = `${
+                projectData.projectTitle || "generated-project"
+              }.zip`;
               document.body.appendChild(element);
               element.click();
               document.body.removeChild(element);
@@ -375,189 +382,446 @@ const EnhancedCodeEditor: React.FC<EnhancedCodeEditorProps> = ({
     setIsFullscreen(!isFullscreen);
   };
 
-  // Fallback code for when the preview has errors
-  const fallbackCode = `
-// This is a fallback component shown when there are errors in the code
-import React from 'react';
-
-export default function ErrorFallback() {
-  return (
-    <div style={{ 
-      padding: '20px', 
-      color: '#e53e3e', 
-      fontFamily: 'system-ui, sans-serif',
-      textAlign: 'center',
-      height: '100%',
-      display: 'flex',
-      flexDirection: 'column',
-      justifyContent: 'center',
-      alignItems: 'center'
-    }}>
-      <svg 
-        width="64" 
-        height="64" 
-        viewBox="0 0 24 24" 
-        fill="none" 
-        stroke="currentColor" 
-        strokeWidth="2" 
-        strokeLinecap="round" 
-        strokeLinejoin="round"
-      >
-        <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
-        <line x1="12" y1="9" x2="12" y2="13"></line>
-        <line x1="12" y1="17" x2="12.01" y2="17"></line>
-      </svg>
-      <h2 style={{ marginTop: '20px', fontWeight: 'bold' }}>Code Error</h2>
-      <p style={{ marginTop: '10px' }}>
-        There are errors in the code that prevent it from rendering correctly.
-      </p>
-      <p style={{ marginTop: '5px', fontSize: '0.9em' }}>
-        Check the console tab for more details.
-      </p>
-    </div>
-  );
-}`;
-
   return (
     <ClientOnly>
       <div className="my-4">
         {/* Enhanced Project title and explanation */}
         {isMultiFile && projectData?.projectTitle && (
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
-            className="mb-6 relative overflow-hidden"
+            className="mb-8 relative overflow-hidden"
           >
-            <div className="relative z-10 p-6 bg-gradient-to-br from-white/90 to-white/70 dark:from-gray-800/90 dark:to-gray-900/70 backdrop-blur-sm rounded-xl border border-gray-200/50 dark:border-gray-700/50 shadow-lg">
-              {/* Decorative elements */}
-              <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-blue-500/20 via-purple-500/20 to-pink-500/20 blur-2xl rounded-full -mr-10 -mt-10 z-0"></div>
-              <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-amber-500/20 via-yellow-500/20 to-emerald-500/20 blur-xl rounded-full -ml-10 -mb-10 z-0"></div>
-              
-              {/* Floating animated dots */}
+            <div className="relative z-10 p-6 bg-gradient-to-br from-white/90 via-white/80 to-white/70 dark:from-gray-800/90 dark:via-gray-800/80 dark:to-gray-900/70 backdrop-blur-md rounded-xl border border-gray-200/50 dark:border-gray-700/50 shadow-xl">
+              {/* Enhanced decorative elements */}
+              <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-br from-blue-500/30 via-purple-500/30 to-pink-500/30 blur-3xl rounded-full -mr-10 -mt-10 z-0 animate-pulse"></div>
+              <div
+                className="absolute bottom-0 left-0 w-32 h-32 bg-gradient-to-tr from-amber-500/30 via-yellow-500/30 to-emerald-500/30 blur-2xl rounded-full -ml-10 -mb-10 z-0 animate-pulse"
+                style={{ animationDelay: "1s" }}
+              ></div>
+              <div
+                className="absolute top-1/3 left-1/4 w-24 h-24 bg-gradient-to-r from-cyan-500/20 to-teal-500/20 blur-xl rounded-full z-0 animate-pulse"
+                style={{ animationDelay: "2s" }}
+              ></div>
+
+              {/* Code pattern background overlay */}
+              <div className="absolute inset-0 opacity-5">
+                <svg
+                  width="100%"
+                  height="100%"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <pattern
+                    id="codePattern"
+                    x="0"
+                    y="0"
+                    width="20"
+                    height="20"
+                    patternUnits="userSpaceOnUse"
+                  >
+                    <text
+                      x="0"
+                      y="10"
+                      fill="currentColor"
+                      fontSize="10"
+                    >{`{}`}</text>
+                    <text
+                      x="10"
+                      y="20"
+                      fill="currentColor"
+                      fontSize="10"
+                    >{`()`}</text>
+                  </pattern>
+                  <rect width="100%" height="100%" fill="url(#codePattern)" />
+                </svg>
+              </div>
+
+              {/* Enhanced floating animated dots */}
               <div className="absolute inset-0 overflow-hidden">
-                {[...Array(5)].map((_, i) => (
+                {[...Array(12)].map((_, i) => (
                   <motion.div
                     key={i}
-                    className="absolute w-2 h-2 rounded-full bg-indigo-500/30 dark:bg-indigo-400/30"
-                    initial={{ 
-                      x: Math.random() * 100 + '%', 
-                      y: Math.random() * 100 + '%' 
+                    className={`absolute rounded-full ${
+                      i % 3 === 0
+                        ? "bg-indigo-500/40 dark:bg-indigo-400/40"
+                        : i % 3 === 1
+                        ? "bg-cyan-500/40 dark:bg-cyan-400/40"
+                        : "bg-purple-500/40 dark:bg-purple-400/40"
+                    }`}
+                    style={{
+                      width: `${Math.max(2, Math.random() * 6)}px`,
+                      height: `${Math.max(2, Math.random() * 6)}px`,
                     }}
-                    animate={{ 
-                      x: [Math.random() * 100 + '%', Math.random() * 100 + '%', Math.random() * 100 + '%'],
-                      y: [Math.random() * 100 + '%', Math.random() * 100 + '%', Math.random() * 100 + '%']
+                    initial={{
+                      x: Math.random() * 100 + "%",
+                      y: Math.random() * 100 + "%",
                     }}
-                    transition={{ 
-                      duration: 10 + Math.random() * 20, 
+                    animate={{
+                      x: [
+                        Math.random() * 100 + "%",
+                        Math.random() * 100 + "%",
+                        Math.random() * 100 + "%",
+                      ],
+                      y: [
+                        Math.random() * 100 + "%",
+                        Math.random() * 100 + "%",
+                        Math.random() * 100 + "%",
+                      ],
+                      opacity: [0.4, 0.7, 0.4],
+                    }}
+                    transition={{
+                      duration: 10 + Math.random() * 20,
                       repeat: Infinity,
-                      ease: "linear"
+                      ease: "easeInOut",
                     }}
                   />
                 ))}
               </div>
-              
-              {/* Title with decorative underline */}
+
+              {/* Enhanced title with 3D effect and animated icon */}
               <div className="relative">
-                <div className="flex items-center mb-1">
-                  <motion.div 
-                    initial={{ scale: 0.8, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    transition={{ delay: 0.2, duration: 0.5 }}
-                    className="mr-2 p-1.5 bg-gradient-to-br from-blue-500 to-indigo-600 dark:from-blue-400 dark:to-indigo-500 rounded-lg text-white"
+                <div className="flex items-center mb-2">
+                  <motion.div
+                    initial={{ scale: 0.8, opacity: 0, rotateY: -90 }}
+                    animate={{ scale: 1, opacity: 1, rotateY: 0 }}
+                    transition={{ delay: 0.2, duration: 0.6, type: "spring" }}
+                    className="mr-3 p-2 bg-gradient-to-br from-blue-500 to-indigo-600 dark:from-blue-400 dark:to-indigo-500 rounded-lg text-white shadow-lg shadow-blue-500/30 dark:shadow-blue-400/20"
                   >
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                    </svg>
+                    <motion.svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-6 w-6"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      animate={{
+                        rotateZ: [0, 10, 0, -10, 0],
+                      }}
+                      transition={{
+                        duration: 5,
+                        repeat: Infinity,
+                        ease: "easeInOut",
+                      }}
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                      />
+                    </motion.svg>
                   </motion.div>
-                  <h2 className="text-2xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 dark:from-blue-400 dark:via-indigo-400 dark:to-purple-400">
-                    {projectData.projectTitle}
-                  </h2>
+
+                  <div className="flex flex-col">
+                    <h2 className="text-2xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 dark:from-blue-400 dark:via-indigo-400 dark:to-purple-400 drop-shadow-sm">
+                      {projectData.projectTitle}
+                    </h2>
+                    <div className="h-1.5 w-24 bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-500 rounded-full mt-1 shadow-sm"></div>
+                  </div>
                 </div>
-                
-                <div className="h-1 w-16 bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-500 rounded-full mb-4"></div>
               </div>
-              
-              {/* Project stats */}
-              <div className="grid grid-cols-3 gap-4 mb-4">
-                <div className="text-center p-2 bg-blue-50 dark:bg-blue-900/30 rounded-lg">
-                  <div className="text-xs uppercase text-blue-500 dark:text-blue-300 font-semibold">Files</div>
-                  <div className="text-lg font-bold text-blue-700 dark:text-blue-200">
+
+              {/* Enhanced project stats with animations and more visual appeal */}
+              <motion.div
+                className="grid grid-cols-3 gap-4 mb-6 mt-4"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.4, duration: 0.5 }}
+              >
+                <motion.div
+                  className="text-center p-3 bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/30 dark:to-blue-800/30 rounded-xl border border-blue-200/50 dark:border-blue-700/30 shadow-md relative overflow-hidden group"
+                  whileHover={{ scale: 1.05, y: -5 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 10 }}
+                >
+                  <div className="absolute inset-0 bg-blue-600/5 dark:bg-blue-400/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                  <motion.div
+                    className="absolute -right-3 -top-3 w-12 h-12 bg-blue-500/10 rounded-full blur-md"
+                    animate={{
+                      scale: [1, 1.2, 1],
+                      opacity: [0.5, 0.8, 0.5],
+                    }}
+                    transition={{ duration: 3, repeat: Infinity }}
+                  />
+                  <div className="text-xs uppercase text-blue-600 dark:text-blue-300 font-bold tracking-wider mb-1">
+                    Files
+                  </div>
+                  <div className="text-2xl font-black text-blue-700 dark:text-blue-200">
                     {Object.keys(projectData.files || {}).length}
                   </div>
-                </div>
-                <div className="text-center p-2 bg-purple-50 dark:bg-purple-900/30 rounded-lg">
-                  <div className="text-xs uppercase text-purple-500 dark:text-purple-300 font-semibold">Components</div>
-                  <div className="text-lg font-bold text-purple-700 dark:text-purple-200">
-                    {Math.max(1, Math.floor(Object.keys(projectData.files || {}).length / 2))}
-                  </div>
-                </div>
-                <div className="text-center p-2 bg-pink-50 dark:bg-pink-900/30 rounded-lg">
-                  <div className="text-xs uppercase text-pink-500 dark:text-pink-300 font-semibold">Complexity</div>
-                  <div className="text-lg font-bold text-pink-700 dark:text-pink-200">
-                    {Object.keys(projectData.files || {}).length > 3 ? 'Advanced' : 'Basic'}
-                  </div>
-                </div>
-              </div>
-              
-              {/* Explanation with enhanced styling */}
-              {projectData.explanation && (
-                <motion.div 
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 0.3, duration: 0.5 }}
-                  className="relative"
+                </motion.div>
+
+                <motion.div
+                  className="text-center p-3 bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-900/30 dark:to-purple-800/30 rounded-xl border border-purple-200/50 dark:border-purple-700/30 shadow-md relative overflow-hidden group"
+                  whileHover={{ scale: 1.05, y: -5 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 10 }}
                 >
-                  <div className="absolute left-0 top-0 w-1 h-full bg-gradient-to-b from-indigo-500/50 to-transparent rounded-full"></div>
+                  <div className="absolute inset-0 bg-purple-600/5 dark:bg-purple-400/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                  <motion.div
+                    className="absolute -right-3 -top-3 w-12 h-12 bg-purple-500/10 rounded-full blur-md"
+                    animate={{
+                      scale: [1, 1.2, 1],
+                      opacity: [0.5, 0.8, 0.5],
+                    }}
+                    transition={{ duration: 3, repeat: Infinity, delay: 1 }}
+                  />
+                  <div className="text-xs uppercase text-purple-600 dark:text-purple-300 font-bold tracking-wider mb-1">
+                    Components
+                  </div>
+                  <div className="text-2xl font-black text-purple-700 dark:text-purple-200">
+                    {Math.max(
+                      1,
+                      Math.floor(
+                        Object.keys(projectData.files || {}).length / 2
+                      )
+                    )}
+                  </div>
+                </motion.div>
+
+                <motion.div
+                  className="text-center p-3 bg-gradient-to-br from-pink-50 to-pink-100 dark:from-pink-900/30 dark:to-pink-800/30 rounded-xl border border-pink-200/50 dark:border-pink-700/30 shadow-md relative overflow-hidden group"
+                  whileHover={{ scale: 1.05, y: -5 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 10 }}
+                >
+                  <div className="absolute inset-0 bg-pink-600/5 dark:bg-pink-400/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                  <motion.div
+                    className="absolute -right-3 -top-3 w-12 h-12 bg-pink-500/10 rounded-full blur-md"
+                    animate={{
+                      scale: [1, 1.2, 1],
+                      opacity: [0.5, 0.8, 0.5],
+                    }}
+                    transition={{ duration: 3, repeat: Infinity, delay: 2 }}
+                  />
+                  <div className="text-xs uppercase text-pink-600 dark:text-pink-300 font-bold tracking-wider mb-1">
+                    Complexity
+                  </div>
+                  <div className="text-2xl font-black text-pink-700 dark:text-pink-200 flex items-center justify-center">
+                    {Object.keys(projectData.files || {}).length > 3
+                      ? "Advanced"
+                      : "Basic"}
+                    <motion.span
+                      className="ml-1 text-yellow-500"
+                      animate={{ rotate: [0, 20, 0, -20, 0] }}
+                      transition={{ duration: 2, repeat: Infinity, delay: 1 }}
+                    >
+                      {Object.keys(projectData.files || {}).length > 3
+                        ? "⭐"
+                        : ""}
+                    </motion.span>
+                  </div>
+                </motion.div>
+              </motion.div>
+
+              {/* Enhanced explanation with animated left border and card effect */}
+              {projectData.explanation && (
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.5, duration: 0.5 }}
+                  className="relative bg-gradient-to-r from-gray-50/80 to-white/80 dark:from-gray-800/50 dark:to-gray-700/50 p-4 rounded-lg shadow-md border border-gray-100/50 dark:border-gray-700/30"
+                >
+                  <div className="absolute left-0 top-0 w-1.5 h-full bg-gradient-to-b from-indigo-500 via-blue-500 to-indigo-300 dark:from-indigo-400 dark:via-blue-400 dark:to-indigo-200 rounded-l-lg"></div>
+                  <motion.div
+                    animate={{
+                      y: [0, -5, 0, -5, 0],
+                      opacity: [0.3, 0.6, 0.3, 0.6, 0.3],
+                    }}
+                    transition={{ duration: 6, repeat: Infinity }}
+                    className="absolute -right-2 -bottom-2 w-16 h-16 bg-gradient-to-tr from-indigo-500/10 to-purple-500/10 blur-md rounded-full"
+                  />
                   <div className="pl-4">
-                    <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-200 mb-2">Project Overview</h3>
-                    <p className="text-gray-600 dark:text-gray-300 text-sm leading-relaxed">
+                    <h3 className="flex items-center text-sm font-bold text-gray-800 dark:text-gray-100 mb-2">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-4 w-4 mr-1 text-indigo-500"
+                        viewBox="0 0 20 20"
+                        fill="currentColor"
+                      >
+                        <path d="M11 3a1 1 0 10-2 0v1a1 1 0 102 0V3zM15.657 5.757a1 1 0 00-1.414-1.414l-.707.707a1 1 0 001.414 1.414l.707-.707zM18 10a1 1 0 01-1 1h-1a1 1 0 110-2h1a1 1 0 011 1zM5.05 6.464A1 1 0 106.464 5.05l-.707-.707a1 1 0 00-1.414 1.414l.707.707zM5 10a1 1 0 01-1 1H3a1 1 0 110-2h1a1 1 0 011 1zM8 16v-1h4v1a2 2 0 11-4 0zM12 14c.015-.34.208-.646.477-.859a4 4 0 10-4.954 0c.27.213.462.519.476.859h4.002z" />
+                      </svg>
+                      Project Overview
+                    </h3>
+                    <p className="text-gray-700 dark:text-gray-200 text-sm leading-relaxed">
                       {projectData.explanation}
                     </p>
                   </div>
                 </motion.div>
               )}
-              
 
+              {/* Technical specification tags */}
+              <motion.div
+                className="flex flex-wrap gap-2 mt-4"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.6, duration: 0.5 }}
+              >
+                <div className="px-2.5 py-1 bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 text-xs font-medium rounded-full flex items-center">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-3 w-3 mr-1"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2z"
+                    />
+                  </svg>
+                  React Project
+                </div>
+                <div className="px-2.5 py-1 bg-purple-100 dark:bg-purple-900/40 text-purple-700 dark:text-purple-300 text-xs font-medium rounded-full flex items-center">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-3 w-3 mr-1"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"
+                    />
+                  </svg>
+                  TypeScript
+                </div>
+                <div className="px-2.5 py-1 bg-teal-100 dark:bg-teal-900/40 text-teal-700 dark:text-teal-300 text-xs font-medium rounded-full flex items-center">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-3 w-3 mr-1"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"
+                    />
+                  </svg>
+                  Tailwind CSS
+                </div>
+              </motion.div>
             </div>
+
+            {/* Enhanced action buttons with floating effects and better icons */}
+            <motion.div
+              className="flex justify-end space-x-1 mt-4"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.7, duration: 0.5 }}
+            >
+              {/* Share button */}
+              <motion.button
+                onClick={handleShareCode}
+                className="p-2.5 rounded-lg bg-gradient-to-br from-indigo-500 to-indigo-600 text-white shadow-lg shadow-indigo-500/30 hover:shadow-indigo-500/50 relative group overflow-hidden"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                aria-label="Share code"
+              >
+                <div className="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                <Share2 size={18} />
+                <span className="absolute bottom-full mb-2 left-1/2 transform -translate-x-1/2 px-2 py-1 text-xs bg-gray-900 text-white rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap">
+                  Share code
+                </span>
+              </motion.button>
+
+              {/* Copy code button */}
+              <motion.button
+                onClick={handleCopyCode}
+                className="p-2.5 rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 text-white shadow-lg shadow-blue-500/30 hover:shadow-blue-500/50 relative group overflow-hidden"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                aria-label="Copy code"
+              >
+                <div className="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                {isCopied ? (
+                  <Check size={18} className="text-white" />
+                ) : (
+                  <Copy size={18} />
+                )}
+                <span className="absolute bottom-full mb-2 left-1/2 transform -translate-x-1/2 px-2 py-1 text-xs bg-gray-900 text-white rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap">
+                  {isCopied ? "Copied!" : "Copy code"}
+                </span>
+              </motion.button>
+
+              {/* Download button */}
+              <motion.button
+                onClick={downloadCode}
+                className="p-2.5 rounded-lg bg-gradient-to-br from-purple-500 to-purple-600 text-white shadow-lg shadow-purple-500/30 hover:shadow-purple-500/50 relative group overflow-hidden"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                aria-label="Download code"
+              >
+                <div className="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                <Download size={18} />
+                <span className="absolute bottom-full mb-2 left-1/2 transform -translate-x-1/2 px-2 py-1 text-xs bg-gray-900 text-white rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap">
+                  Download {isMultiFile ? "project" : "code"}
+                </span>
+              </motion.button>
+
+              {/* Fullscreen toggle */}
+              <motion.button
+                onClick={toggleFullscreen}
+                className="p-2.5 rounded-lg bg-gradient-to-br from-pink-500 to-pink-600 text-white shadow-lg shadow-pink-500/30 hover:shadow-pink-500/50 relative group overflow-hidden"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                aria-label={
+                  isFullscreen ? "Exit fullscreen" : "Enter fullscreen"
+                }
+              >
+                <div className="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                {isFullscreen ? <Minimize size={18} /> : <Maximize size={18} />}
+                <span className="absolute bottom-full mb-2 left-1/2 transform -translate-x-1/2 px-2 py-1 text-xs bg-gray-900 text-white rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap">
+                  {isFullscreen ? "Exit fullscreen" : "Fullscreen"}
+                </span>
+              </motion.button>
+            </motion.div>
           </motion.div>
         )}
 
         {/* Editor container */}
         <div
-          className={`rounded-xl overflow-hidden shadow-lg ${isFullscreen
-            ? "fixed inset-0 z-50 p-4 bg-white dark:bg-gray-900"
-            : ""
-            }`}
+          className={`rounded-xl overflow-hidden shadow-lg ${
+            isFullscreen
+              ? "fixed inset-0 z-50 p-4 bg-white dark:bg-gray-900"
+              : ""
+          }`}
         >
           {/* Tabs navigation */}
           <div className="flex items-center justify-between bg-slate-800 text-white p-2">
             <div className="flex space-x-1">
               <button
                 onClick={() => setActiveTab("code")}
-                className={`flex items-center px-3 py-1.5 rounded-md ${activeTab === "code" ? "bg-blue-600" : "hover:bg-slate-700"
-                  }`}
+                className={`flex items-center px-3 py-1.5 rounded-md ${
+                  activeTab === "code" ? "bg-blue-600" : "hover:bg-slate-700"
+                }`}
               >
                 <Code size={16} className="mr-1.5" />
                 <span>Code + Files</span>
               </button>
               <button
                 onClick={() => setActiveTab("preview")}
-                className={`flex items-center px-3 py-1.5 rounded-md ${activeTab === "preview" ? "bg-blue-600" : "hover:bg-slate-700"
-                  }`}
+                className={`flex items-center px-3 py-1.5 rounded-md ${
+                  activeTab === "preview" ? "bg-blue-600" : "hover:bg-slate-700"
+                }`}
               >
                 <Eye size={16} className="mr-1.5" />
                 <span>Preview</span>
               </button>
               <button
                 onClick={() => setActiveTab("console")}
-                className={`flex items-center px-3 py-1.5 rounded-md ${activeTab === "console" ? "bg-blue-600" : "hover:bg-slate-700"
-                  }`}
+                className={`flex items-center px-3 py-1.5 rounded-md ${
+                  activeTab === "console" ? "bg-blue-600" : "hover:bg-slate-700"
+                }`}
               >
                 <Terminal size={16} className="mr-1.5" />
                 <span>Console</span>
               </button>
-
             </div>
 
             <div className="flex space-x-2">
@@ -584,10 +848,11 @@ export default function ErrorFallback() {
                       {Object.entries(availableThemes).map(([name, theme]) => (
                         <button
                           key={name}
-                          className={`block w-full text-left px-4 py-2 text-sm ${currentTheme === name
-                            ? "bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300"
-                            : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
-                            }`}
+                          className={`block w-full text-left px-4 py-2 text-sm ${
+                            currentTheme === name
+                              ? "bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300"
+                              : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                          }`}
                           onClick={() => {
                             setCurrentTheme(name);
                             setShowThemeSelector(false);
@@ -606,60 +871,6 @@ export default function ErrorFallback() {
                   </div>
                 )}
               </div>
-
-              {/* Share button */}
-              <button
-                onClick={handleShareCode}
-                className="p-1.5 rounded-md hover:bg-slate-700 relative group"
-                aria-label="Share code"
-              >
-                <Share2 size={18} />
-                <span className="absolute bottom-full mb-2 left-1/2 transform -translate-x-1/2 px-2 py-1 text-xs bg-gray-900 text-white rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                  Share code
-                </span>
-              </button>
-
-              {/* Copy code button */}
-              <button
-                onClick={handleCopyCode}
-                className="p-1.5 rounded-md hover:bg-slate-700 relative group"
-                aria-label="Copy code"
-              >
-                {isCopied ? (
-                  <Check size={18} className="text-green-400" />
-                ) : (
-                  <Copy size={18} />
-                )}
-                <span className="absolute bottom-full mb-2 left-1/2 transform -translate-x-1/2 px-2 py-1 text-xs bg-gray-900 text-white rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                  {isCopied ? "Copied!" : "Copy code"}
-                </span>
-              </button>
-
-              {/* Download button */}
-              <button
-                onClick={downloadCode}
-                className="p-1.5 rounded-md hover:bg-slate-700 relative group"
-                aria-label="Download code"
-              >
-                <Download size={18} />
-                <span className="absolute bottom-full mb-2 left-1/2 transform -translate-x-1/2 px-2 py-1 text-xs bg-gray-900 text-white rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                  Download {isMultiFile ? "project" : "code"}
-                </span>
-              </button>
-
-              {/* Fullscreen toggle */}
-              <button
-                onClick={toggleFullscreen}
-                className="p-1.5 rounded-md hover:bg-slate-700 relative group"
-                aria-label={
-                  isFullscreen ? "Exit fullscreen" : "Enter fullscreen"
-                }
-              >
-                {isFullscreen ? <Minimize size={18} /> : <Maximize size={18} />}
-                <span className="absolute bottom-full mb-2 left-1/2 transform -translate-x-1/2 px-2 py-1 text-xs bg-gray-900 text-white rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                  {isFullscreen ? "Exit fullscreen" : "Fullscreen"}
-                </span>
-              </button>
             </div>
           </div>
 
@@ -714,8 +925,17 @@ export default function ErrorFallback() {
                   <SandpackLayout>
                     {/* Always show file explorer when in multi-file mode */}
                     {(activeTab === "explorer" || activeTab === "code") && (
-                      <div className="sandpack-wrapper" style={{ display: "flex", height: "900px" }}>
-                        <div style={{ width: "25%", height: "100%", borderRight: "1px solid #e5e7eb" }}>
+                      <div
+                        className="sandpack-wrapper"
+                        style={{ display: "flex", height: "900px" }}
+                      >
+                        <div
+                          style={{
+                            width: "25%",
+                            height: "100%",
+                            borderRight: "1px solid #e5e7eb",
+                          }}
+                        >
                           <SandpackFileExplorer style={{ height: "100%" }} />
                         </div>
                         <div style={{ width: "75%", height: "100%" }}>
@@ -752,19 +972,18 @@ export default function ErrorFallback() {
                   }}
                   files={{
                     "/src/index.css": {
-                      code: `@tailwind base;\n@tailwind components;\n@tailwind utilities;\n`
+                      code: `@tailwind base;\n@tailwind components;\n@tailwind utilities;\n`,
                     },
                     "/src/index.jsx": {
-                      code: `import React from 'react';\nimport ReactDOM from 'react-dom';\nimport './index.css';\nimport App from './App';\n\nReactDOM.render(\n  <React.StrictMode>\n    <App />\n  </React.StrictMode>,\n  document.getElementById('root')\n);`
+                      code: `import React from 'react';\nimport ReactDOM from 'react-dom';\nimport './index.css';\nimport App from './App';\n\nReactDOM.render(\n  <React.StrictMode>\n    <App />\n  </React.StrictMode>,\n  document.getElementById('root')\n);`,
                     },
                     "/src/App.js": {
-                      code: hasError ? fallbackCode : processedCode,
+                      code: hasError ? Constants.fallbackCode : processedCode,
                     },
                   }}
                   customSetup={{
                     dependencies: {
                       ...AILookup.DEPENDANCY,
-
                     },
                   }}
                 >
