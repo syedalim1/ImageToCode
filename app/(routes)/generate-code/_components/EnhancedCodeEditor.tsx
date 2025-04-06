@@ -451,7 +451,7 @@ export default function ErrorFallback() {
                   }`}
               >
                 <Code size={16} className="mr-1.5" />
-                <span>Code</span>
+                <span>Code + Files</span>
               </button>
               <button
                 onClick={() => setActiveTab("preview")}
@@ -469,18 +469,7 @@ export default function ErrorFallback() {
                 <Terminal size={16} className="mr-1.5" />
                 <span>Console</span>
               </button>
-              {isMultiFile && (
-                <button
-                  onClick={() => setActiveTab("explorer")}
-                  className={`flex items-center px-3 py-1.5 rounded-md ${activeTab === "explorer"
-                    ? "bg-blue-600"
-                    : "hover:bg-slate-700"
-                    }`}
-                >
-                  <FolderTree size={16} className="mr-1.5" />
-                  <span>Files</span>
-                </button>
-              )}
+
             </div>
 
             <div className="flex space-x-2">
@@ -635,18 +624,23 @@ export default function ErrorFallback() {
                   }}
                 >
                   <SandpackLayout>
-                    {activeTab === "explorer" && (
-                      <SandpackFileExplorer style={{ height: "900px" }} />
-                    )}
-                    {activeTab === "code" && (
-                      <SandpackCodeEditor
-                        showTabs
-                        showLineNumbers
-                        showInlineErrors
-                        wrapContent
-                        closableTabs
-                        style={{ height: "600px" }}
-                      />
+                    {/* Always show file explorer when in multi-file mode */}
+                    {(activeTab === "explorer" || activeTab === "code") && (
+                      <div className="sandpack-wrapper" style={{ display: "flex", height: "900px" }}>
+                        <div style={{ width: "25%", height: "100%", borderRight: "1px solid #e5e7eb" }}>
+                          <SandpackFileExplorer style={{ height: "100%" }} />
+                        </div>
+                        <div style={{ width: "75%", height: "100%" }}>
+                          <SandpackCodeEditor
+                            showTabs
+                            showLineNumbers
+                            showInlineErrors
+                            wrapContent
+                            closableTabs
+                            style={{ height: "100%" }}
+                          />
+                        </div>
+                      </div>
                     )}
                     {activeTab === "preview" && (
                       <SandpackPreview
