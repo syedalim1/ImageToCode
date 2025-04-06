@@ -61,7 +61,6 @@ const Page: React.FC = () => {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [regenerationCount, setRegenerationCount] = useState(0);
-  const [file, setFile] = useState();
   interface Design {
     id: number;
     uid: string;
@@ -124,40 +123,57 @@ const Page: React.FC = () => {
         `/api/codetoimage?uid=${uid}`
       );
 
-      let code=data.code;
-      let codeee = code?.content?.files;
-      setFile(codeee);
+      const normalizedRecord: CodeRecord = {
+        ...data,
+        code:
+          typeof data.code === "string" ? { content: data.code } : data.code,
+      };
 
-
-      // const normalizedRecord: CodeRecord = {
-      //   ...data,
-      //   code:
-      //     typeof data.code === "string" ? { content: data.code } : data.code,
-      // };
-
-      // setRecord(normalizedRecord);
+      setRecord(normalizedRecord);
 
       // Get the raw code content
-      // let codeContent =
-      //   typeof data.code === "string" ? data.code : data.code?.content || "";
+      let codeContent =
+        typeof data.code === "string" ? data.code : data.code?.content || "";
+
+      // Try to parse the code if it's a JSON string containing AI response
+      try {
+        if (
+          codeContent.trim().startsWith("{") &&
+          codeContent.includes('"message"')
+        ) {
+          const parsedData = JSON.parse(codeContent);
+
+          // Check if this is an AI response with content
+          if (
+            parsedData.choices &&
+            parsedData.choices[0] &&
+            parsedData.choices[0].message &&
+            parsedData.choices[0].message.content
+          ) {
+            // Extract the actual code from the AI response
+            codeContent = parsedData.choices[0].message.content;
+          }
+        }
+      } catch (e) {
+        console.error("Failed to parse code as JSON:", e);
+        // If parsing fails, continue with the original code
+      }
 
       // Clean up the code content - remove markdown code blocks
-      // setResponse(
-      //   codeContent
-      //     .replace(
-      //       /```javascript|```typescript|```typescrpt|```jsx|```tsx|```/g,
-      //       ""
-      //     )
-      //     .trim() || ""
-      // );
+      setResponse(
+        codeContent
+          .replace(
+            /```javascript|```typescript|```typescrpt|```jsx|```tsx|```/g,
+            ""
+          )
+          .trim() || ""
+      );
     } catch (err) {
       handleError(err, "Error fetching record:");
     } finally {
       setLoading(false);
     }
   };
-
- console.log(file, "file code");
 
   const handleError = (error: unknown, context: string) => {
     console.error(context, error);
@@ -204,11 +220,11 @@ const Page: React.FC = () => {
         userEmail: user?.primaryEmailAddress?.emailAddress,
       });
 
-      // Extract the content from the response
-      let codeContent = res.data;
-      setFile(codeContent?.file);
+      console.log(res.data, "final code");
 
-      if (res.data && typeof res.data === 'object') {
+      // Extract the content from the response
+      let codeContent;
+      if (res.data && typeof res.data === "object") {
         // If response is an object with content property
         if (res.data.content) {
           codeContent = res.data.content;
@@ -218,11 +234,10 @@ const Page: React.FC = () => {
           codeContent = JSON.stringify(res.data);
           setResponse(codeContent);
         }
-      } else if (typeof res.data === 'string') {
+      } else if (typeof res.data === "string") {
         // If response is a string
         codeContent = res.data;
         setResponse(codeContent);
-
       }
 
       await axios.put(`/api/codetoimage?uid=${uid}`, {
@@ -239,7 +254,7 @@ const Page: React.FC = () => {
       setLoading(false);
     }
   };
-  console.log(response, "response file");
+
   const handleUpdateCode = async () => {
     try {
       setLoading(true);
@@ -367,6 +382,7 @@ const Page: React.FC = () => {
       setLoading(false);
     }
   };
+  console.log(design?.code.content, "design");
 
   return (
     <div className="min-h-screen transition-colors duration-300">
@@ -490,14 +506,14 @@ const Page: React.FC = () => {
 
             {/* Code editor */}
             <div className="h-full">
-              {file ? (
+              {design ? (
                 <motion.div
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ duration: 0.5 }}
                 >
                   <EnhancedCodeEditor
-                    code={file}
+                    code={response || design?.code.content}
                     onCodeChange={handleCodeChange}
                     isLoading={loading}
                   />
