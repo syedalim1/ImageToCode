@@ -198,7 +198,7 @@ const EnhancedCodeEditor: React.FC<EnhancedCodeEditorProps> = ({
           const entry = determineEntryFile(files);
           setEntryFile(entry);
           setIsMultiFile(true);
-          return; // Exit early since we've handled the multi-file case
+          return; // Exit early since we've handled the multi-file 
         }
 
         // Check if this is an AI response with content

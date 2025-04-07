@@ -452,7 +452,7 @@ const Page: React.FC = () => {
           </div>
 
           {/* Inner content area with slight padding for border visibility */}
-          <div className="relative m-0.5 bg-white dark:bg-gray-800 p-6 rounded-md">
+          <div className="relative  bg-white dark:bg-gray-800  rounded-md">
             <CodeHeader {...record} />
           </div>
 
@@ -568,7 +568,7 @@ const Page: React.FC = () => {
         </motion.div>
       </div>
 
-      {/* Add CSS for background pattern */}
+      {/* Add CSS for background patternS */}
       <style jsx global>{`
         .bg-grid-pattern {
           background-image: linear-gradient(
