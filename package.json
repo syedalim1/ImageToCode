@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "NODE_ENV=production node server.js"
+    "start": "NODE_ENV=production node server.js",
     "lint": "next lint",
     "drizzle:push": "drizzle-kit push",
     "drizzle:studio": "drizzle-kit studio"
