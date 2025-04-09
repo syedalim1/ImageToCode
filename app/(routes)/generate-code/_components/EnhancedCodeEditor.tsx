@@ -46,6 +46,13 @@ interface EnhancedCodeEditorProps {
   isLoading?: boolean;
 }
 
+interface SandpackProject {
+  projectTitle?: string;
+  explanation?: string;
+  files: Record<string, { code: string }>;
+  generatedFiles?: string[];
+}
+
 // Custom hook to capture code changes
 function CodeEditorWithCapture({
   setCode,
@@ -169,7 +176,7 @@ const EnhancedCodeEditor: React.FC<EnhancedCodeEditorProps> = ({
   const [sandpackFiles, setSandpackFiles] = useState<SandpackFiles | null>(
     null
   );
-  const [projectData, setProjectData] = useState();
+  const [projectData, setProjectData] = useState<SandpackProject | null>(null);
   const [entryFile, setEntryFile] = useState<string>("/src/index.jsx");
   const [currentTheme, setCurrentTheme] = useState<string>("light");
   const [isFullscreen, setIsFullscreen] = useState(false);
