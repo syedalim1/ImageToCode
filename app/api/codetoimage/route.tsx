@@ -28,7 +28,7 @@ export async function POST(req: NextRequest) {
         { status: 400 }
       );
     }
-    const model = "gemini";
+
     console.log("🔹 Incoming Request Data:", body);
     let result;
 
@@ -42,7 +42,6 @@ export async function POST(req: NextRequest) {
         uid: uid,
         description: description || "",
         imageUrl: imageUrl,
-        model: model,
         code: formattedCode,
         email: email,
         createdAt: createdAt || new Date(),

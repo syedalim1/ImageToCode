@@ -1,46 +1,149 @@
 "use client";
-import { useCallback, useState, useEffect } from "react";
+import { useCallback, useState, useEffect, useRef } from "react";
 import { useDropzone } from "react-dropzone";
 import {
   CloudUpload,
-  X,
-  CheckCircle,
   AlertCircle,
-  FileImage,
-  MoveRight,
   Upload,
   Image as ImageIcon,
   Camera,
   Sparkles,
+  Trash2,
+  Crop,
+  ZoomIn,
+  ZoomOut,
+  RotateCcw,
+  RotateCw,
+  Check,
+  X,
+  FileImage,
+  Layers,
+  History,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import Cropper from 'react-easy-crop';
+import { getCroppedImg } from '@/lib/imageUtils';
 
 interface ImageDropzoneProps {
-  selectedFile: File | null;
   setSelectedFile: (file: File | null) => void;
-  preview: string | null;
-  setPreview: (preview: string | null) => void;
   error: string | null;
   setError: (error: string | null) => void;
-  setShowSuccessIndicator: (show: boolean) => void;
   setActiveTab: (tab: "upload" | "options" | "description") => void;
 }
 
+interface CropArea {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
+// Animated floating particles component
+const FloatingParticles = () => {
+  return (
+    <>
+      {[...Array(10)].map((_, i) => (
+        <motion.div
+          key={i}
+          className="absolute rounded-full"
+          style={{
+            width: Math.random() * 6 + 3,
+            height: Math.random() * 6 + 3,
+            left: `${Math.random() * 100}%`,
+            top: `${Math.random() * 100}%`,
+            background: `rgba(${Math.floor(Math.random() * 100) + 100}, ${Math.floor(
+              Math.random() * 100
+            ) + 100}, ${Math.floor(Math.random() * 200) + 55}, 0.3)`,
+          }}
+          animate={{
+            x: [0, Math.random() * 30 - 15, 0],
+            y: [0, Math.random() * 30 - 15, 0],
+            scale: [1, Math.random() * 0.5 + 1, 1],
+            opacity: [0.3, 0.7, 0.3],
+          }}
+          transition={{
+            duration: Math.random() * 8 + 7,
+            repeat: Infinity,
+            ease: "easeInOut",
+          }}
+        />
+      ))}
+    </>
+  );
+};
+
 const ImageDropzone: React.FC<ImageDropzoneProps> = ({
-  selectedFile,
   setSelectedFile,
-  preview,
-  setPreview,
   error,
   setError,
-  setShowSuccessIndicator,
   setActiveTab,
 }) => {
   const [isUploading, setIsUploading] = useState(false);
   const [dragCount, setDragCount] = useState(0);
   const [isSuccess, setIsSuccess] = useState(false);
   const [hoverState, setHoverState] = useState(false);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [crop, setCrop] = useState({ x: 0, y: 0 });
+  const [zoom, setZoom] = useState(1);
+  const [rotation, setRotation] = useState(0);
+  const [croppedAreaPixels, setCroppedAreaPixels] = useState<CropArea | null>(null);
+  const [recentImages, setRecentImages] = useState<string[]>([]);
+  const [showRecentImages, setShowRecentImages] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
+  // Load recent images from localStorage on component mount
+  useEffect(() => {
+    const savedImages = localStorage.getItem('recentImages');
+    if (savedImages) {
+      setRecentImages(JSON.parse(savedImages));
+    }
+  }, []);
+
+  // Save image to recent images
+  const saveToRecentImages = useCallback((dataUrl: string) => {
+    const updatedRecentImages = [dataUrl, ...recentImages.slice(0, 4)];
+    setRecentImages(updatedRecentImages);
+    localStorage.setItem('recentImages', JSON.stringify(updatedRecentImages));
+  }, [recentImages]);
+
+  // Handle crop complete
+  const onCropComplete = useCallback((croppedArea: any, croppedAreaPixels: any) => {
+    setCroppedAreaPixels(croppedAreaPixels);
+  }, []);
+
+  // Apply crop to image
+  const applyCrop = useCallback(async () => {
+    if (previewUrl && croppedAreaPixels) {
+      try {
+        setIsUploading(true);
+        const croppedImage = await getCroppedImg(
+          previewUrl,
+          croppedAreaPixels,
+          rotation
+        );
+        const croppedUrl = URL.createObjectURL(croppedImage);
+        setPreviewUrl(croppedUrl);
+        
+        // Convert blob to file
+        const fileName = 'cropped-image.jpg';
+        const croppedFile = new File([croppedImage], fileName, { type: 'image/jpeg' });
+        setSelectedFile(croppedFile);
+        
+        setIsEditMode(false);
+        setIsUploading(false);
+        setZoom(1);
+        setRotation(0);
+        setCrop({ x: 0, y: 0 });
+      } catch (error) {
+        console.error('Error applying crop:', error);
+        setError('Failed to crop image. Please try again.');
+        setIsUploading(false);
+      }
+    }
+  }, [previewUrl, croppedAreaPixels, rotation, setSelectedFile, setError]);
+
+  // Handle file drop
   const onDrop = useCallback(
     (acceptedFiles: File[]) => {
       const file = acceptedFiles[0];
@@ -60,17 +163,18 @@ const ImageDropzone: React.FC<ImageDropzoneProps> = ({
 
         const reader = new FileReader();
         reader.onload = () => {
+          const dataUrl = reader.result as string;
+          setPreviewUrl(dataUrl);
+          saveToRecentImages(dataUrl);
+          
           // Simulate loading for better UX
           setTimeout(() => {
-            setPreview(reader.result as string);
             setIsUploading(false);
             setIsSuccess(true);
-            setShowSuccessIndicator(true);
 
             // Advance to next tab after success
             setTimeout(() => {
               setIsSuccess(false);
-              setShowSuccessIndicator(false);
               setActiveTab("options");
             }, 1500);
           }, 800);
@@ -78,42 +182,68 @@ const ImageDropzone: React.FC<ImageDropzoneProps> = ({
         reader.readAsDataURL(file);
       }
     },
-    [
-      setSelectedFile,
-      setPreview,
-      setError,
-      setShowSuccessIndicator,
-      setActiveTab,
-    ]
+    [setSelectedFile, setError, setActiveTab, saveToRecentImages]
   );
+
+  // Use a custom open function to trigger the file input
+  const openFileDialog = useCallback(() => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
+    }
+  }, []);
+
+  // Select a recent image
+  const selectRecentImage = useCallback((dataUrl: string) => {
+    setPreviewUrl(dataUrl);
+    setIsUploading(true);
+    
+    // Convert data URL to file
+    fetch(dataUrl)
+      .then(res => res.blob())
+      .then(blob => {
+        const file = new File([blob], 'recent-image.jpg', { type: 'image/jpeg' });
+        setSelectedFile(file);
+        setIsUploading(false);
+        setIsSuccess(true);
+        
+        setTimeout(() => {
+          setIsSuccess(false);
+          setActiveTab("options");
+        }, 1500);
+      })
+      .catch(err => {
+        console.error('Error loading recent image:', err);
+        setError('Failed to load recent image');
+        setIsUploading(false);
+      });
+  }, [setSelectedFile, setActiveTab, setError]);
+
+  // Reset the current edit
+  const resetEdit = useCallback(() => {
+    setIsEditMode(false);
+    setZoom(1);
+    setRotation(0);
+    setCrop({ x: 0, y: 0 });
+  }, []);
 
   const { getRootProps, getInputProps, isDragActive, open } = useDropzone({
     onDrop,
     accept: { "image/*": [".png", ".jpg", ".jpeg", ".gif"] },
     multiple: false,
-    noClick: !!preview, // Disable click when preview exists
+    noClick: isEditMode || !!previewUrl, // Disable click when in edit mode or preview is shown
+    noKeyboard: isEditMode || !!previewUrl,
   });
 
   // Track drag enter/leave events for better visual feedback
   const onDragEnter = useCallback(() => {
-    setDragCount((prev) => prev + 1);
-  }, []);
+    if (!isEditMode && !previewUrl) {
+      setDragCount((prev) => prev + 1);
+    }
+  }, [isEditMode, previewUrl]);
 
   const onDragLeave = useCallback(() => {
     setDragCount((prev) => Math.max(prev - 1, 0));
   }, []);
-
-  const handleRemoveFile = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    setSelectedFile(null);
-    setPreview(null);
-    setError(null);
-  };
-
-  const handleContinue = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    setActiveTab("options");
-  };
 
   // Reset drag count when active state changes
   useEffect(() => {
@@ -123,15 +253,7 @@ const ImageDropzone: React.FC<ImageDropzoneProps> = ({
   }, [isDragActive]);
 
   // Determine if we should show drag active styles
-  const showDragActiveStyles = isDragActive || dragCount > 0;
-
-  // Decorative elements for empty state
-  const decorativeElements = [
-    { x: "10%", y: "15%", size: "8", color: "purple-500", delay: 0 },
-    { x: "85%", y: "20%", size: "6", color: "pink-500", delay: 0.1 },
-    { x: "75%", y: "80%", size: "10", color: "blue-500", delay: 0.2 },
-    { x: "20%", y: "75%", size: "7", color: "green-500", delay: 0.3 },
-  ];
+  const showDragActiveStyles = (isDragActive || dragCount > 0) && !isEditMode && !previewUrl;
 
   return (
     <div className="h-full">
@@ -144,43 +266,16 @@ const ImageDropzone: React.FC<ImageDropzoneProps> = ({
                 : "border-gray-300 dark:border-gray-700 hover:border-indigo-400 hover:bg-gradient-to-br hover:from-indigo-50/50 hover:to-purple-50/50 dark:hover:from-indigo-950/20 dark:hover:to-purple-950/20"
             } 
             ${error ? "border-red-400 bg-red-50 dark:bg-red-950/30" : ""} 
-            ${preview ? "p-4" : "p-8"}
-            ${preview ? "" : "cursor-pointer"}`,
+            ${isEditMode ? "border-indigo-500 bg-gradient-to-br from-indigo-50/80 to-purple-50/80" : ""}
+           `,
           onDragEnter,
           onDragLeave,
           onMouseEnter: () => setHoverState(true),
           onMouseLeave: () => setHoverState(false),
         })}
       >
-        <input {...getInputProps()} id="imageselect" />
-
-        {/* Decorative background elements */}
-        {!preview && !isUploading && (
-          <>
-            {decorativeElements.map((elem, index) => (
-              <motion.div
-                key={index}
-                className={`absolute rounded-full bg-${elem.color} bg-opacity-20 dark:bg-opacity-40`}
-                style={{
-                  left: elem.x,
-                  top: elem.y,
-                  width: `${elem.size}px`,
-                  height: `${elem.size}px`,
-                }}
-                initial={{ scale: 0, opacity: 0 }}
-                animate={{
-                  scale: 1,
-                  opacity: hoverState || showDragActiveStyles ? 0.8 : 0.4,
-                }}
-                transition={{
-                  delay: elem.delay,
-                  duration: 0.5,
-                  ease: "easeOut",
-                }}
-              />
-            ))}
-          </>
-        )}
+        <input {...getInputProps()} ref={fileInputRef} id="imageselect" />
+        <FloatingParticles />
 
         <AnimatePresence mode="wait">
           {isUploading ? (
@@ -218,82 +313,154 @@ const ImageDropzone: React.FC<ImageDropzoneProps> = ({
                 Your creativity is being prepared for the next step
               </p>
             </motion.div>
-          ) : preview ? (
+          ) : isEditMode && previewUrl ? (
+            // Image Editing Mode
+            <motion.div
+              key="editing"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="w-full h-full flex flex-col"
+            >
+              <div className="relative h-[calc(100%-80px)] w-full">
+                <Cropper
+                  image={previewUrl}
+                  crop={crop}
+                  zoom={zoom}
+                  rotation={rotation}
+                  aspect={4 / 3}
+                  onCropChange={setCrop}
+                  onCropComplete={onCropComplete}
+                  onZoomChange={setZoom}
+                />
+              </div>
+              
+              <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-md p-4 rounded-lg mt-4">
+                <div className="flex justify-between items-center mb-3">
+                  <h3 className="text-sm font-medium text-indigo-800 dark:text-indigo-300">Edit Image</h3>
+                  <div className="flex space-x-2">
+                    <motion.button
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={resetEdit}
+                      className="p-1.5 bg-red-100 dark:bg-red-900/40 rounded-full text-red-600 dark:text-red-400"
+                      title="Cancel"
+                    >
+                      <X className="h-4 w-4" />
+                    </motion.button>
+                    <motion.button
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={applyCrop}
+                      className="p-1.5 bg-green-100 dark:bg-green-900/40 rounded-full text-green-600 dark:text-green-400"
+                      title="Apply"
+                    >
+                      <Check className="h-4 w-4" />
+                    </motion.button>
+                  </div>
+                </div>
+                
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <p className="text-xs text-gray-600 dark:text-gray-300 mb-1">Zoom</p>
+                    <div className="flex items-center space-x-2">
+                      <ZoomOut className="h-3 w-3 text-gray-500" />
+                      <input
+                        type="range"
+                        value={zoom}
+                        min={1}
+                        max={3}
+                        step={0.1}
+                        onChange={(e) => setZoom(Number(e.target.value))}
+                        className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-indigo-600"
+                      />
+                      <ZoomIn className="h-3 w-3 text-gray-500" />
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <p className="text-xs text-gray-600 dark:text-gray-300 mb-1">Rotation</p>
+                    <div className="flex items-center space-x-2">
+                      <RotateCcw className="h-3 w-3 text-gray-500" />
+                      <input
+                        type="range"
+                        value={rotation}
+                        min={0}
+                        max={360}
+                        step={1}
+                        onChange={(e) => setRotation(Number(e.target.value))}
+                        className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-indigo-600"
+                      />
+                      <RotateCw className="h-3 w-3 text-gray-500" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          ) : previewUrl ? (
+            // Image Preview Mode
             <motion.div
               key="preview"
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.9 }}
-              className="relative group flex flex-col items-center"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="w-full h-full flex flex-col items-center justify-center p-4"
             >
-              <div className="relative overflow-hidden rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
-                <motion.div
-                  className="absolute inset-0 bg-gradient-to-tr from-indigo-500/20 to-purple-500/20 opacity-0 group-hover:opacity-100"
+              <div className="relative w-full max-w-md overflow-hidden rounded-lg shadow-lg border-2 border-indigo-200 dark:border-indigo-800 mb-4">
+                <img 
+                  src={previewUrl} 
+                  alt="Preview" 
+                  className="w-full h-auto object-contain bg-white dark:bg-gray-900" 
+                />
+                <motion.div 
+                  className="absolute inset-0 bg-gradient-to-r from-indigo-600/10 to-purple-600/10 pointer-events-none"
                   initial={{ opacity: 0 }}
-                  animate={{ opacity: 0 }}
-                  whileHover={{ opacity: 1 }}
-                  transition={{ duration: 0.3 }}
+                  animate={{ opacity: [0, 0.5, 0] }}
+                  transition={{ duration: 2, repeat: Infinity }}
                 />
-
-                <img
-                  src={preview}
-                  alt="Preview"
-                  className="max-h-64 max-w-full object-contain"
-                />
-
-                <button
-                  type="button"
-                  onClick={handleRemoveFile}
-                  className="absolute top-2 right-2 bg-black/70 backdrop-blur-sm rounded-full p-1.5 
-                    hover:bg-red-600 transition-colors opacity-0 group-hover:opacity-100 focus:opacity-100"
-                  aria-label="Remove image"
-                >
-                  <X className="h-4 w-4 text-white" />
-                </button>
               </div>
-
-              <div className="mt-4 flex items-center space-x-3">
+              
+              <div className="flex space-x-3 mb-4">
                 <motion.button
-                  onClick={open}
-                  className="flex items-center space-x-1 text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300 text-sm font-medium"
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
+                  onClick={() => {
+                    setPreviewUrl(null);
+                    setSelectedFile(null);
+                  }}
+                  className="px-4 py-2 bg-red-100 hover:bg-red-200 dark:bg-red-900/40 dark:hover:bg-red-800/60 text-red-600 dark:text-red-400 rounded-lg flex items-center shadow-sm transition-colors"
                 >
-                  <FileImage className="h-4 w-4" />
-                  <span>Change image</span>
+                  <Trash2 className="h-4 w-4 mr-2" />
+                  Remove
                 </motion.button>
-
-                <span className="text-gray-300 dark:text-gray-600">|</span>
-
+                
                 <motion.button
-                  onClick={handleContinue}
-                  className="flex items-center space-x-1 text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300 text-sm font-medium"
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
+                  onClick={() => setIsEditMode(true)}
+                  className="px-4 py-2 bg-indigo-100 hover:bg-indigo-200 dark:bg-indigo-900/40 dark:hover:bg-indigo-800/60 text-indigo-600 dark:text-indigo-400 rounded-lg flex items-center shadow-sm transition-colors"
                 >
-                  <span>Continue</span>
-                  <MoveRight className="h-4 w-4" />
+                  <Crop className="h-4 w-4 mr-2" />
+                  Edit
+                </motion.button>
+                
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => setActiveTab("options")}
+                  className="px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white rounded-lg flex items-center shadow-md hover:shadow-lg transition-colors"
+                >
+                  <Sparkles className="h-4 w-4 mr-2" />
+                  Continue
                 </motion.button>
               </div>
-
-              <AnimatePresence>
-                {isSuccess && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -20 }}
-                    className="absolute -bottom-12 left-1/2 transform -translate-x-1/2 
-                      bg-gradient-to-r from-green-500 to-emerald-600 text-white px-6 py-2 rounded-full flex items-center shadow-lg"
-                  >
-                    <CheckCircle className="h-5 w-5 mr-2" />
-                    <span className="font-medium">
-                      Image Uploaded Successfully!
-                    </span>
-                  </motion.div>
-                )}
-              </AnimatePresence>
+              
+              <p className="text-sm text-gray-600 dark:text-gray-300 text-center max-w-xs">
+                Your image is ready to be transformed into beautiful code
+              </p>
             </motion.div>
           ) : (
+            // Upload Mode
             <motion.div
               key="upload"
               initial={{ opacity: 0 }}
@@ -350,8 +517,8 @@ const ImageDropzone: React.FC<ImageDropzoneProps> = ({
 
                   <motion.button
                     type="button"
-                    onClick={open}
-                    className="px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white rounded-lg font-medium transition-colors mb-8 shadow-md hover:shadow-lg"
+                    onClick={openFileDialog}
+                    className="px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white rounded-lg font-medium transition-colors mb-6 shadow-md hover:shadow-lg"
                     whileHover={{ scale: 1.03 }}
                     whileTap={{ scale: 0.97 }}
                   >
@@ -360,6 +527,47 @@ const ImageDropzone: React.FC<ImageDropzoneProps> = ({
                       Choose Image
                     </span>
                   </motion.button>
+                  
+                  {recentImages.length > 0 && (
+                    <motion.div 
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="mb-6"
+                    >
+                      <button 
+                        onClick={() => setShowRecentImages(!showRecentImages)}
+                        className="flex items-center text-sm text-indigo-600 dark:text-indigo-400 mb-2"
+                      >
+                        <History className="h-4 w-4 mr-1" />
+                        {showRecentImages ? 'Hide' : 'Show'} recent images
+                      </button>
+                      
+                      {showRecentImages && (
+                        <motion.div 
+                          initial={{ height: 0, opacity: 0 }}
+                          animate={{ height: 'auto', opacity: 1 }}
+                          exit={{ height: 0, opacity: 0 }}
+                          className="grid grid-cols-5 gap-2 overflow-hidden"
+                        >
+                          {recentImages.map((img, index) => (
+                            <motion.div 
+                              key={index}
+                              whileHover={{ scale: 1.05 }}
+                              whileTap={{ scale: 0.95 }}
+                              className="relative w-12 h-12 rounded-md overflow-hidden border border-indigo-200 dark:border-indigo-800 cursor-pointer shadow-sm"
+                              onClick={() => selectRecentImage(img)}
+                            >
+                              <img 
+                                src={img} 
+                                alt={`Recent ${index + 1}`} 
+                                className="w-full h-full object-cover"
+                              />
+                            </motion.div>
+                          ))}
+                        </motion.div>
+                      )}
+                    </motion.div>
+                  )}
 
                   <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm p-4 rounded-lg text-sm text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-700 shadow-md">
                     <div className="flex items-center justify-center space-x-3 mb-2">

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   SandpackProvider,
@@ -33,18 +33,17 @@ import {
 import ClientOnly from "./ClientOnly";
 import AILookup from "@/data/AILookup";
 import Constants from "@/data/Constants";
+import { db } from "@/configs/db";
+import { imagetocodeTable } from "@/configs/schema";
+import { desc, eq } from "drizzle-orm";
+import { useParams } from "next/navigation";
+import { UserUidContext } from "@/app/context/UserUidContext";
+import { UserDesignContext } from "@/app/context/UserDesignContext";
 
 interface EnhancedCodeEditorProps {
   code: string;
   onCodeChange?: (code: string | { content: string }) => void;
   isLoading?: boolean;
-}
-
-interface SandpackProject {
-  projectTitle?: string;
-  explanation?: string;
-  files: Record<string, { code: string }>;
-  generatedFiles?: string[];
 }
 
 // Custom hook to capture code changes
@@ -170,7 +169,7 @@ const EnhancedCodeEditor: React.FC<EnhancedCodeEditorProps> = ({
   const [sandpackFiles, setSandpackFiles] = useState<SandpackFiles | null>(
     null
   );
-  const [projectData, setProjectData] = useState<SandpackProject | null>(null);
+  const [projectData, setProjectData] = useState();
   const [entryFile, setEntryFile] = useState<string>("/src/index.jsx");
   const [currentTheme, setCurrentTheme] = useState<string>("light");
   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -179,6 +178,9 @@ const EnhancedCodeEditor: React.FC<EnhancedCodeEditorProps> = ({
   const [isCopied, setIsCopied] = useState(false);
   const [showThemeSelector, setShowThemeSelector] = useState(false);
 
+  const { userUid, setUserUid } = useContext(UserUidContext);
+
+  const { design, setDesign } = useContext(UserDesignContext);
   useEffect(() => {
     let processedCode = code;
     setHasError(false);
@@ -198,7 +200,7 @@ const EnhancedCodeEditor: React.FC<EnhancedCodeEditorProps> = ({
           const entry = determineEntryFile(files);
           setEntryFile(entry);
           setIsMultiFile(true);
-          return; // Exit early since we've handled the multi-file 
+          return; // Exit early since we've handled the multi-file
         }
 
         // Check if this is an AI response with content
@@ -275,6 +277,29 @@ const EnhancedCodeEditor: React.FC<EnhancedCodeEditorProps> = ({
       );
     }
   }, [code]);
+
+  useEffect(() => {
+    const fetchDesign = async () => {
+      try {
+        const result = await db
+          .select()
+          .from(imagetocodeTable)
+          .where(eq(imagetocodeTable.uid, userUid ?? ""))
+          .orderBy(desc(imagetocodeTable.createdAt));
+
+        if (result.length > 0) {
+          setDesign(result[0]);
+        } else {
+          console.log("No design found.");
+        }
+      } catch (err) {
+        console.error("Error fetching design:", err);
+      } finally {
+      }
+    };
+    fetchDesign();
+    console.log(design, "design");
+  }, [userUid]);
 
   const handleCodeChange = (newCode: string) => {
     setCurrentCode(newCode);
@@ -381,6 +406,8 @@ const EnhancedCodeEditor: React.FC<EnhancedCodeEditorProps> = ({
   const toggleFullscreen = () => {
     setIsFullscreen(!isFullscreen);
   };
+  console.log(design?.uid, "design uid");
+  console.log(design?.language, " language");
 
   return (
     <ClientOnly>
@@ -906,7 +933,10 @@ const EnhancedCodeEditor: React.FC<EnhancedCodeEditorProps> = ({
               transition={{ duration: 0.15 }}
               className="w-full h-full bg-white"
             >
-              {isMultiFile && sandpackFiles ? (
+              {/* //This is Only For React and Tailwind Css  */}
+              {design?.language == "react-tailwind" &&
+              isMultiFile &&
+              sandpackFiles ? (
                 // Multi-file Sandpack setup
                 <SandpackProvider
                   theme={availableThemes[currentTheme]}

@@ -20,7 +20,6 @@ export const usersTable = pgTable("users", {
 export const imagetocodeTable = pgTable("imagetocode", {
   id: integer().primaryKey().generatedAlwaysAsIdentity(),
   uid: varchar({ length: 255 }).notNull(),
-  model: varchar({ length: 255 }).notNull(),
   imageUrl: varchar({ length: 255 }).notNull(),
   code: json("code").notNull(),
   description: varchar({ length: 255 }),

@@ -1,7 +1,7 @@
 "use client";
 
 import axios from "axios";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useUser } from "@clerk/nextjs";
 import { motion } from "framer-motion";
@@ -26,6 +26,8 @@ import { db } from "@/configs/db";
 import { imagetocodeTable, usersTable } from "@/configs/schema";
 import { desc, eq } from "drizzle-orm";
 import Constants from "@/data/Constants";
+import { UserUidContext } from "@/app/context/UserUidContext";
+import { UserDesignContext } from "@/app/context/UserDesignContext";
 
 interface CodeContent {
   content: string;
@@ -53,28 +55,16 @@ const MAX_REGENERATIONS = 3;
 const Page: React.FC = () => {
   const params = useParams();
   const router = useRouter();
-  const { user } = useUser();
   const uid = Array.isArray(params.uid) ? params.uid[0] : params.uid;
+  const { user } = useUser();
   const [response, setResponse] = useState<string>("");
   const [loading, setLoading] = useState(false);
   const [record, setRecord] = useState<CodeRecord | null>(null);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [regenerationCount, setRegenerationCount] = useState(0);
-  interface Design {
-    id: number;
-    uid: string;
-    model: string;
-    imageUrl: string;
-    description: string | null;
-    createdAt: string;
-    language: string;
-    options: string[];
-    code: {
-      content: string;
-    };
-  }
-  const [design, setDesign] = useState<Design | null>(null);
+  const { design, setDesign } = useContext(UserDesignContext);
+  const { userUid, setUserUid } = useContext(UserUidContext);
   useEffect(() => {
     const fetchDesign = async () => {
       try {
@@ -88,7 +78,7 @@ const Page: React.FC = () => {
           .orderBy(desc(imagetocodeTable.createdAt));
 
         if (result.length > 0) {
-          setDesign(result[0] as Design);
+          setDesign(result[0]);
           console.log(result[0], "designs");
         } else {
           setError("No design found.");
@@ -102,6 +92,7 @@ const Page: React.FC = () => {
     };
     fetchDesign();
     console.log(design, "design");
+    setUserUid(uid ?? "");
   }, [uid]);
   // Handle success message timeout
   useEffect(() => {
@@ -294,95 +285,7 @@ const Page: React.FC = () => {
     router.push("/");
   };
 
-  const Extraimproveai = async () => {
-    setLoading(true);
-    setError("");
 
-    try {
-      // Check if user is logged in first
-      if (!user || !user.primaryEmailAddress?.emailAddress) {
-        setError("User not found. Please log in to improve code.");
-        return;
-      }
-
-      // Get user credits from database
-      const userdatabase = await db
-        .select()
-        .from(usersTable)
-        .where(eq(usersTable.email, user.primaryEmailAddress.emailAddress));
-
-      if (!userdatabase || userdatabase.length === 0) {
-        setError("User not found in database. Please log in again.");
-        return;
-      }
-
-      const currentCredits = userdatabase[0]?.credits ?? 0;
-
-      // Check if user has enough credits
-      if (currentCredits < Constants.CREDIT_COSTS.EXPERT_MODE) {
-        setError(
-          `You need ${Constants.CREDIT_COSTS.EXPERT_MODE} credits to use Extra Improve AI. You have ${currentCredits} credits.`
-        );
-        return;
-      }
-
-      // Call API to improve code
-      const improvecode = await fetch("/api/googleimprovecode", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          code: response,
-          userEmail: user.primaryEmailAddress.emailAddress,
-        }),
-      });
-
-      if (!improvecode.ok) {
-        const errorData = await improvecode.json();
-        throw new Error(errorData.error || "Request failed");
-      }
-
-      // Process response
-      const responseData = await improvecode.text();
-      let optimizedCode = responseData;
-
-      // Try to parse as JSON if it looks like a JSON response
-      try {
-        if (
-          optimizedCode.trim().startsWith("{") &&
-          optimizedCode.includes('"message"')
-        ) {
-          const parsedData = JSON.parse(optimizedCode);
-          if (
-            parsedData.choices &&
-            parsedData.choices[0] &&
-            parsedData.choices[0].message &&
-            parsedData.choices[0].message.content
-          ) {
-            optimizedCode = parsedData.choices[0].message.content;
-          }
-        }
-      } catch (e) {
-        console.error("Failed to parse response as JSON:", e);
-      }
-
-      // Clean up code by removing markdown code blocks if present
-      optimizedCode = optimizedCode
-        .replace(/```(javascript|typescript|jsx|tsx|typescrpt)?/g, "")
-        .trim();
-
-      // Update state with improved code
-      setResponse(optimizedCode);
-      setSuccess("Code improved successfully with DeepSeek AI!");
-      setRegenerationCount((prev) => prev + 1);
-    } catch (err) {
-      handleError(err, "Error improving code with DeepSeek AI:");
-    } finally {
-      setLoading(false);
-    }
-  };
-  console.log(design?.code.content, "design");
 
   return (
     <div className="min-h-screen transition-colors duration-300">

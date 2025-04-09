@@ -64,7 +64,7 @@ const Page: React.FC = () => {
   interface Design {
     id: number;
     uid: string;
-    model: string;
+    
     imageUrl: string;
     description: string | null;
     createdAt: string;

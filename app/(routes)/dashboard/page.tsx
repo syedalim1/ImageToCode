@@ -1,31 +1,12 @@
 "use client";
 
-import React, { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import React from 'react';
 import { SignedIn, SignedOut, SignInButton, useUser } from '@clerk/nextjs';
 import ImageUpload from './_component/ImageUpload';
 import { motion } from 'framer-motion';
 
 function Dashboard() {
-    const router = useRouter();
-    const { isLoaded, isSignedIn } = useUser();
-    const [isClient, setIsClient] = useState(false);
 
-    useEffect(() => {
-        setIsClient(true);
-    }, []);
-
-    // Redirect to home if not authenticated (for extra security)
-    useEffect(() => {
-        if (isLoaded && !isSignedIn && isClient) {
-            // Optional: You can uncomment this to force redirect
-            // router.push('/');
-        }
-    }, [isLoaded, isSignedIn, router, isClient]);
-
-    if (!isClient) {
-        return null; // Prevent flash of content during hydration
-    }
 
     return (
         <div className='w-full px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 max-w-full overflow-x-hidden relative'>
