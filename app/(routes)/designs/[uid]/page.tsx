@@ -25,7 +25,6 @@ import SuccessConfetti from "../../generate-code/_components/SuccessConfetti";
 import { db } from "@/configs/db";
 import { imagetocodeTable, usersTable } from "@/configs/schema";
 import { desc, eq } from "drizzle-orm";
-import Constants from "@/data/Constants";
 
 interface CodeContent {
   content: string;
@@ -64,7 +63,7 @@ const Page: React.FC = () => {
   interface Design {
     id: number;
     uid: string;
-    
+
     imageUrl: string;
     description: string | null;
     createdAt: string;
@@ -184,6 +183,8 @@ const Page: React.FC = () => {
     );
   };
 
+  console.log(record, "record");
+
   const generateCode = async (record: CodeRecord) => {
     const userdatabase = await db
       .select()
@@ -220,7 +221,6 @@ const Page: React.FC = () => {
         userEmail: user?.primaryEmailAddress?.emailAddress,
       });
 
-      console.log(res.data, "final code");
 
       // Extract the content from the response
       let codeContent;
@@ -294,95 +294,8 @@ const Page: React.FC = () => {
     router.push("/");
   };
 
-  const Extraimproveai = async () => {
-    setLoading(true);
-    setError("");
 
-    try {
-      // Check if user is logged in first
-      if (!user || !user.primaryEmailAddress?.emailAddress) {
-        setError("User not found. Please log in to improve code.");
-        return;
-      }
-
-      // Get user credits from database
-      const userdatabase = await db
-        .select()
-        .from(usersTable)
-        .where(eq(usersTable.email, user.primaryEmailAddress.emailAddress));
-
-      if (!userdatabase || userdatabase.length === 0) {
-        setError("User not found in database. Please log in again.");
-        return;
-      }
-
-      const currentCredits = userdatabase[0]?.credits ?? 0;
-
-      // Check if user has enough credits
-      if (currentCredits < Constants.CREDIT_COSTS.EXPERT_MODE) {
-        setError(
-          `You need ${Constants.CREDIT_COSTS.EXPERT_MODE} credits to use Extra Improve AI. You have ${currentCredits} credits.`
-        );
-        return;
-      }
-
-      // Call API to improve code
-      const improvecode = await fetch("/api/googleimprovecode", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          code: response,
-          userEmail: user.primaryEmailAddress.emailAddress,
-        }),
-      });
-
-      if (!improvecode.ok) {
-        const errorData = await improvecode.json();
-        throw new Error(errorData.error || "Request failed");
-      }
-
-      // Process response
-      const responseData = await improvecode.text();
-      let optimizedCode = responseData;
-
-      // Try to parse as JSON if it looks like a JSON response
-      try {
-        if (
-          optimizedCode.trim().startsWith("{") &&
-          optimizedCode.includes('"message"')
-        ) {
-          const parsedData = JSON.parse(optimizedCode);
-          if (
-            parsedData.choices &&
-            parsedData.choices[0] &&
-            parsedData.choices[0].message &&
-            parsedData.choices[0].message.content
-          ) {
-            optimizedCode = parsedData.choices[0].message.content;
-          }
-        }
-      } catch (e) {
-        console.error("Failed to parse response as JSON:", e);
-      }
-
-      // Clean up code by removing markdown code blocks if present
-      optimizedCode = optimizedCode
-        .replace(/```(javascript|typescript|jsx|tsx|typescrpt)?/g, "")
-        .trim();
-
-      // Update state with improved code
-      setResponse(optimizedCode);
-      setSuccess("Code improved successfully with DeepSeek AI!");
-      setRegenerationCount((prev) => prev + 1);
-    } catch (err) {
-      handleError(err, "Error improving code with DeepSeek AI:");
-    } finally {
-      setLoading(false);
-    }
-  };
-  console.log(design?.code.content, "design");
+  console.log(design, "design");
 
   return (
     <div className="min-h-screen transition-colors duration-300">

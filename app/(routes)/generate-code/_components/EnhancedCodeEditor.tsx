@@ -32,11 +32,9 @@ import {
 } from "lucide-react";
 import ClientOnly from "./ClientOnly";
 import AILookup from "@/data/AILookup";
-import Constants from "@/data/Constants";
 import { db } from "@/configs/db";
 import { imagetocodeTable } from "@/configs/schema";
 import { desc, eq } from "drizzle-orm";
-import { useParams } from "next/navigation";
 import { UserUidContext } from "@/app/context/UserUidContext";
 import { UserDesignContext } from "@/app/context/UserDesignContext";
 
@@ -53,36 +51,7 @@ interface SandpackProject {
   generatedFiles?: string[];
 }
 
-// Custom hook to capture code changes
-function CodeEditorWithCapture({
-  setCode,
-  readOnly = false,
-  style,
-}: {
-  setCode: (code: string) => void;
-  readOnly?: boolean;
-  style?: React.CSSProperties;
-}) {
-  const { code, updateCode } = useActiveCode();
 
-  // Update the parent component's state when code changes
-  useEffect(() => {
-    setCode(code);
-  }, [code, setCode]);
-
-  return (
-    <SandpackCodeEditor
-      style={{
-        minWidth: "100%",
-        height: "600px",
-        ...style,
-      }}
-      showLineNumbers
-      showTabs
-      readOnly={readOnly}
-    />
-  );
-}
 
 // Function to ensure code is a valid React component
 const ensureValidReactComponent = (code: string): string => {
@@ -124,38 +93,7 @@ const convertToSandpackFiles = (
   return sandpackFiles;
 };
 
-// Function to determine the entry file for the Sandpack preview
-const determineEntryFile = (files: SandpackFiles): string => {
-  // Priority order for entry files
-  const possibleEntries = [
-    "/src/main.jsx",
-    "/src/main.tsx",
-    "/src/index.jsx",
-    "/src/index.tsx",
-    "/src/App.jsx",
-    "/src/App.tsx",
-    "/src/App.js",
-    "/src/App.ts",
-    "/index.jsx",
-    "/index.js",
-  ];
 
-  for (const entry of possibleEntries) {
-    if (files[entry]) {
-      return entry;
-    }
-  }
-
-  // If no standard entry is found, return the first .jsx or .js file found
-  const firstJsxFile = Object.keys(files).find((file) => file.endsWith(".jsx"));
-  if (firstJsxFile) return firstJsxFile;
-
-  const firstJsFile = Object.keys(files).find((file) => file.endsWith(".js"));
-  if (firstJsFile) return firstJsFile;
-
-  // Default to the first file as a last resort
-  return Object.keys(files)[0];
-};
 
 // Available themes for the editor
 const availableThemes: Record<string, SandpackThemeProp> = {
@@ -177,7 +115,6 @@ const EnhancedCodeEditor: React.FC<EnhancedCodeEditorProps> = ({
     null
   );
   const [projectData, setProjectData] = useState<SandpackProject | null>(null);
-  const [entryFile, setEntryFile] = useState<string>("/src/index.jsx");
   const [currentTheme, setCurrentTheme] = useState<string>("light");
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [hasError, setHasError] = useState(false);
@@ -204,8 +141,6 @@ const EnhancedCodeEditor: React.FC<EnhancedCodeEditorProps> = ({
           setProjectData(parsedData);
           const files = convertToSandpackFiles(parsedData.files);
           setSandpackFiles(files);
-          const entry = determineEntryFile(files);
-          setEntryFile(entry);
           setIsMultiFile(true);
           return; // Exit early since we've handled the multi-file
         }
@@ -239,8 +174,6 @@ const EnhancedCodeEditor: React.FC<EnhancedCodeEditorProps> = ({
                   setProjectData(projectJson);
                   const files = convertToSandpackFiles(projectJson.files);
                   setSandpackFiles(files);
-                  const entry = determineEntryFile(files);
-                  setEntryFile(entry);
                   setIsMultiFile(true);
                   return; // Exit early
                 }
@@ -278,8 +211,7 @@ const EnhancedCodeEditor: React.FC<EnhancedCodeEditorProps> = ({
       console.error("Error processing code:", e);
       setHasError(true);
       setProcessedCode(
-        `// Error: Invalid code format\n// ${
-          e instanceof Error ? e.message : String(e)
+        `// Error: Invalid code format\n// ${e instanceof Error ? e.message : String(e)
         }`
       );
     }
@@ -368,9 +300,8 @@ const EnhancedCodeEditor: React.FC<EnhancedCodeEditorProps> = ({
             });
 
             // Add README with project information
-            let readmeContent = `# ${
-              projectData.projectTitle || "Generated Project"
-            }\n\n`;
+            let readmeContent = `# ${projectData.projectTitle || "Generated Project"
+              }\n\n`;
             if (projectData.explanation) {
               readmeContent += `${projectData.explanation}\n\n`;
             }
@@ -383,9 +314,8 @@ const EnhancedCodeEditor: React.FC<EnhancedCodeEditorProps> = ({
             zip.generateAsync({ type: "blob" }).then((blob) => {
               const element = document.createElement("a");
               element.href = URL.createObjectURL(blob);
-              element.download = `${
-                projectData.projectTitle || "generated-project"
-              }.zip`;
+              element.download = `${projectData.projectTitle || "generated-project"
+                }.zip`;
               document.body.appendChild(element);
               element.click();
               document.body.removeChild(element);
@@ -413,8 +343,9 @@ const EnhancedCodeEditor: React.FC<EnhancedCodeEditorProps> = ({
   const toggleFullscreen = () => {
     setIsFullscreen(!isFullscreen);
   };
-  console.log(design?.uid, "design uid");
-  console.log(design?.language, " language");
+  // console.log(code, "design uid DESIGN");
+  // console.log(design?.language, " language");
+  console.log(sandpackFiles, "isMultiFile");
 
   return (
     <ClientOnly>
@@ -476,13 +407,12 @@ const EnhancedCodeEditor: React.FC<EnhancedCodeEditorProps> = ({
                 {[...Array(12)].map((_, i) => (
                   <motion.div
                     key={i}
-                    className={`absolute rounded-full ${
-                      i % 3 === 0
+                    className={`absolute rounded-full ${i % 3 === 0
                         ? "bg-indigo-500/40 dark:bg-indigo-400/40"
                         : i % 3 === 1
-                        ? "bg-cyan-500/40 dark:bg-cyan-400/40"
-                        : "bg-purple-500/40 dark:bg-purple-400/40"
-                    }`}
+                          ? "bg-cyan-500/40 dark:bg-cyan-400/40"
+                          : "bg-purple-500/40 dark:bg-purple-400/40"
+                      }`}
                     style={{
                       width: `${Math.max(2, Math.random() * 6)}px`,
                       height: `${Math.max(2, Math.random() * 6)}px`,
@@ -820,38 +750,34 @@ const EnhancedCodeEditor: React.FC<EnhancedCodeEditorProps> = ({
 
         {/* Editor container */}
         <div
-          className={`rounded-xl overflow-hidden shadow-lg ${
-            isFullscreen
+          className={`rounded-xl overflow-hidden shadow-lg ${isFullscreen
               ? "fixed inset-0 z-50 p-4 bg-white dark:bg-gray-900"
               : ""
-          }`}
+            }`}
         >
           {/* Tabs navigation */}
           <div className="flex items-center justify-between bg-slate-800 text-white p-2">
             <div className="flex space-x-1">
               <button
                 onClick={() => setActiveTab("code")}
-                className={`flex items-center px-3 py-1.5 rounded-md ${
-                  activeTab === "code" ? "bg-blue-600" : "hover:bg-slate-700"
-                }`}
+                className={`flex items-center px-3 py-1.5 rounded-md ${activeTab === "code" ? "bg-blue-600" : "hover:bg-slate-700"
+                  }`}
               >
                 <Code size={16} className="mr-1.5" />
                 <span>Code + Files</span>
               </button>
               <button
                 onClick={() => setActiveTab("preview")}
-                className={`flex items-center px-3 py-1.5 rounded-md ${
-                  activeTab === "preview" ? "bg-blue-600" : "hover:bg-slate-700"
-                }`}
+                className={`flex items-center px-3 py-1.5 rounded-md ${activeTab === "preview" ? "bg-blue-600" : "hover:bg-slate-700"
+                  }`}
               >
                 <Eye size={16} className="mr-1.5" />
                 <span>Preview</span>
               </button>
               <button
                 onClick={() => setActiveTab("console")}
-                className={`flex items-center px-3 py-1.5 rounded-md ${
-                  activeTab === "console" ? "bg-blue-600" : "hover:bg-slate-700"
-                }`}
+                className={`flex items-center px-3 py-1.5 rounded-md ${activeTab === "console" ? "bg-blue-600" : "hover:bg-slate-700"
+                  }`}
               >
                 <Terminal size={16} className="mr-1.5" />
                 <span>Console</span>
@@ -882,11 +808,10 @@ const EnhancedCodeEditor: React.FC<EnhancedCodeEditorProps> = ({
                       {Object.entries(availableThemes).map(([name, theme]) => (
                         <button
                           key={name}
-                          className={`block w-full text-left px-4 py-2 text-sm ${
-                            currentTheme === name
+                          className={`block w-full text-left px-4 py-2 text-sm ${currentTheme === name
                               ? "bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300"
                               : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
-                          }`}
+                            }`}
                           onClick={() => {
                             setCurrentTheme(name);
                             setShowThemeSelector(false);
@@ -941,9 +866,7 @@ const EnhancedCodeEditor: React.FC<EnhancedCodeEditorProps> = ({
               className="w-full h-full bg-white"
             >
               {/* //This is Only For React and Tailwind Css  */}
-              {design?.language == "react-tailwind" &&
-              isMultiFile &&
-              sandpackFiles ? (
+              {isMultiFile && sandpackFiles ? (
                 // Multi-file Sandpack setup
                 <SandpackProvider
                   theme={availableThemes[currentTheme]}
@@ -956,7 +879,6 @@ const EnhancedCodeEditor: React.FC<EnhancedCodeEditorProps> = ({
                     dependencies: {
                       ...AILookup.DEPENDANCY,
                     },
-                    entry: entryFile,
                   }}
                 >
                   <SandpackLayout>
@@ -1001,48 +923,7 @@ const EnhancedCodeEditor: React.FC<EnhancedCodeEditorProps> = ({
                 </SandpackProvider>
               ) : (
                 // Single file Sandpack setup
-                <SandpackProvider
-                  theme={availableThemes[currentTheme]}
-                  template="react"
-                  options={{
-                    externalResources: ["https://cdn.tailwindcss.com"],
-                  }}
-                  files={{
-                    "/src/index.css": {
-                      code: `@tailwind base;\n@tailwind components;\n@tailwind utilities;\n`,
-                    },
-                    "/src/index.jsx": {
-                      code: `import React from 'react';\nimport ReactDOM from 'react-dom';\nimport './index.css';\nimport App from './App';\n\nReactDOM.render(\n  <React.StrictMode>\n    <App />\n  </React.StrictMode>,\n  document.getElementById('root')\n);`,
-                    },
-                    "/src/App.js": {
-                      code: hasError ? Constants.fallbackCode : processedCode,
-                    },
-                  }}
-                  customSetup={{
-                    dependencies: {
-                      ...AILookup.DEPENDANCY,
-                    },
-                  }}
-                >
-                  <SandpackLayout>
-                    {activeTab === "code" && (
-                      <CodeEditorWithCapture
-                        setCode={handleCodeChange}
-                        style={{ height: "600px" }}
-                      />
-                    )}
-                    {activeTab === "preview" && (
-                      <SandpackPreview
-                        showOpenInCodeSandbox
-                        showRefreshButton
-                        style={{ height: "600px" }}
-                      />
-                    )}
-                    {activeTab === "console" && (
-                      <SandpackConsole style={{ height: "600px" }} />
-                    )}
-                  </SandpackLayout>
-                </SandpackProvider>
+                <div></div>
               )}
             </motion.div>
           </AnimatePresence>

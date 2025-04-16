@@ -25,7 +25,7 @@ import EditorSettings from "./EditorSettings";
 const availableThemes: Record<string, SandpackThemeProp> = {
   light: "light",
   dark: "dark",
-  
+
 };
 
 interface EnhancedCodeEditorProps {
@@ -73,38 +73,6 @@ const convertToSandpackFiles = (files: Record<string, { code: string }>): Sandpa
   return sandpackFiles;
 };
 
-// Function to determine the entry file for the Sandpack preview
-const determineEntryFile = (files: SandpackFiles): string => {
-  // Priority order for entry files
-  const possibleEntries = [
-    '/src/main.jsx',
-    '/src/main.tsx',
-    '/src/index.jsx',
-    '/src/index.tsx',
-    '/src/App.jsx',
-    '/src/App.tsx',
-    '/src/App.js',
-    '/src/App.ts',
-    '/index.jsx',
-    '/index.js',
-  ];
-
-  for (const entry of possibleEntries) {
-    if (files[entry]) {
-      return entry;
-    }
-  }
-
-  // If no standard entry is found, return the first .jsx or .js file found
-  const firstJsxFile = Object.keys(files).find(file => file.endsWith('.jsx'));
-  if (firstJsxFile) return firstJsxFile;
-
-  const firstJsFile = Object.keys(files).find(file => file.endsWith('.js'));
-  if (firstJsFile) return firstJsFile;
-
-  // Default to the first file as a last resort
-  return Object.keys(files)[0];
-};
 
 const EnhancedCodeEditor: React.FC<EnhancedCodeEditorProps> = ({
   code,
@@ -117,13 +85,12 @@ const EnhancedCodeEditor: React.FC<EnhancedCodeEditorProps> = ({
   const [processedCode, setProcessedCode] = useState("");
   const [sandpackFiles, setSandpackFiles] = useState<SandpackFiles | null>(null);
   const [projectData, setProjectData] = useState<SandpackProject | null>(null);
-  const [entryFile, setEntryFile] = useState<string>("/src/App.js");
   const [currentTheme, setCurrentTheme] = useState<string>("light");
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [hasError, setHasError] = useState(false);
   const [isMultiFile, setIsMultiFile] = useState(false);
   const [isCopied, setIsCopied] = useState(false);
-  
+
   // Editor settings
   const [fontSize, setFontSize] = useState(14);
   const [lineHeight, setLineHeight] = useState(1.5);
@@ -150,8 +117,6 @@ const EnhancedCodeEditor: React.FC<EnhancedCodeEditorProps> = ({
           setProjectData(parsedData);
           const files = convertToSandpackFiles(parsedData.files);
           setSandpackFiles(files);
-          const entry = determineEntryFile(files);
-          setEntryFile(entry);
           setIsMultiFile(true);
           return; // Exit early since we've handled the multi-file case
         }
@@ -177,8 +142,6 @@ const EnhancedCodeEditor: React.FC<EnhancedCodeEditorProps> = ({
                   setProjectData(projectJson);
                   const files = convertToSandpackFiles(projectJson.files);
                   setSandpackFiles(files);
-                  const entry = determineEntryFile(files);
-                  setEntryFile(entry);
                   setIsMultiFile(true);
                   return; // Exit early
                 }
@@ -378,10 +341,10 @@ export default function ErrorFallback() {
         )}
 
         {/* Editor container with responsive design */}
-        <div 
+        <div
           className={`rounded-xl overflow-hidden shadow-xl border border-gray-200 dark:border-gray-700 
-            ${isFullscreen 
-              ? 'fixed inset-0 z-50 p-4 bg-white dark:bg-gray-900' 
+            ${isFullscreen
+              ? 'fixed inset-0 z-50 p-4 bg-white dark:bg-gray-900'
               : 'transition-all duration-300 hover:shadow-2xl'}`
           }
         >
@@ -441,7 +404,7 @@ export default function ErrorFallback() {
               exit={{ opacity: 0 }}
               transition={{ duration: 0.15 }}
               className="h-[1000px] overflow-hidden"
-              style={{ 
+              style={{
                 maxHeight: isFullscreen ? 'calc(100vh - 120px)' : '1000px',
                 height: isFullscreen ? 'calc(100vh - 120px)' : '1000px'
               }}
@@ -483,7 +446,7 @@ export default function ErrorFallback() {
                     dependencies: {
                       ...AILookup.DEPENDANCY
                     },
-                    entry: entryFile
+
                   }}
                 >
                   <SandpackLayout className="h-full">
@@ -492,7 +455,7 @@ export default function ErrorFallback() {
                         <EnhancedFileExplorer showFileInfo />
                       </div>
                     )}
-                    
+
                     {activeTab === "code" && (
                       <CodeEditorWithCapture
                         setCode={handleCodeChange}
@@ -503,7 +466,7 @@ export default function ErrorFallback() {
                         style={{ height: "100%", overflow: "auto" }}
                       />
                     )}
-                    
+
                     {activeTab === "preview" && (
                       <SandpackPreview
                         showOpenInCodeSandbox
@@ -511,7 +474,7 @@ export default function ErrorFallback() {
                         style={{ height: "100%", overflow: "auto" }}
                       />
                     )}
-                    
+
                     {activeTab === "console" && (
                       <SandpackConsole className="h-full" />
                     )}
@@ -546,7 +509,7 @@ export default function ErrorFallback() {
                         style={{ height: "100%", overflow: "auto" }}
                       />
                     )}
-                    
+
                     {activeTab === "preview" && (
                       <SandpackPreview
                         showOpenInCodeSandbox
@@ -554,7 +517,7 @@ export default function ErrorFallback() {
                         style={{ height: "100%", overflow: "auto" }}
                       />
                     )}
-                    
+
                     {activeTab === "console" && (
                       <SandpackConsole className="h-full" />
                     )}
@@ -563,11 +526,11 @@ export default function ErrorFallback() {
               )}
             </motion.div>
           </AnimatePresence>
-          
+
           {/* Animated decorative elements */}
           <div className="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 opacity-70"></div>
         </div>
-        
+
         {/* Additional features info */}
         <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-100 dark:border-blue-800">
@@ -576,14 +539,14 @@ export default function ErrorFallback() {
               Analyze code structure, complexity, and patterns in the Performance tab
             </p>
           </div>
-          
+
           <div className="p-3 bg-purple-50 dark:bg-purple-900/20 rounded-lg border border-purple-100 dark:border-purple-800">
             <h3 className="text-sm font-medium text-purple-700 dark:text-purple-300">Export Options</h3>
             <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
               Export your code in multiple formats: JS, TS, JSX, TSX, HTML, or as a project
             </p>
           </div>
-          
+
           <div className="p-3 bg-pink-50 dark:bg-pink-900/20 rounded-lg border border-pink-100 dark:border-pink-800">
             <h3 className="text-sm font-medium text-pink-700 dark:text-pink-300">Responsive Preview</h3>
             <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
