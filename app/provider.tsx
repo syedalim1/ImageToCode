@@ -9,6 +9,7 @@ import { IsUploadingContext } from "./context/IsUploadingContext";
 import { UploadedImageUrlContext } from "./context/UploadedImageUrlContext";
 import { UserUidContext } from "./context/UserUidContext";
 import { UserDesignContext } from "./context/UserDesignContext";
+import { LanguageContext } from "./context/LanguageContext"
 function Provider({ children }: Readonly<{ children: React.ReactNode }>) {
   interface Design {
     id: number;
@@ -30,6 +31,7 @@ function Provider({ children }: Readonly<{ children: React.ReactNode }>) {
   const [uploadedImageUrl, setUploadedImageUrl] = useState("");
   const [userUid, setUserUid] = useState<string | null>(null);
   const [design, setDesign] = useState<Design | null>(null);
+  const [language, setLanguage] = useState("");
 
   // Handle hydration issues
   useEffect(() => {
@@ -45,45 +47,47 @@ function Provider({ children }: Readonly<{ children: React.ReactNode }>) {
       {/* Main content area */}
       <div className="flex flex-col flex-1 w-full overflow-hidden">
         {/* Header */}
-        <UserDesignContext.Provider value={{ design, setDesign }}>
-          <UserUidContext.Provider value={{ userUid, setUserUid }}>
-            <UploadedImageUrlContext.Provider
-              value={{ uploadedImageUrl, setUploadedImageUrl }}
-            >
-              <IsUploadingContext.Provider
-                value={{ isUploading, setIsUploading }}
+        <LanguageContext.Provider value={{ language, setLanguage }}>
+          <UserDesignContext.Provider value={{ design, setDesign }}>
+            <UserUidContext.Provider value={{ userUid, setUserUid }}>
+              <UploadedImageUrlContext.Provider
+                value={{ uploadedImageUrl, setUploadedImageUrl }}
               >
-                <UserDescriptionContext.Provider
-                  value={{ userDescription, setUserDescription }}
+                <IsUploadingContext.Provider
+                  value={{ isUploading, setIsUploading }}
                 >
-                  <ProjectTitleContext.Provider
-                    value={{ projectTitle, setProjectTitle }}
+                  <UserDescriptionContext.Provider
+                    value={{ userDescription, setUserDescription }}
                   >
-                    <AppHeader />
-
-                    {/* Main content with scrolling */}
-                    <motion.main
-                      className="flex-1 overflow-auto pb-20 md:pb-10 w-full"
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      transition={{
-                        duration: 0.3,
-                        ease: "easeOut",
-                      }}
-                      style={{
-                        willChange: "opacity, transform",
-                        transform: "translate3d(0,0,0)",
-                        backfaceVisibility: "hidden",
-                      }}
+                    <ProjectTitleContext.Provider
+                      value={{ projectTitle, setProjectTitle }}
                     >
-                      {children}
-                    </motion.main>
-                  </ProjectTitleContext.Provider>
-                </UserDescriptionContext.Provider>
-              </IsUploadingContext.Provider>
-            </UploadedImageUrlContext.Provider>
-          </UserUidContext.Provider>
-        </UserDesignContext.Provider>
+                      <AppHeader />
+
+                      {/* Main content with scrolling */}
+                      <motion.main
+                        className="flex-1 overflow-auto pb-20 md:pb-10 w-full"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{
+                          duration: 0.3,
+                          ease: "easeOut",
+                        }}
+                        style={{
+                          willChange: "opacity, transform",
+                          transform: "translate3d(0,0,0)",
+                          backfaceVisibility: "hidden",
+                        }}
+                      >
+                        {children}
+                      </motion.main>
+                    </ProjectTitleContext.Provider>
+                  </UserDescriptionContext.Provider>
+                </IsUploadingContext.Provider>
+              </UploadedImageUrlContext.Provider>
+            </UserUidContext.Provider>
+          </UserDesignContext.Provider>
+        </LanguageContext.Provider>
       </div>
     </div>
   );

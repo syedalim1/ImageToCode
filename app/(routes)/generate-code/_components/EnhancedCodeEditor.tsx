@@ -37,6 +37,7 @@ import { imagetocodeTable } from "@/configs/schema";
 import { desc, eq } from "drizzle-orm";
 import { UserUidContext } from "@/app/context/UserUidContext";
 import { UserDesignContext } from "@/app/context/UserDesignContext";
+import { LanguageContext } from "@/app/context/LanguageContext";
 
 interface EnhancedCodeEditorProps {
   code: string;
@@ -123,6 +124,7 @@ const EnhancedCodeEditor: React.FC<EnhancedCodeEditorProps> = ({
   const [showThemeSelector, setShowThemeSelector] = useState(false);
 
   const { userUid, setUserUid } = useContext(UserUidContext);
+  const { language, setLanguage } = useContext(LanguageContext);
 
   const { design, setDesign } = useContext(UserDesignContext);
   useEffect(() => {
@@ -408,10 +410,10 @@ const EnhancedCodeEditor: React.FC<EnhancedCodeEditorProps> = ({
                   <motion.div
                     key={i}
                     className={`absolute rounded-full ${i % 3 === 0
-                        ? "bg-indigo-500/40 dark:bg-indigo-400/40"
-                        : i % 3 === 1
-                          ? "bg-cyan-500/40 dark:bg-cyan-400/40"
-                          : "bg-purple-500/40 dark:bg-purple-400/40"
+                      ? "bg-indigo-500/40 dark:bg-indigo-400/40"
+                      : i % 3 === 1
+                        ? "bg-cyan-500/40 dark:bg-cyan-400/40"
+                        : "bg-purple-500/40 dark:bg-purple-400/40"
                       }`}
                     style={{
                       width: `${Math.max(2, Math.random() * 6)}px`,
@@ -751,8 +753,8 @@ const EnhancedCodeEditor: React.FC<EnhancedCodeEditorProps> = ({
         {/* Editor container */}
         <div
           className={`rounded-xl overflow-hidden shadow-lg ${isFullscreen
-              ? "fixed inset-0 z-50 p-4 bg-white dark:bg-gray-900"
-              : ""
+            ? "fixed inset-0 z-50 p-4 bg-white dark:bg-gray-900"
+            : ""
             }`}
         >
           {/* Tabs navigation */}
@@ -809,8 +811,8 @@ const EnhancedCodeEditor: React.FC<EnhancedCodeEditorProps> = ({
                         <button
                           key={name}
                           className={`block w-full text-left px-4 py-2 text-sm ${currentTheme === name
-                              ? "bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300"
-                              : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                            ? "bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300"
+                            : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
                             }`}
                           onClick={() => {
                             setCurrentTheme(name);
@@ -866,7 +868,7 @@ const EnhancedCodeEditor: React.FC<EnhancedCodeEditorProps> = ({
               className="w-full h-full bg-white"
             >
               {/* //This is Only For React and Tailwind Css  */}
-              {isMultiFile && sandpackFiles ? (
+              {language == "react-tailwind" && isMultiFile && sandpackFiles ? (
                 // Multi-file Sandpack setup
                 <SandpackProvider
                   theme={availableThemes[currentTheme]}
@@ -921,9 +923,62 @@ const EnhancedCodeEditor: React.FC<EnhancedCodeEditorProps> = ({
                     )}
                   </SandpackLayout>
                 </SandpackProvider>
+              ) : language == "html-css" && isMultiFile && sandpackFiles ? (
+                // Single file Sandpack setup
+                <div>
+                  <SandpackProvider
+                    theme={availableThemes[currentTheme]}
+                    template="static"
+
+                    files={sandpackFiles}
+
+                  >
+                    <SandpackLayout>
+                      {/* Always show file explorer when in multi-file mode */}
+                      {(activeTab === "explorer" || activeTab === "code") && (
+                        <div
+                          className="sandpack-wrapper"
+                          style={{ display: "flex", height: "900px", width: "100%" }}
+                        >
+                          <div
+                            style={{
+                              width: "25%",
+                              height: "100%",
+                              borderRight: "1px solid #e5e7eb",
+                            }}
+                          >
+                            <SandpackFileExplorer style={{ height: "100%", width: "100%" }} />
+                          </div>
+                          <div style={{ width: "75%", height: "100%", }}>
+                            <SandpackCodeEditor
+                              showTabs
+                              showLineNumbers
+                              showInlineErrors
+                              wrapContent
+                              closableTabs
+                              style={{ height: "100%", width: "100%" }}
+                            />
+                          </div>
+                        </div>
+                      )}
+                      {activeTab === "preview" && (
+                        <SandpackPreview
+                          showOpenInCodeSandbox
+                          showRefreshButton
+                          style={{ height: "900px", width: "100%" }}
+                        />
+                      )}
+                      {activeTab === "console" && (
+                        <SandpackConsole style={{ height: "900px", width: "100%" }} />
+                      )}
+                    </SandpackLayout>
+                  </SandpackProvider>
+                </div>
               ) : (
                 // Single file Sandpack setup
-                <div></div>
+                <div>
+
+                </div>
               )}
             </motion.div>
           </AnimatePresence>

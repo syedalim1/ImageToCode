@@ -1,7 +1,7 @@
 "use client";
 
 import axios from "axios";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useUser } from "@clerk/nextjs";
 import { motion } from "framer-motion";
@@ -25,6 +25,7 @@ import SuccessConfetti from "../../generate-code/_components/SuccessConfetti";
 import { db } from "@/configs/db";
 import { imagetocodeTable, usersTable } from "@/configs/schema";
 import { desc, eq } from "drizzle-orm";
+import { LanguageContext } from "@/app/context/LanguageContext";
 
 interface CodeContent {
   content: string;
@@ -33,7 +34,7 @@ interface CodeContent {
 interface CodeRecord {
   id: number;
   uid: string;
-  Language: string;
+  language: string;
   mode: string;
   description: string;
   model: string;
@@ -60,6 +61,9 @@ const Page: React.FC = () => {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [regenerationCount, setRegenerationCount] = useState(0);
+  const { language, setLanguage } = useContext(LanguageContext);
+
+
   interface Design {
     id: number;
     uid: string;
@@ -89,6 +93,7 @@ const Page: React.FC = () => {
         if (result.length > 0) {
           setDesign(result[0] as Design);
           console.log(result[0], "designs");
+          setLanguage(result[0].language)
         } else {
           setError("No design found.");
         }
@@ -101,6 +106,7 @@ const Page: React.FC = () => {
     };
     fetchDesign();
     console.log(design, "design");
+
   }, [uid]);
   // Handle success message timeout
   useEffect(() => {
@@ -113,6 +119,8 @@ const Page: React.FC = () => {
   // Load record data
   useEffect(() => {
     uid && getRecordInfo(uid);
+
+
   }, [uid]);
 
   const getRecordInfo = async (uid: string) => {
@@ -167,6 +175,7 @@ const Page: React.FC = () => {
           )
           .trim() || ""
       );
+
     } catch (err) {
       handleError(err, "Error fetching record:");
     } finally {
@@ -217,7 +226,7 @@ const Page: React.FC = () => {
         mode: record.mode,
         options: record.options,
         model: record.model,
-        language: record.Language,
+        language: record.language,
         userEmail: user?.primaryEmailAddress?.emailAddress,
       });
 
