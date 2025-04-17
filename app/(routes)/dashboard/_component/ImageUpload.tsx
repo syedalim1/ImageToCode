@@ -319,7 +319,7 @@ const ImageUpload = () => {
 
       setTimeout(() => {
         setShowConfetti(false);
-        router.push(`/generate-code/${conversionUid}`);
+        router.push(`/designs/${conversionUid}`);
       }, 2500);
     } catch (error) {
       // Track conversion failed
