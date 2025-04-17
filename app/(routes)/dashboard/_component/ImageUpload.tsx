@@ -46,13 +46,10 @@ const ImageUpload = () => {
   const [showConfetti, setShowConfetti] = useState(false);
   const [aiEnhancements, setAiEnhancements] = useState<string[]>([]);
   const [recentConversions, setRecentConversions] = useState<any[]>([]);
-  const [showTips, setShowTips] = useState(false);
-  const [showColorPalette, setShowColorPalette] = useState(false);
+  const [showTips, setShowTips] = useState(true);
   const [selectedTheme, setSelectedTheme] = useState("blue");
   const [previewScale, setPreviewScale] = useState(1);
-  const [showExportOptions, setShowExportOptions] = useState(false);
-  const [exportFormat, setExportFormat] = useState("jsx");
-  const [showShareOptions, setShowShareOptions] = useState(false);
+
 
   // Animation controls
   const controls = useAnimation();
@@ -716,208 +713,18 @@ const ImageUpload = () => {
                   Preview Your Design
                 </h3>
 
-                <div className="flex space-x-3">
-                  {/* Theme selector button */}
-                  <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    onClick={() => setShowColorPalette(!showColorPalette)}
-                    className="flex items-center px-3 py-2 bg-gray-50 hover:bg-gray-100 rounded-lg text-sm font-medium text-gray-700 border border-gray-200"
-                  >
-                    <IoColorPaletteOutline className="mr-2" />
-                    Theme
-                  </motion.button>
 
-                  {/* Export options button */}
-                  <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    onClick={() => setShowExportOptions(!showExportOptions)}
-                    className="flex items-center px-3 py-2 bg-gray-50 hover:bg-gray-100 rounded-lg text-sm font-medium text-gray-700 border border-gray-200"
-                  >
-                    <FiDownload className="mr-2" />
-                    Export
-                  </motion.button>
-
-                  {/* Share button */}
-                  <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    onClick={() => setShowShareOptions(!showShareOptions)}
-                    className="flex items-center px-3 py-2 bg-gray-50 hover:bg-gray-100 rounded-lg text-sm font-medium text-gray-700 border border-gray-200"
-                  >
-                    <FiShare2 className="mr-2" />
-                    Share
-                  </motion.button>
-                </div>
               </div>
 
-              {/* Color palette selector */}
-              <AnimatePresence>
-                {showColorPalette && (
-                  <motion.div
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: "auto" }}
-                    exit={{ opacity: 0, height: 0 }}
-                    transition={{ duration: 0.3 }}
-                    className="mb-6 overflow-hidden"
-                  >
-                    <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
-                      <h4 className="font-medium mb-3 text-gray-700 flex items-center">
-                        <IoColorPaletteOutline className="mr-2" />
-                        Select Color Theme
-                      </h4>
-                      <div className="flex flex-wrap gap-3">
-                        {[
-                          { id: "blue", label: "Blue", colors: ["#3b82f6", "#1d4ed8"] },
-                          { id: "purple", label: "Purple", colors: ["#8b5cf6", "#6d28d9"] },
-                          { id: "green", label: "Green", colors: ["#10b981", "#047857"] },
-                          { id: "red", label: "Red", colors: ["#ef4444", "#b91c1c"] },
-                          { id: "amber", label: "Amber", colors: ["#f59e0b", "#b45309"] },
-                          { id: "pink", label: "Pink", colors: ["#ec4899", "#be185d"] },
-                        ].map((theme) => (
-                          <motion.div
-                            key={theme.id}
-                            whileHover={{ scale: 1.05 }}
-                            whileTap={{ scale: 0.95 }}
-                            className={`flex flex-col items-center cursor-pointer p-2 rounded-lg ${selectedTheme === theme.id ? 'ring-2 ring-offset-2 ring-blue-500' : ''}`}
-                            onClick={() => setSelectedTheme(theme.id)}
-                          >
-                            <div className="w-12 h-12 rounded-full mb-1 flex items-center justify-center"
-                              style={{ background: `linear-gradient(135deg, ${theme.colors[0]}, ${theme.colors[1]})` }}>
-                              {selectedTheme === theme.id && (
-                                <motion.div
-                                  initial={{ scale: 0 }}
-                                  animate={{ scale: 1 }}
-                                  className="text-white"
-                                >
-                                  ✓
-                                </motion.div>
-                              )}
-                            </div>
-                            <span className="text-xs text-gray-600">{theme.label}</span>
-                          </motion.div>
-                        ))}
-                      </div>
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
 
-              {/* Export options */}
-              <AnimatePresence>
-                {showExportOptions && (
-                  <motion.div
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: "auto" }}
-                    exit={{ opacity: 0, height: 0 }}
-                    transition={{ duration: 0.3 }}
-                    className="mb-6 overflow-hidden"
-                  >
-                    <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
-                      <h4 className="font-medium mb-3 text-gray-700 flex items-center">
-                        <FiDownload className="mr-2" />
-                        Export Options
-                      </h4>
-                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                        {[
-                          { id: "jsx", label: "JSX", icon: <TbBrandReact /> },
-                          { id: "tsx", label: "TSX", icon: <TbBrandReact /> },
-                          { id: "html", label: "HTML", icon: <TbBrandHtml5 /> },
-                          { id: "css", label: "CSS", icon: <TbBrandCss3 /> },
-                          { id: "code", label: "Full Code", icon: <BsCodeSlash /> },
-                          { id: "zip", label: "ZIP Package", icon: <FiSave /> },
-                        ].map((format) => (
-                          <motion.div
-                            key={format.id}
-                            whileHover={{ scale: 1.03 }}
-                            whileTap={{ scale: 0.97 }}
-                            className={`flex items-center p-3 rounded-lg cursor-pointer border ${exportFormat === format.id ? 'bg-blue-50 border-blue-200' : 'bg-white border-gray-200'}`}
-                            onClick={() => setExportFormat(format.id)}
-                          >
-                            <div className={`mr-2 text-lg ${exportFormat === format.id ? 'text-blue-500' : 'text-gray-400'}`}>
-                              {format.icon}
-                            </div>
-                            <span className={`text-sm ${exportFormat === format.id ? 'text-blue-700 font-medium' : 'text-gray-600'}`}>
-                              {format.label}
-                            </span>
-                          </motion.div>
-                        ))}
-                      </div>
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
 
-              {/* Share options */}
-              <AnimatePresence>
-                {showShareOptions && (
-                  <motion.div
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: "auto" }}
-                    exit={{ opacity: 0, height: 0 }}
-                    transition={{ duration: 0.3 }}
-                    className="mb-6 overflow-hidden"
-                  >
-                    <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
-                      <h4 className="font-medium mb-3 text-gray-700 flex items-center">
-                        <FiShare2 className="mr-2" />
-                        Share Your Design
-                      </h4>
-                      <div className="flex flex-col space-y-3">
-                        <div className="flex">
-                          <input
-                            type="text"
-                            readOnly
-                            value="https://imagetocode.com/share/your-unique-link"
-                            className="flex-1 p-2 border border-gray-300 rounded-l-lg text-sm"
-                          />
-                          <button className="bg-blue-500 text-white px-3 rounded-r-lg text-sm hover:bg-blue-600">
-                            Copy
-                          </button>
-                        </div>
-                        <div className="flex space-x-3">
-                          <button className="flex-1 py-2 bg-[#1877F2] text-white rounded-lg text-sm flex items-center justify-center">
-                            <span className="mr-2">Facebook</span>
-                          </button>
-                          <button className="flex-1 py-2 bg-[#1DA1F2] text-white rounded-lg text-sm flex items-center justify-center">
-                            <span className="mr-2">Twitter</span>
-                          </button>
-                          <button className="flex-1 py-2 bg-[#0A66C2] text-white rounded-lg text-sm flex items-center justify-center">
-                            <span className="mr-2">LinkedIn</span>
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
 
               {/* Image preview with zoom controls */}
               {selectedFile && (
                 <div className="mb-6 border border-gray-200 rounded-lg overflow-hidden bg-gray-50 p-4">
                   <div className="flex justify-between items-center mb-3">
                     <h4 className="font-medium text-gray-700">Image Preview</h4>
-                    <div className="flex space-x-2">
-                      <button
-                        onClick={() => setPreviewScale(Math.max(0.5, previewScale - 0.1))}
-                        className="p-1 bg-white border border-gray-200 rounded-md hover:bg-gray-100"
-                      >
-                        -
-                      </button>
-                      <button
-                        onClick={() => setPreviewScale(Math.min(2, previewScale + 0.1))}
-                        className="p-1 bg-white border border-gray-200 rounded-md hover:bg-gray-100"
-                      >
-                        +
-                      </button>
-                      <button
-                        onClick={() => setPreviewScale(1)}
-                        className="p-1 bg-white border border-gray-200 rounded-md hover:bg-gray-100 text-xs"
-                      >
-                        Reset
-                      </button>
-                    </div>
+
                   </div>
                   <div className="flex justify-center overflow-hidden rounded-lg bg-white border border-gray-200 p-2">
                     <motion.div
@@ -953,14 +760,8 @@ const ImageUpload = () => {
                         <span className="w-24 text-gray-500">Mode:</span>
                         <span className="font-medium text-gray-800">{selectedMode}</span>
                       </li>
-                      <li className="flex items-center">
-                        <span className="w-24 text-gray-500">Theme:</span>
-                        <span className="font-medium text-gray-800 capitalize">{selectedTheme}</span>
-                      </li>
-                      <li className="flex items-center">
-                        <span className="w-24 text-gray-500">Export Format:</span>
-                        <span className="font-medium text-gray-800 uppercase">{exportFormat}</span>
-                      </li>
+
+
                     </ul>
                   </div>
 
@@ -993,12 +794,7 @@ const ImageUpload = () => {
                     <HiOutlineSparkles className="mr-2" />
                     Pro Tips
                   </h4>
-                  <button
-                    onClick={() => setShowTips(!showTips)}
-                    className="text-xs text-blue-600 hover:text-blue-800"
-                  >
-                    {showTips ? 'Hide' : 'Show'}
-                  </button>
+
                 </div>
 
                 <AnimatePresence>
@@ -1149,27 +945,6 @@ const ImageUpload = () => {
         </motion.div>
       )}
 
-      {/* Floating help button */}
-      <motion.button
-        className={`fixed bottom-6 right-6 p-4 rounded-full shadow-lg bg-blue-500 text-white hover:bg-blue-600 z-10`}
-        whileHover={{ scale: 1.1 }}
-        whileTap={{ scale: 0.9 }}
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          className="h-6 w-6"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-          />
-        </svg>
-      </motion.button>
     </motion.div>
   );
 };

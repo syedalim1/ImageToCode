@@ -70,34 +70,3 @@ export const aiSuggestions = [
   },
 ];
 
-// Tag suggestions organized by categories
-export const tagSuggestions = {
-  "Page Types": [
-    "Landing Page",
-    "Dashboard",
-    "Portfolio",
-    "Blog",
-    "E-commerce",
-  ],
-  Components: [
-    "Hero Section",
-    "Navigation",
-    "Footer",
-    "Contact Form",
-    "Gallery",
-  ],
-  Styles: [
-    "Minimalist",
-    "Colorful",
-    "Dark Mode",
-    "Glassmorphism",
-    "Neumorphism",
-  ],
-  Features: [
-    "Responsive",
-    "Animated",
-    "Interactive",
-    "Accessible",
-    "Mobile-First",
-  ],
-};

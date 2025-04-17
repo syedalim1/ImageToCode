@@ -23,27 +23,7 @@ export const HeaderSection = ({ setShowTemplates, showTemplates, setShowAiSugges
                     Describe Your Design
                 </motion.h2>
 
-                <div className="flex space-x-2">
-                    <motion.button
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                        className="p-2 bg-white rounded-lg shadow-md text-indigo-600 hover:bg-indigo-50 transition-all duration-300 flex items-center"
-                        onClick={() => setShowTemplates(!showTemplates)}
-                        title="Saved templates"
-                    >
-                        <Clock className="w-5 h-5" />
-                    </motion.button>
-
-                    <motion.button
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                        className="p-2 bg-white rounded-lg shadow-md text-indigo-600 hover:bg-indigo-50 transition-all duration-300 flex items-center"
-                        onClick={() => setShowAiSuggestions(!showAiSuggestions)}
-                        title="AI suggestions"
-                    >
-                        <Wand2 className="w-5 h-5" />
-                    </motion.button>
-                </div>
+              
             </div>
 
             <motion.p

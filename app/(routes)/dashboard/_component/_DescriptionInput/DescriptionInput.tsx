@@ -8,15 +8,10 @@ import React, { useContext, useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence, useAnimation } from "framer-motion";
 import { BackgroundElements } from "./BackgroundElements";
 import { SuccessCheckmark } from "./SuccessCheckmark";
-import { TemplatesPanel } from "./TemplatesPanel";
-import { AiSuggestionsPanel } from "./AiSuggestionsPanel";
 import { TagSuggestionsPanel } from "./TagSuggestionsPanel";
 import { DescriptionTextarea } from "./DescriptionTextarea";
 import { HeaderSection } from "./HeaderSection";
-import { ActionButtons } from "./ActionButtons";
-import { aiSuggestions, tagSuggestions } from "./aiSuggestionsData";
-import { formatExportContent, downloadAsFile } from "./utils";
-import { Template, AiSuggestion } from "./types";
+import { Template, } from "./types";
 
 const DescriptionInput = () => {
   const { userDescription, setUserDescription } = useContext(UserDescriptionContext);
@@ -27,14 +22,8 @@ const DescriptionInput = () => {
   const [savedTemplates, setSavedTemplates] = useState<Template[]>([]);
   const [showTemplates, setShowTemplates] = useState(false);
   const [showAiSuggestions, setShowAiSuggestions] = useState(false);
-  const [showTagSuggestions, setShowTagSuggestions] = useState(true);
-  const [isGeneratingSuggestion, setIsGeneratingSuggestion] = useState(false);
-  const [copiedToClipboard, setCopiedToClipboard] = useState(false);
+
   const [showSavedSuccess, setShowSavedSuccess] = useState(false);
-  const [characterLimit] = useState(1500);
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [activeTab, setActiveTab] = useState<'suggestions' | 'templates'>('suggestions');
   const [isFullscreen, setIsFullscreen] = useState(false);
 
   // Refs
@@ -77,97 +66,6 @@ const DescriptionInput = () => {
     }
   }, []);
 
-  // Save template function with enhanced features
-  const saveTemplate = () => {
-    if (userDescription.trim()) {
-      // Check if template with same content already exists
-      const exists = savedTemplates.some(template => template.content === userDescription);
-
-      if (!exists) {
-        // Generate a title from the content or use project title if available
-        const title = projectTitle || userDescription.substring(0, 30) + (userDescription.length > 30 ? '...' : '');
-
-        const newTemplate: Template = {
-          id: `template-${Date.now()}`,
-          content: userDescription,
-          title,
-          createdAt: Date.now(),
-          category: selectedCategory || 'General'
-        };
-
-        const newTemplates = [newTemplate, ...savedTemplates];
-        setSavedTemplates(newTemplates);
-        localStorage.setItem('descriptionTemplates', JSON.stringify(newTemplates));
-
-        // Show success animation
-        setShowSavedSuccess(true);
-
-        // Animate the textarea
-        controls.start({
-          scale: [1, 1.02, 1],
-          borderColor: ['rgba(99, 102, 241, 0.4)', 'rgba(16, 185, 129, 0.7)', 'rgba(99, 102, 241, 0.4)'],
-          transition: { duration: 0.5 }
-        });
-      }
-    }
-  };
-
-  // Delete template function
-  const deleteTemplate = (id: string) => {
-    const newTemplates = savedTemplates.filter(template => template.id !== id);
-    setSavedTemplates(newTemplates);
-    localStorage.setItem('descriptionTemplates', JSON.stringify(newTemplates));
-  };
-
-  // Copy to clipboard function with enhanced feedback
-  const copyToClipboard = () => {
-    navigator.clipboard.writeText(userDescription);
-    setCopiedToClipboard(true);
-
-    // Animate the textarea
-    controls.start({
-      scale: [1, 1.02, 1],
-      borderColor: ['rgba(99, 102, 241, 0.4)', 'rgba(16, 185, 129, 0.7)', 'rgba(99, 102, 241, 0.4)'],
-      transition: { duration: 0.5 }
-    });
-
-    setTimeout(() => setCopiedToClipboard(false), 2000);
-  };
-
-  // Get AI suggestion with category filtering
-  const getAiSuggestion = (categoryFilter?: string | React.MouseEvent) => {
-    setIsGeneratingSuggestion(true);
-
-    // Handle case when called from onClick event
-    const category = typeof categoryFilter === 'string' ? categoryFilter : undefined;
-    
-    // Filter suggestions by category if provided
-    const filteredSuggestions = category
-      ? aiSuggestions.filter(s => s.category === category)
-      : aiSuggestions;
-
-    // Simulate AI suggestion generation
-    setTimeout(() => {
-      const randomSuggestion = filteredSuggestions[
-        Math.floor(Math.random() * filteredSuggestions.length)
-      ];
-      setUserDescription(randomSuggestion.content);
-      setIsGeneratingSuggestion(false);
-      setShowAiSuggestions(false);
-    }, 1500);
-  };
-
-  // Export description as a file
-  const exportDescription = (format: 'txt' | 'md' | 'json') => {
-    const formattedData = formatExportContent(userDescription, projectTitle || '', format);
-    downloadAsFile(formattedData.content, formattedData.mimeType, formattedData.filename);
-  };
-
-  // Toggle fullscreen mode
-  const toggleFullscreen = () => {
-    setIsFullscreen(!isFullscreen);
-  };
-
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -202,39 +100,6 @@ const DescriptionInput = () => {
           />
         </motion.div>
 
-        {/* Action buttons */}
-        <ActionButtons
-          saveTemplate={saveTemplate}
-          copyToClipboard={copyToClipboard}
-          exportDescription={exportDescription}
-          isFullscreen={isFullscreen}
-          toggleFullscreen={toggleFullscreen}
-          copiedToClipboard={copiedToClipboard}
-        />
-
-        {/* Saved templates panel */}
-        <TemplatesPanel
-          showTemplates={showTemplates}
-          savedTemplates={savedTemplates}
-          setUserDescription={setUserDescription}
-          deleteTemplate={deleteTemplate}
-        />
-
-        {/* AI Suggestions panel */}
-        <AiSuggestionsPanel
-          showAiSuggestions={showAiSuggestions}
-          getAiSuggestion={getAiSuggestion}
-          isGeneratingSuggestion={isGeneratingSuggestion}
-        />
-
-        {/* Enhanced tag suggestions with categories */}
-        {!isUploading && (
-          <TagSuggestionsPanel
-            tagSuggestions={tagSuggestions}
-            setUserDescription={setUserDescription}
-            userDescription={userDescription}
-          />
-        )}
       </motion.div>
 
       {/* Show success animation */}
