@@ -56,12 +56,24 @@ export async function POST(req: Request) {
     if (!CONFIG.API.KEY) {
       throw new Error("OpenRouter API key is missing");
     }
+    let enhancedDescription = "";
 
-    const enhancedDescription =
-      AIPrompt.CODE_GEN_PROMPT +
-      description +
-      "\n\n" +
-      (options || "");
+    if (language == "react-tailwind") {
+
+      enhancedDescription =
+        AIPrompt.CODE_GEN_PROMPT_REACT_TAILWIND +
+        description +
+        "\n\n" +
+        (options || "");
+    }
+    if (language == "html-css") {
+      enhancedDescription =
+        AIPrompt.CODE_GEN_PROMPT_FORHTML_CSS +
+        description +
+        "\n\n" +
+        (options || "");
+    }
+
 
     // Using Gemini model for image + text processing
     // Try a different model if the current one is having issues
