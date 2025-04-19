@@ -127,6 +127,7 @@ const EnhancedCodeEditor: React.FC<EnhancedCodeEditorProps> = ({
   const { language, setLanguage } = useContext(LanguageContext);
 
   const { design, setDesign } = useContext(UserDesignContext);
+
   useEffect(() => {
     let processedCode = code;
     setHasError(false);
@@ -196,11 +197,12 @@ const EnhancedCodeEditor: React.FC<EnhancedCodeEditorProps> = ({
     if (typeof processedCode === "string") {
       processedCode = processedCode
         .replace(
-          /```javascript|```typescript|```typescrpt|```jsx|```tsx|```/g,
+          /```javascript|```typescript|```typescrpt|```jsx|```tsx|```|```json|json/g,
           ""
         )
         .trim();
     }
+    console.log(processedCode, "processedCode");
 
     // Set the processed code for single-file mode
     setCurrentCode(processedCode);
@@ -242,12 +244,6 @@ const EnhancedCodeEditor: React.FC<EnhancedCodeEditorProps> = ({
     console.log(design, "design");
   }, [userUid]);
 
-  const handleCodeChange = (newCode: string) => {
-    setCurrentCode(newCode);
-    if (onCodeChange) {
-      onCodeChange(newCode);
-    }
-  };
 
   // Handle copying code
   const handleCopyCode = () => {
@@ -345,9 +341,7 @@ const EnhancedCodeEditor: React.FC<EnhancedCodeEditorProps> = ({
   const toggleFullscreen = () => {
     setIsFullscreen(!isFullscreen);
   };
-  // console.log(code, "design uid DESIGN");
-  // console.log(design?.language, " language");
-  console.log(sandpackFiles, "isMultiFile");
+
 
   return (
     <ClientOnly>
@@ -837,7 +831,7 @@ const EnhancedCodeEditor: React.FC<EnhancedCodeEditorProps> = ({
               </div>
             </div>
           )}
-       
+
 
           {/* Error indicator */}
           {hasError && !isLoading && (

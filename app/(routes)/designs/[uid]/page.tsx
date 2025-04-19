@@ -192,7 +192,7 @@ const Page: React.FC = () => {
     );
   };
 
-  console.log(record, "record");
+  // console.log(record?.code.content.replace("```json", ""), "record");
 
   const generateCode = async (record: CodeRecord) => {
     const userdatabase = await db
@@ -304,7 +304,6 @@ const Page: React.FC = () => {
   };
 
 
-  console.log(design, "design");
 
   return (
     <div className="min-h-screen transition-colors duration-300">
@@ -391,7 +390,7 @@ const Page: React.FC = () => {
                 visible={!!success}
               />
             </div>
-           
+
             {/* Action area */}
             {record && (
               <div className="flex flex-wrap justify-between items-center gap-4">
