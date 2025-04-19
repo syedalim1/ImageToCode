@@ -271,7 +271,8 @@ export async function POST(req: Request) {
             }
 
             // If all JSON parsing fails, return the raw content
-            return NextResponse.json({ content: codeContent });
+           return NextResponse.json({ content: codeContent.replace(/```json/g, ' ') });
+
           }
         } catch (extractError) {
           console.error("Error extracting JSON:", extractError);
