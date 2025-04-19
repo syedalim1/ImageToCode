@@ -1,0 +1,55 @@
+{
+  "name": "ImageToCode - #1 AI Design to Code Generator",
+  "short_name": "ImageToCode",
+  "description": "Transform designs into code with ImageToCodeGenerator AI. Convert images to HTML, CSS, React & Next.js code instantly. Best AI prompt to code service by CodeNovaTech.",
+  "start_url": "https://imagetocode.codenovatech.in",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#9333ea",
+  "icons": [
+    {
+      "src": "/logo.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "related_applications": [],
+  "prefer_related_applications": false,
+  "categories": ["developer tools", "productivity", "ai tools", "web development", "design to code", "image to code"],
+  "screenshots": [],
+  "shortcuts": [
+    {
+      "name": "Dashboard",
+      "url": "/dashboard",
+      "description": "View your ImageToCode dashboard"
+    },
+    {
+      "name": "Generate Code",
+      "url": "/generate-code",
+      "description": "Convert design to code with AI"
+    },
+    {
+      "name": "View Designs", 
+      "url": "/designs",
+      "description": "Browse your saved designs"
+    },
+    {
+      "name": "Image to HTML",
+      "url": "/image-to-html",
+      "description": "Convert images to HTML/CSS code"
+    }
+  ],
+  "orientation": "any",
+  "scope": "https://imagetocode.codenovatech.in",
+  "lang": "en-US",
+  "dir": "ltr",
+  "iarc_rating_id": "",
+  "id": "imagetocode-codenovatech-in"
+}

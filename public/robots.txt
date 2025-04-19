@@ -1,0 +1,30 @@
+# https://www.robotstxt.org/robotstxt.html
+User-agent: *
+Allow: /
+
+# Allow all crawlers
+Sitemap: https://imagetocode.codenovatech.in/sitemap.xml
+
+# Block sensitive areas but allow search engines to access important routes
+Disallow: /api/
+Disallow: /_next/
+Disallow: /auth/
+
+# Additional optimization for search engines
+User-agent: Googlebot
+Allow: /
+Allow: /dashboard
+Allow: /generate-code
+Allow: /view-code
+Allow: /image-to-html
+Allow: /image-to-react
+Allow: /design-to-code
+
+User-agent: Bingbot
+Allow: /
+Allow: /dashboard
+Allow: /generate-code
+Allow: /view-code
+Allow: /image-to-html
+Allow: /image-to-react
+Allow: /design-to-code
