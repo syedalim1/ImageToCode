@@ -866,7 +866,7 @@ const ImageUpload = () => {
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          className="fixed inset-0 bg-black bg-opacity-70 flex h-full w-full items-center justify-center "
+          className="fixed inset-0 bg-black bg-opacity-70 flex h-[100vh] w-full items-center justify-center "
         >
           <motion.div
             className={`bg-white p-6 rounded-lg shadow-lg max-w-md w-full mx-4`}

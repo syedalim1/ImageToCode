@@ -364,6 +364,7 @@ const Page: React.FC = () => {
             </div>
           </div>
 
+
           <div className="p-6 space-y-6">
             {/* Notifications */}
             <div className="space-y-2">
@@ -390,7 +391,7 @@ const Page: React.FC = () => {
                 visible={!!success}
               />
             </div>
-
+           
             {/* Action area */}
             {record && (
               <div className="flex flex-wrap justify-between items-center gap-4">
@@ -406,6 +407,7 @@ const Page: React.FC = () => {
                 />
               </div>
             )}
+
 
             {/* Code editor */}
             <div className="h-full">

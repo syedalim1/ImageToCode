@@ -25,11 +25,20 @@ const CodeHeader: React.FC<CodeHeaderProps> = ({
 }) => {
   // Add typing animation effect
   const [typedText, setTypedText] = useState("");
+  const [isDesktop, setIsDesktop] = useState(true);
   const fullText =
     description ||
     "Transform your ideas into executable code with AI-powered generation";
 
   useEffect(() => {
+    // Handle responsive behavior
+    const handleResize = () => {
+      setIsDesktop(window.innerWidth >= 768);
+    };
+    handleResize();
+    window.addEventListener('resize', handleResize);
+
+    // Typing animation
     let index = 0;
     const timer = setInterval(() => {
       setTypedText(fullText.substring(0, index));
@@ -39,12 +48,15 @@ const CodeHeader: React.FC<CodeHeaderProps> = ({
       }
     }, 40);
 
-    return () => clearInterval(timer);
+    return () => {
+      clearInterval(timer);
+      window.removeEventListener('resize', handleResize);
+    };
   }, [fullText]);
 
   return (
     <motion.header
-      className="mb-8 relative overflow-hidden bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-500 p-8 rounded-xl shadow-xl border border-white/20 dark:border-gray-800/40"
+      className="mb-4 relative overflow-hidden bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-500 p-4 sm:p-6 md:p-8 rounded-xl shadow-xl border border-white/20 dark:border-gray-800/40"
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
@@ -114,160 +126,79 @@ const CodeHeader: React.FC<CodeHeaderProps> = ({
       </div>
 
       <div className="relative z-10">
-        {/* Floating icons */}
-        <motion.div
-          className="absolute top-2 right-10 text-white/30"
-          animate={{
-            y: [0, -10, 0],
-            rotate: [0, 5, 0],
-          }}
-          transition={{
-            duration: 8,
-            repeat: Infinity,
-            ease: "easeInOut",
-          }}
-        >
-          <Terminal className="h-8 w-8" />
-        </motion.div>
-
-        <motion.div
-          className="absolute bottom-8 right-16 text-white/20"
-          animate={{
-            y: [0, 8, 0],
-            rotate: [0, -8, 0],
-          }}
-          transition={{
-            duration: 7,
-            repeat: Infinity,
-            ease: "easeInOut",
-            delay: 1,
-          }}
-        >
-          <Cpu className="h-10 w-10" />
-        </motion.div>
-
-        <div className="flex items-center mb-6 space-x-3">
-          <motion.div
-            initial={{ rotate: -10, scale: 0.9 }}
-            animate={{ rotate: 0, scale: 1 }}
-            transition={{ duration: 0.5 }}
-            className="bg-white/90 dark:bg-gray-800/90 p-3 rounded-lg shadow-inner"
-          >
-            <Code className="h-8 w-8 text-indigo-600 dark:text-indigo-400" />
-          </motion.div>
-
-          <h1 className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-white via-blue-100 to-indigo-200 flex items-center space-x-2">
-            <span>Code Generation Studio</span>
-            <motion.div
-              animate={{
-                scale: [1, 1.2, 1],
-                rotate: [0, 5, 0],
-              }}
-              transition={{
-                duration: 3,
-                repeat: Infinity,
-                ease: "easeInOut",
-              }}
-            >
-              <Zap className="h-6 w-6 text-yellow-300" />
-            </motion.div>
-          </h1>
-        </div>
-
-        <motion.div
-          className="flex flex-col md:flex-row justify-between items-start md:items-center space-y-4 md:space-y-0"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.2, duration: 0.5 }}
-        >
-          <div className="relative group">
-            <p className="text-white/90 dark:text-gray-200 max-w-2xl text-base leading-relaxed backdrop-blur-sm bg-white/10 p-4 rounded-lg shadow-inner border border-white/10 transition-all duration-300 group-hover:bg-white/20">
-              {typedText}
-              <span className="animate-pulse">|</span>
-            </p>
-            <motion.div
-              className="absolute -right-2 -top-2 w-5 h-5 bg-gradient-to-r from-yellow-300 to-yellow-500 rounded-full shadow-lg shadow-yellow-500/30"
-              animate={{ scale: [1, 1.3, 1] }}
-              transition={{ duration: 2, repeat: Infinity }}
-            />
-          </div>
-
-          <div className="flex space-x-3">
-            <motion.div
-              className="flex items-center px-4 py-2.5 bg-gradient-to-r from-blue-600 to-cyan-500 text-white rounded-lg shadow-lg relative overflow-hidden group"
-              whileHover={{
-                scale: 1.05,
-                boxShadow: "0 0 15px rgba(59, 130, 246, 0.6)",
-              }}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.3 }}
-            >
-              <div className="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-              <Layers className="h-5 w-5 mr-2 text-white" />
-              <span className="font-medium">Code Templates</span>
-            </motion.div>
-
-            <motion.div
-              className="flex items-center px-4 py-2.5 bg-gradient-to-r from-purple-600 to-pink-500 text-white rounded-lg shadow-lg relative overflow-hidden group"
-              whileHover={{
-                scale: 1.05,
-                boxShadow: "0 0 15px rgba(168, 85, 247, 0.6)",
-              }}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.4 }}
-            >
-              <div className="absolute inset-0 bg-gradient-to-r from-purple-400/20 to-transparent w-1/2 h-full transform -skew-x-12 animate-shimmer"></div>
-              <div className="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-              <Sparkles className="h-5 w-5 mr-2 text-yellow-300" />
-              <span className="font-medium">AI Generated</span>
-            </motion.div>
-          </div>
-        </motion.div>
-
+        {/* Back button with improved animation and styling */}
         {onBackClick && (
           <motion.button
             onClick={onBackClick}
-            className="absolute top-4 left-4 p-2.5 bg-white/20 hover:bg-white/30 rounded-full text-white transition-all duration-300 shadow-lg backdrop-blur-sm border border-white/10"
-            whileHover={{
-              scale: 1.1,
-              boxShadow: "0 0 15px rgba(255, 255, 255, 0.3)",
-            }}
-            whileTap={{ scale: 0.9 }}
+            className="flex items-center gap-2 mb-4 sm:mb-6 px-2 sm:px-3 py-1.5 sm:py-2 rounded-md bg-white/10 hover:bg-white/20 text-white backdrop-blur-sm border border-white/10 transition-all duration-300 hover:shadow-lg"
+            whileHover={{ x: -5 }}
+            whileTap={{ scale: 0.95 }}
           >
-            <ArrowLeft className="h-5 w-5" />
+            <ArrowLeft className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+            <span className="text-xs sm:text-sm font-medium">Back to Designs</span>
           </motion.button>
         )}
+
       </div>
 
-      {/* Interactive code particle effect at the bottom */}
-      <div className="absolute bottom-0 left-0 w-full h-8 flex items-end overflow-hidden">
-        {[...Array(20)].map((_, i) => (
-          <motion.div
-            key={i}
-            className="bg-white opacity-50 rounded-t-sm mx-0.5"
-            style={{
-              height: `${Math.max(4, Math.random() * 24)}px`,
-              width: `${Math.max(2, Math.random() * 6)}px`,
-            }}
-            animate={{
-              height: [
-                `${Math.max(4, Math.random() * 24)}px`,
-                `${Math.max(8, Math.random() * 32)}px`,
-                `${Math.max(4, Math.random() * 24)}px`,
-              ],
-              opacity: [0.3, 0.7, 0.3],
-            }}
-            transition={{
-              duration: 1.5 + Math.random() * 2,
-              repeat: Infinity,
-              ease: "easeInOut",
-              delay: Math.random() * 2,
-            }}
-          />
-        ))}
-      </div>
+      {/* Modern Code Generation Panel */}
+      <motion.div
+        className="relative overflow-hidden  mt-2 md:mt-8"
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.8, ease: "easeOut" }}
+      >
+        {/* Animated particle effects - reduced for mobile */}
+        <div className="absolute top-0 left-0 w-full h-full">
+          {[...Array(isDesktop ? 15 : 8)].map((_, i) => (
+            <motion.div
+              key={i}
+              className="absolute rounded-full bg-white opacity-60"
+              style={{
+                width: Math.random() * (isDesktop ? 10 : 6) + 5,
+                height: Math.random() * (isDesktop ? 10 : 6) + 5,
+                top: `${Math.random() * 100}%`,
+                left: `${Math.random() * 100}%`,
+              }}
+              animate={{
+                y: [0, Math.random() * -70 - 20],
+                opacity: [0.6, 0],
+              }}
+              transition={{
+                duration: Math.random() * 3 + 2,
+                repeat: Infinity,
+                repeatType: "loop",
+              }}
+            />
+          ))}
+        </div>
+
+        <div className=" rounded-xl p-2 sm:p-4 md:p-4 border border-white/20 relative z-10">
+        
+        
+
+        
+
+          <motion.h3
+            className="text-2xl sm:text-3xl font-bold mb-2 sm:mb-4 text-center bg-clip-text text-transparent bg-gradient-to-r from-yellow-200 to-pink-200"
+            animate={{ y: [0, -5, 0] }}
+            transition={{ duration: 3, repeat: Infinity }}
+          >
+            Ready to Create Magic!
+          </motion.h3>
+
+          <motion.p
+            className="text-base sm:text-lg md:text-xl text-white mb-2 sm:mb-4 text-center font-light leading-relaxed"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3, duration: 0.8 }}
+          >
+            If you want to generate code, click the <span className="font-semibold text-yellow-300">Generate Code</span> button.
+            <br className="hidden sm:block" />After clicking, all code will be displayed here.
+          </motion.p>
+
+        </div>
+      </motion.div>
     </motion.header>
   );
 };
