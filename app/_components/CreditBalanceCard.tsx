@@ -296,29 +296,7 @@ const CreditBalanceCard: React.FC<CreditBalanceCardProps> = ({
                 </Button>
               </motion.div>
               
-              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                <Button
-                  variant="outline"
-                  onClick={async () => {
-                    try {
-                      const response = await axios.post(
-                        "/api/user/reset-credits"
-                      );
-                      alert(
-                        `Success: ${response.data.updatedCount} users updated to have 100 credits.`
-                      );
-                      window.location.reload(); // Refresh the page to update the credit display
-                    } catch (error) {
-                      console.error("Error resetting credits:", error);
-                      alert("Failed to reset credits. Please try again.");
-                    }
-                  }}
-                  className="border-gray-300 hover:border-gray-400 shadow-sm hover:shadow transition-all duration-300"
-                >
-                  <RefreshCw className="mr-2 h-4 w-4" />
-                  Reset Credits
-                </Button>
-              </motion.div>
+             
             </div>
           </motion.div>
         </div>

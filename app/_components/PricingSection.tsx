@@ -29,14 +29,14 @@ export const pricingPlans = Constants.CREDIT_COSTS.PRICING_PLANS.map(
       Boolean
     ),
     popular: index === 1,
-    cta: index === 3 ? "Contact Sales" : "Get Started",
+    cta: "Buy Now" ,
     save:
       index === 1
         ? "SAVE 17%"
         : index === 2
         ? "SAVE 33%"
         : index === 3
-        ? "SAVE 33%"
+        ? "SAVE 50%"
         : undefined,
     icon:
       index === 0 ? Sparkles : index === 1 ? Star : index === 2 ? Award : Crown,
@@ -92,14 +92,7 @@ const cardVariants = {
   },
 };
 
-const floatingAnimation = {
-  y: [-8, 8, -8],
-  transition: {
-    repeat: Infinity,
-    duration: 6,
-    ease: "easeInOut",
-  },
-};
+
 
 // Array of colorful shapes for enhanced background
 const colorfulShapes = [
@@ -132,73 +125,8 @@ export default function PricingSection() {
         <div className="absolute inset-0 opacity-30 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-purple-300 via-blue-200 to-transparent" />
       </div>
 
-      {/* Enhanced decorative floating elements */}
-      {colorfulShapes.map((shape, i) => (
-        <motion.div
-          key={i}
-          className={`absolute rounded-full bg-gradient-to-r ${shape.color} opacity-20 ${shape.blur}`}
-          style={{
-            top: `${10 + Math.random() * 80}%`,
-            left: `${5 + Math.random() * 90}%`,
-            transform: `rotate(${Math.random() * 360}deg)`,
-          }}
-          animate={{
-            y: [
-              i % 2 === 0 ? -30 : 30,
-              i % 2 === 0 ? 30 : -30,
-              i % 2 === 0 ? -30 : 30,
-            ],
-            x: [
-              i % 3 === 0 ? -20 : 20,
-              i % 3 === 0 ? 20 : -20,
-              i % 3 === 0 ? -20 : 20,
-            ],
-            scale: [1, 1.1 + Math.random() * 0.2, 1],
-            rotate: [0, 5, 0, -5, 0],
-          }}
-          transition={{
-            repeat: Infinity,
-            duration: 15 + Math.random() * 15,
-            ease: "easeInOut",
-            delay: Math.random() * 5,
-          }}
-        />
-      ))}
-
-      {/* Small animated particles */}
-      {[...Array(12)].map((_, i) => (
-        <motion.div
-          key={`particle-${i}`}
-          className={`absolute w-2 h-2 rounded-full bg-gradient-to-r ${
-            i % 6 === 0
-              ? "from-purple-400 to-pink-400"
-              : i % 6 === 1
-              ? "from-blue-400 to-cyan-400"
-              : i % 6 === 2
-              ? "from-indigo-400 to-blue-400"
-              : i % 6 === 3
-              ? "from-green-400 to-teal-400"
-              : i % 6 === 4
-              ? "from-yellow-400 to-orange-400"
-              : "from-rose-400 to-red-400"
-          }`}
-          style={{
-            top: `${5 + Math.random() * 90}%`,
-            left: `${5 + Math.random() * 90}%`,
-          }}
-          animate={{
-            y: [-20, 20, -20],
-            x: [-20, 20, -20],
-            opacity: [0.4, 0.8, 0.4],
-            scale: [1, 1.5, 1],
-          }}
-          transition={{
-            repeat: Infinity,
-            duration: 5 + Math.random() * 10,
-            delay: Math.random() * 5,
-          }}
-        />
-      ))}
+     
+  
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <motion.div

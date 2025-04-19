@@ -4,11 +4,11 @@ import { useState, useCallback } from "react";
 
 import { motion, AnimatePresence } from "framer-motion";
 import CreditBalanceCard from "@/app/_components/CreditBalanceCard";
-import CreditPackages from "@/app/_components/CreditPackages";
 import TransactionHistory from "@/app/_components/TransactionHistory";
 import CreditSystemExplainer from "@/app/_components/CreditSystemExplainer";
 import { Zap, Clock, Info } from "lucide-react";
 import { useUser } from "@clerk/nextjs";
+import PricingSection from "@/app/_components/PricingSection";
 
 // Sample transaction history
 const transactions = [
@@ -39,7 +39,7 @@ const transactions = [
 ];
 
 export default function CreditsPage() {
-  
+
   const { user } = useUser();
   console.log(user, "user");
 
@@ -47,10 +47,7 @@ export default function CreditsPage() {
     "packages" | "history" | "explainer"
   >("packages");
 
-  const handlePaymentSuccess = useCallback(() => {
-    // Refresh the page to update the credit display
-    window.location.reload();
-  }, []);
+
 
   const handleViewHistory = () => {
     setActiveTab("history");
@@ -147,11 +144,10 @@ export default function CreditsPage() {
           <div className="bg-white rounded-full p-1 shadow-md inline-flex">
             <motion.button
               onClick={() => setActiveTab("packages")}
-              className={`px-6 py-2 rounded-full text-sm font-medium transition-all flex items-center ${
-                activeTab === "packages"
+              className={`px-6 py-2 rounded-full text-sm font-medium transition-all flex items-center ${activeTab === "packages"
                   ? "bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-md"
                   : "text-gray-600 hover:text-gray-900"
-              }`}
+                }`}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
@@ -161,11 +157,10 @@ export default function CreditsPage() {
             {user ? (
               <motion.button
                 onClick={() => setActiveTab("history")}
-                className={`px-6 py-2 rounded-full text-sm font-medium transition-all flex items-center ${
-                  activeTab === "history"
+                className={`px-6 py-2 rounded-full text-sm font-medium transition-all flex items-center ${activeTab === "history"
                     ? "bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-md"
                     : "text-gray-600 hover:text-gray-900"
-                }`}
+                  }`}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
@@ -173,19 +168,7 @@ export default function CreditsPage() {
                 Transaction History
               </motion.button>
             ) : null}
-            <motion.button
-              onClick={() => setActiveTab("explainer")}
-              className={`px-6 py-2 rounded-full text-sm font-medium transition-all flex items-center ${
-                activeTab === "explainer"
-                  ? "bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-md"
-                  : "text-gray-600 hover:text-gray-900"
-              }`}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              <Info className="h-4 w-4 mr-1" />
-              How Credits Work
-            </motion.button>
+          
           </div>
         </div>
 
@@ -198,7 +181,8 @@ export default function CreditsPage() {
               animate="visible"
               exit="exit"
             >
-              <CreditPackages onPaymentSuccess={handlePaymentSuccess} />
+              <PricingSection  />
+              
             </motion.div>
           )}
 
@@ -217,17 +201,7 @@ export default function CreditsPage() {
             </motion.div>
           )}
 
-          {activeTab === "explainer" && (
-            <motion.div
-              key="explainer"
-              variants={tabVariants}
-              initial="hidden"
-              animate="visible"
-              exit="exit"
-            >
-              <CreditSystemExplainer />
-            </motion.div>
-          )}
+        
         </AnimatePresence>
       </div>
     </div>

@@ -137,8 +137,8 @@ export default {
     PRICING_PLANS: [
       { price: 20, credits: 10 },
       { price: 50, credits: 30, originalPrice: 60 },
-      { price: 140, credits: 90, originalPrice: 180 },
-      { price: 400, credits: 250, originalPrice: 500 },
+      { price: 120, credits: 90, originalPrice: 180 },
+      { price: 250, credits: 250, originalPrice: 500 },
     ],
   },
   CODE_OPTIMIZER_PROMPT: `  

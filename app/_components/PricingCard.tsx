@@ -366,13 +366,7 @@ const PricingCard: React.FC<PricingCardProps> = ({
               )}
             </AnimatePresence>
           </motion.span>
-          <span
-            className={`ml-2 text-sm font-medium ${
-              popular ? "text-white/70" : "text-gray-500"
-            }`}
-          >
-            /month
-          </span>
+  
         </motion.div>
 
         {/* Display Credits with animation */}
@@ -420,56 +414,7 @@ const PricingCard: React.FC<PricingCardProps> = ({
                 </span>
               </div>
 
-              {/* Circular indicator */}
-              <motion.div
-                className="relative w-10 h-10"
-                initial={{ opacity: 0, scale: 0 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 0.8, type: "spring" }}
-              >
-                <svg className="w-10 h-10" viewBox="0 0 36 36">
-                  <path
-                    d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                    stroke={
-                      popular
-                        ? "rgba(255, 255, 255, 0.2)"
-                        : `rgba(79, 70, 229, 0.2)`
-                    }
-                    fill="none"
-                    strokeWidth="3"
-                    strokeLinecap="round"
-                  />
-                  <motion.path
-                    d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                    fill="none"
-                    stroke={popular ? "#ffffff" : "#4F46E5"}
-                    strokeWidth="3"
-                    strokeLinecap="round"
-                    strokeDasharray={Math.min(100, (creditsValue / 200) * 100)}
-                    strokeDashoffset={
-                      100 - Math.min(100, (creditsValue / 200) * 100)
-                    }
-                    initial={{ strokeDasharray: 0 }}
-                    animate={{
-                      strokeDasharray: Math.min(
-                        100,
-                        (creditsValue / 200) * 100
-                      ),
-                    }}
-                    transition={{ delay: 0.9, duration: 1.5, ease: "easeOut" }}
-                  />
-                  <text
-                    x="18"
-                    y="20.5"
-                    textAnchor="middle"
-                    fontSize="8"
-                    fill={popular ? "#ffffff" : "#4F46E5"}
-                    fontWeight="bold"
-                  >
-                    {Math.min(100, Math.round((creditsValue / 200) * 100))}%
-                  </text>
-                </svg>
-              </motion.div>
+             
             </div>
 
             {/* Credit value visualization */}
