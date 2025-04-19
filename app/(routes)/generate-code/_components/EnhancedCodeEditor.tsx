@@ -758,92 +758,86 @@ const EnhancedCodeEditor: React.FC<EnhancedCodeEditorProps> = ({
             }`}
         >
           {/* Tabs navigation */}
-          <div className="flex items-center justify-between bg-slate-800 text-white p-2">
-            <div className="flex space-x-1">
-              <button
-                onClick={() => setActiveTab("code")}
-                className={`flex items-center px-3 py-1.5 rounded-md ${activeTab === "code" ? "bg-blue-600" : "hover:bg-slate-700"
-                  }`}
-              >
-                <Code size={16} className="mr-1.5" />
-                <span>Code + Files</span>
-              </button>
-              <button
-                onClick={() => setActiveTab("preview")}
-                className={`flex items-center px-3 py-1.5 rounded-md ${activeTab === "preview" ? "bg-blue-600" : "hover:bg-slate-700"
-                  }`}
-              >
-                <Eye size={16} className="mr-1.5" />
-                <span>Preview</span>
-              </button>
-              <button
-                onClick={() => setActiveTab("console")}
-                className={`flex items-center px-3 py-1.5 rounded-md ${activeTab === "console" ? "bg-blue-600" : "hover:bg-slate-700"
-                  }`}
-              >
-                <Terminal size={16} className="mr-1.5" />
-                <span>Console</span>
-              </button>
-            </div>
+          {sandpackFiles && (
 
-            <div className="flex space-x-2">
-              {/* Theme selector */}
-              <div className="relative">
+            <div className="flex items-center justify-between bg-slate-800 text-white p-2">
+              <div className="flex space-x-1">
                 <button
-                  onClick={() => setShowThemeSelector(!showThemeSelector)}
-                  className="p-1.5 rounded-md hover:bg-slate-700 relative group"
-                  aria-label="Change theme"
+                  onClick={() => setActiveTab("code")}
+                  className={`flex items-center px-3 py-1.5 rounded-md ${activeTab === "code" ? "bg-blue-600" : "hover:bg-slate-700"
+                    }`}
                 >
-                  {currentTheme.includes("dark") ? (
-                    <Moon size={18} className="text-blue-300" />
-                  ) : (
-                    <Sun size={18} className="text-yellow-300" />
-                  )}
-                  <span className="absolute bottom-full mb-2 left-1/2 transform -translate-x-1/2 px-2 py-1 text-xs bg-gray-900 text-white rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                    Change theme
-                  </span>
+                  <Code size={16} className="mr-1.5" />
+                  <span>Code + Files</span>
                 </button>
+                <button
+                  onClick={() => setActiveTab("preview")}
+                  className={`flex items-center px-3 py-1.5 rounded-md ${activeTab === "preview" ? "bg-blue-600" : "hover:bg-slate-700"
+                    }`}
+                >
+                  <Eye size={16} className="mr-1.5" />
+                  <span>Preview</span>
+                </button>
+                <button
+                  onClick={() => setActiveTab("console")}
+                  className={`flex items-center px-3 py-1.5 rounded-md ${activeTab === "console" ? "bg-blue-600" : "hover:bg-slate-700"
+                    }`}
+                >
+                  <Terminal size={16} className="mr-1.5" />
+                  <span>Console</span>
+                </button>
+              </div>
 
-                {showThemeSelector && (
-                  <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-md shadow-lg z-50 border border-gray-200 dark:border-gray-700">
-                    <div className="py-1">
-                      {Object.entries(availableThemes).map(([name, theme]) => (
-                        <button
-                          key={name}
-                          className={`block w-full text-left px-4 py-2 text-sm ${currentTheme === name
-                            ? "bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300"
-                            : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
-                            }`}
-                          onClick={() => {
-                            setCurrentTheme(name);
-                            setShowThemeSelector(false);
-                          }}
-                        >
-                          {name
-                            .split("-")
-                            .map(
-                              (word) =>
-                                word.charAt(0).toUpperCase() + word.slice(1)
-                            )
-                            .join(" ")}
-                        </button>
-                      ))}
+              <div className="flex space-x-2">
+                {/* Theme selector */}
+                <div className="relative">
+                  <button
+                    onClick={() => setShowThemeSelector(!showThemeSelector)}
+                    className="p-1.5 rounded-md hover:bg-slate-700 relative group"
+                    aria-label="Change theme"
+                  >
+                    {currentTheme.includes("dark") ? (
+                      <Moon size={18} className="text-blue-300" />
+                    ) : (
+                      <Sun size={18} className="text-yellow-300" />
+                    )}
+                    <span className="absolute bottom-full mb-2 left-1/2 transform -translate-x-1/2 px-2 py-1 text-xs bg-gray-900 text-white rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                      Change theme
+                    </span>
+                  </button>
+
+                  {showThemeSelector && (
+                    <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-md shadow-lg z-50 border border-gray-200 dark:border-gray-700">
+                      <div className="py-1">
+                        {Object.entries(availableThemes).map(([name, theme]) => (
+                          <button
+                            key={name}
+                            className={`block w-full text-left px-4 py-2 text-sm ${currentTheme === name
+                              ? "bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300"
+                              : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                              }`}
+                            onClick={() => {
+                              setCurrentTheme(name);
+                              setShowThemeSelector(false);
+                            }}
+                          >
+                            {name
+                              .split("-")
+                              .map(
+                                (word) =>
+                                  word.charAt(0).toUpperCase() + word.slice(1)
+                              )
+                              .join(" ")}
+                          </button>
+                        ))}
+                      </div>
                     </div>
-                  </div>
-                )}
+                  )}
+                </div>
               </div>
             </div>
-          </div>
-
-          {/* Loading indicator */}
-          {isLoading && (
-            <div className="flex items-center justify-center p-4 bg-white dark:bg-gray-900">
-              <RefreshCw className="animate-spin text-blue-500" size={24} />
-              <span className="ml-2 text-gray-600 dark:text-gray-300">
-                Loading code...
-              </span>
-            </div>
           )}
+       
 
           {/* Error indicator */}
           {hasError && !isLoading && (

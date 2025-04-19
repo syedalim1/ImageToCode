@@ -9,11 +9,11 @@ function Dashboard() {
 
 
     return (
-        <div className='w-full px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 max-w-full overflow-x-hidden relative'>
+        <div className='w-full  px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 max-w-full overflow-x-hidden relative'>
             <SignedIn>
                 {/* Content only visible to signed in users */}
                 <motion.div 
-                    className='w-full'
+                    className='w-full h-full'
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ duration: 0.5 }}

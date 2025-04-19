@@ -308,10 +308,7 @@ const Page: React.FC = () => {
 
   return (
     <div className="min-h-screen transition-colors duration-300">
-      {/* Background pattern */}
-      <div className="fixed inset-0 bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-gray-900 dark:to-indigo-950 -z-10">
-        <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
-      </div>
+
 
       {/* Theme toggle button - moved to client component */}
       <DarkModeToggle />
@@ -357,7 +354,7 @@ const Page: React.FC = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="bg-white dark:bg-gray-800 rounded-xl shadow-xl overflow-hidden border border-gray-200 dark:border-gray-700"
+          className="bg-white  dark:bg-gray-800 rounded-xl shadow-xl overflow-hidden border border-gray-200 dark:border-gray-700"
         >
           {/* Header with animated gradient border */}
           <div className="relative">

@@ -436,9 +436,14 @@ const ImageUpload = () => {
         );
       } else {
         return (
+
           <>
-            <BsCodeSlash className="mr-2" />
-            Generate Code
+            {!isUploading && (
+              <>
+                <BsCodeSlash className="mr-2" />
+                Generate Code
+              </>
+            )}
           </>
         );
       }
@@ -457,13 +462,15 @@ const ImageUpload = () => {
         {getButtonContent()}
 
         {/* Animated arrow for button */}
-        <motion.div
-          animate={{ x: [0, 5, 0] }}
-          transition={{ repeat: Infinity, duration: 1.5 }}
-          className="ml-2"
-        >
-          →
-        </motion.div>
+        {!isUploading && (
+          <motion.div
+            animate={{ x: [0, 5, 0] }}
+            transition={{ repeat: Infinity, duration: 1.5 }}
+            className="ml-2"
+          >
+            →
+          </motion.div>
+        )}
       </motion.button>
     );
   };
@@ -859,7 +866,7 @@ const ImageUpload = () => {
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50"
+          className="fixed inset-0 bg-black bg-opacity-70 flex h-full w-full items-center justify-center "
         >
           <motion.div
             className={`bg-white p-6 rounded-lg shadow-lg max-w-md w-full mx-4`}
