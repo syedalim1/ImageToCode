@@ -5,7 +5,6 @@ import FeaturesSection from "./_components/FeaturesSection";
 import Footer from "./_components/Footer";
 import HeroSection from "./_components/HeroSection";
 import PricingSection from "./_components/PricingSection";
-import EnhancedStatsSection from "./_components/StatsSection";
 
 
 
@@ -16,8 +15,7 @@ export default function Home() {
       <div style={{ contain: "content" }}>
         <HeroSection />
 
-        <EnhancedStatsSection />
-
+        
         <FeaturesSection />
 
         <PricingSection />
