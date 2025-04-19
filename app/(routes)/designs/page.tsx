@@ -103,23 +103,6 @@ function DesignsPage() {
   }, [user, isSignedIn]);
 
 
-  const weeklyData = Array(7)
-    .fill(0)
-    .map((_, i) => {
-      const d = new Date();
-      d.setDate(d.getDate() - i);
-      const dateStr = d.toISOString().split("T")[0];
-
-      return {
-        name: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"][d.getDay()],
-        count: designs.filter((design) => {
-          const designDate = parseDate(design.createdAt);
-          return (
-            designDate && designDate.toISOString().split("T")[0] === dateStr
-          );
-        }).length,
-      };
-    });
 
   const handleDelete = async (uid: string) => {
     try {

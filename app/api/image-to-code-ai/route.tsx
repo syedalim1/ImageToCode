@@ -77,7 +77,7 @@ export async function POST(req: Request) {
 
     // Using Gemini model for image + text processing
     // Try a different model if the current one is having issues
-    const modelName = "openai/gpt-4.1-nano";
+    const modelName = "openai/gpt-4o-mini";
 
     // Format payload according to OpenRouter's expected format
     const payload = {
