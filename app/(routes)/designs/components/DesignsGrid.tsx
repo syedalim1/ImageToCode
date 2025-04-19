@@ -15,9 +15,7 @@ interface DesignsGridProps {
 const DesignsGrid: React.FC<DesignsGridProps> = ({ designs, onDelete }) => {
   const router = useRouter();
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
-  const [favorites, setFavorites] = useState<string[]>([]);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
-
 
   // Track mouse position for hover effects
   useEffect(() => {
@@ -29,14 +27,6 @@ const DesignsGrid: React.FC<DesignsGridProps> = ({ designs, onDelete }) => {
     return () => window.removeEventListener('mousemove', handleMouseMove);
   }, []);
 
-
-  // Load favorites from localStorage
-  useEffect(() => {
-    const storedFavorites = localStorage.getItem('favoriteDesigns');
-    if (storedFavorites) {
-      setFavorites(JSON.parse(storedFavorites));
-    }
-  }, []);
 
 
   const handleDesignClick = (uid: string) => {
@@ -107,6 +97,11 @@ const DesignsGrid: React.FC<DesignsGridProps> = ({ designs, onDelete }) => {
     }
   };
 
+
+
+
+
+
   return (
     <>
       {/* Floating interactive background element */}
@@ -170,7 +165,7 @@ const DesignsGrid: React.FC<DesignsGridProps> = ({ designs, onDelete }) => {
                   animate={{ opacity: 1 }}
                   transition={{ delay: 0.1 }}
                 >
-                  {design.description || "Untitled Design"}
+                  {design?.projectTitle || "Untitled Design"}
                 </motion.h3>
               </div>
 

@@ -37,6 +37,7 @@ function DesignsPage() {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
 
+
   const fetchDesigns = async () => {
     try {
       setLoading(true);

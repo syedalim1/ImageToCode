@@ -42,6 +42,8 @@ interface CodeRecord {
   code: CodeContent;
   createdAt: string;
   options: Record<string, any>;
+  projectTitle: string;
+  explanation: string;
 }
 
 type APIResponse = Omit<CodeRecord, "code"> & {
@@ -54,7 +56,7 @@ const Page: React.FC = () => {
   const params = useParams();
   const router = useRouter();
   const { user } = useUser();
-  const uid = Array.isArray(params.uid) ? params.uid[0] : params.uid;
+  const uid = Array.isArray(params.uid) ? params.uid[0] : params.uid || '';
   const [response, setResponse] = useState<string>("");
   const [loading, setLoading] = useState(false);
   const [record, setRecord] = useState<CodeRecord | null>(null);
@@ -67,7 +69,6 @@ const Page: React.FC = () => {
   interface Design {
     id: number;
     uid: string;
-
     imageUrl: string;
     description: string | null;
     createdAt: string;
@@ -76,6 +77,8 @@ const Page: React.FC = () => {
     code: {
       content: string;
     };
+    projectTitle: string;
+    explanation: string;
   }
   const [design, setDesign] = useState<Design | null>(null);
   useEffect(() => {
@@ -192,7 +195,6 @@ const Page: React.FC = () => {
     );
   };
 
-  // console.log(record?.code.content.replace("```json", ""), "record");
 
   const generateCode = async (record: CodeRecord) => {
     const userdatabase = await db
@@ -228,33 +230,68 @@ const Page: React.FC = () => {
         model: record.model,
         language: record.language,
         userEmail: user?.primaryEmailAddress?.emailAddress,
-      });
 
+      });
 
       // Extract the content from the response
       let codeContent;
+      let parsedData = null;
+
+      // Handle different response formats
       if (res.data && typeof res.data === "object") {
         // If response is an object with content property
         if (res.data.content) {
           codeContent = res.data.content;
-          setResponse(codeContent);
+          // Try to parse if it's a stringified JSON
+          try {
+            if (typeof codeContent === "string") {
+              parsedData = JSON.parse(codeContent);
+            } else {
+              parsedData = codeContent;
+            }
+          } catch (e) {
+            // If not valid JSON, use as is
+            parsedData = null;
+          }
+          setResponse(typeof codeContent === "string" ? codeContent : JSON.stringify(codeContent));
         } else {
           // If it's already the code object
+          parsedData = res.data;
           codeContent = JSON.stringify(res.data);
           setResponse(codeContent);
         }
       } else if (typeof res.data === "string") {
         // If response is a string
         codeContent = res.data;
+        // Try to parse if it's a stringified JSON
+        try {
+          parsedData = JSON.parse(codeContent);
+        } catch (e) {
+          // If not valid JSON, use as is
+          parsedData = null;
+        }
         setResponse(codeContent);
       }
 
-      await axios.put(`/api/codetoimage?uid=${uid}`, {
-        code: { content: codeContent },
-        model: record.model,
-        email: user?.primaryEmailAddress?.emailAddress || "",
-        options: record.options || {},
+      // Extract metadata from parsed data if available
+      const projectTitle = parsedData?.projectTitle || "";
+      const explanation = parsedData?.explanation || "";
+
+      console.log("Saving to database with:", {
+        projectTitle,
+        explanation,
+
       });
+
+      // Update the database with the new code
+      await axios.put("/api/codetoimage", {
+        uid: uid,
+        code: { content: codeContent },
+        projectTitle: projectTitle,
+        explanation: explanation,
+      });
+
+
 
       setRegenerationCount((prev) => prev + 1);
     } catch (err) {

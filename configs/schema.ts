@@ -20,31 +20,33 @@ export const usersTable = pgTable("users", {
 export const imagetocodeTable = pgTable("imagetocode", {
   id: integer().primaryKey().generatedAlwaysAsIdentity(),
   uid: varchar({ length: 255 }).notNull(),
-  imageUrl: varchar({ length: 255 }).notNull(),
+  imageUrl: varchar().notNull(),
   code: json("code").notNull(),
-  description: varchar({ length: 255 }),
+  description: varchar(),
   email: varchar({ length: 255 }),
   createdAt: varchar({ length: 255 }).notNull(),
   options: json().default({}),
   mode: varchar({ length: 255 }).notNull(),
   theme: varchar({ length: 255 }).notNull(),
   language: varchar({ length: 255 }).notNull(),
-});
+  projectTitle: varchar(),
+  explanation: varchar(),
 
+});
 export const transactionsTable = pgTable("transactions", {
   id: integer().primaryKey().generatedAlwaysAsIdentity(),
   userId: integer().notNull(),
   credits: integer().notNull(),
   amount: integer().notNull(),
-  paymentId: varchar({ length: 255 }).notNull(),
-  orderId: varchar({ length: 255 }).notNull(),
-  signature: varchar({ length: 255 }).notNull(),
+  paymentId: varchar().notNull(),
+  orderId: varchar().notNull(),
+  signature: varchar().notNull(),
   createdAt: timestamp().defaultNow(),
 });
 
 export const submissions = pgTable("submissions", {
   id: integer().primaryKey().generatedAlwaysAsIdentity(),
-  uid: varchar({ length: 255 }).notNull(),
-  description: varchar({ length: 255 }),
+  uid: varchar().notNull(),
+  description: varchar(),
   email: varchar({ length: 255 }),
 });

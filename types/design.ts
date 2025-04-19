@@ -11,4 +11,7 @@ export interface Design {
   mode: string;
   theme: string;
   language: string;
+  projectTitle: string;
+  explanation: string;
+  
 }

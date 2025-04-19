@@ -38,7 +38,7 @@ interface SandpackProject {
   projectTitle?: string;
   explanation?: string;
   files: Record<string, { code: string }>;
-  generatedFiles?: string[];
+
 }
 
 // Function to ensure code is a valid React component

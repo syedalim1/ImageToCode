@@ -4,6 +4,7 @@ import { imagetocodeTable } from "@/configs/schema";
 import { eq } from "drizzle-orm";
 
 export async function POST(req: NextRequest) {
+
   try {
     const body = await req.json();
     const {
@@ -17,6 +18,8 @@ export async function POST(req: NextRequest) {
       language,
       mode,
       theme,
+      projectTitle,
+      explanation,
     } = body;
 
     if (!uid || !imageUrl || !email) {
@@ -49,6 +52,8 @@ export async function POST(req: NextRequest) {
         mode: mode || "",
         theme: theme || "",
         language: language || "",
+        projectTitle: projectTitle || "",
+        explanation: explanation || "",
       })
       .returning();
 
@@ -77,9 +82,9 @@ export async function POST(req: NextRequest) {
 export async function PUT(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
-    const uid = searchParams.get("uid");
+
     const body = await req.json();
-    const { code, imageUrl, description, createdAt, email } = body;
+    const { code, imageUrl, description, createdAt, email, projectTitle, explanation, uid } = body;
 
     if (!uid) {
       return NextResponse.json(
@@ -101,6 +106,9 @@ export async function PUT(req: NextRequest) {
     if (description) updateData.description = description;
     if (createdAt) updateData.createdAt = createdAt;
     if (email) updateData.email = email;
+    if (projectTitle) updateData.projectTitle = projectTitle;
+    if (explanation) updateData.explanation = explanation;
+
 
     const result = await db
       .update(imagetocodeTable)

@@ -30,7 +30,7 @@ export default {
         },
         ...
       },
-      "generatedFiles": []
+      
     }
 
     - You can use date-fns for date formatting
@@ -69,7 +69,7 @@ export default {
         },
         ...
       },
-      "generatedFiles": []
+     
     }
 
     💡 Make it visually appealing — no boring or default styles!

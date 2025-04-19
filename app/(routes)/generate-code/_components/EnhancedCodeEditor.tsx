@@ -38,6 +38,9 @@ import { desc, eq } from "drizzle-orm";
 import { UserUidContext } from "@/app/context/UserUidContext";
 import { UserDesignContext } from "@/app/context/UserDesignContext";
 import { LanguageContext } from "@/app/context/LanguageContext";
+import axios from "axios";
+import { useUser } from "@clerk/nextjs";
+import { useParams } from "next/navigation";
 
 interface EnhancedCodeEditorProps {
   code: string;
@@ -49,7 +52,7 @@ interface SandpackProject {
   projectTitle?: string;
   explanation?: string;
   files: Record<string, { code: string }>;
-  generatedFiles?: string[];
+ 
 }
 
 
@@ -126,8 +129,9 @@ const EnhancedCodeEditor: React.FC<EnhancedCodeEditorProps> = ({
   const { userUid, setUserUid } = useContext(UserUidContext);
   const { language, setLanguage } = useContext(LanguageContext);
 
+  const { uid } = useParams();
   const { design, setDesign } = useContext(UserDesignContext);
-
+  const { user } = useUser();
   useEffect(() => {
     let processedCode = code;
     setHasError(false);
@@ -139,9 +143,11 @@ const EnhancedCodeEditor: React.FC<EnhancedCodeEditorProps> = ({
       if (typeof code === "string" && code.trim().startsWith("{")) {
         const parsedData = JSON.parse(code);
 
+
         // Check if this is a Sandpack project format
         if (parsedData.files && typeof parsedData.files === "object") {
           setProjectData(parsedData);
+
           const files = convertToSandpackFiles(parsedData.files);
           setSandpackFiles(files);
           setIsMultiFile(true);
@@ -193,6 +199,7 @@ const EnhancedCodeEditor: React.FC<EnhancedCodeEditorProps> = ({
       // If parsing fails, continue with the original code
     }
 
+
     // Remove markdown code blocks if present
     if (typeof processedCode === "string") {
       processedCode = processedCode
@@ -202,10 +209,11 @@ const EnhancedCodeEditor: React.FC<EnhancedCodeEditorProps> = ({
         )
         .trim();
     }
-    console.log(processedCode, "processedCode");
+
 
     // Set the processed code for single-file mode
     setCurrentCode(processedCode);
+
 
     // Ensure the code is a valid React component for the preview
     try {
@@ -219,7 +227,14 @@ const EnhancedCodeEditor: React.FC<EnhancedCodeEditorProps> = ({
         }`
       );
     }
+
+
+    
+
+   
   }, [code]);
+
+
 
   useEffect(() => {
     const fetchDesign = async () => {
@@ -342,6 +357,10 @@ const EnhancedCodeEditor: React.FC<EnhancedCodeEditorProps> = ({
     setIsFullscreen(!isFullscreen);
   };
 
+  useEffect(() => {
+
+
+  }, [projectData])
 
   return (
     <ClientOnly>
