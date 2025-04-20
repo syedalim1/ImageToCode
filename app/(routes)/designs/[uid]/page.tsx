@@ -81,6 +81,10 @@ const Page: React.FC = () => {
     explanation: string;
   }
   const [design, setDesign] = useState<Design | null>(null);
+
+
+
+
   useEffect(() => {
     const fetchDesign = async () => {
       try {
@@ -92,6 +96,7 @@ const Page: React.FC = () => {
           .from(imagetocodeTable)
           .where(eq(imagetocodeTable.uid, uid ?? ""))
           .orderBy(desc(imagetocodeTable.createdAt));
+
 
         if (result.length > 0) {
           setDesign(result[0] as Design);
@@ -108,6 +113,8 @@ const Page: React.FC = () => {
       }
     };
     fetchDesign();
+
+
     console.log(design, "design");
 
   }, [uid]);
@@ -210,6 +217,7 @@ const Page: React.FC = () => {
       setError("You have no credits left to regenerate code.");
       return;
     }
+
     // Check if user is logged in
     if (!user) {
       setError("User not found. Please log in to generate code.");
@@ -222,78 +230,167 @@ const Page: React.FC = () => {
       setResponse("");
       setError("");
 
-      const res = await axios.post("/api/image-to-code-ai", {
-        description: record.description,
-        imageUrl: record.imageUrl,
-        mode: record.mode,
-        options: record.options,
-        model: record.model,
-        language: record.language,
-        userEmail: user?.primaryEmailAddress?.emailAddress,
-
-      });
-
-      // Extract the content from the response
-      let codeContent;
+      // Create object to accumulate streamed content
+      let accumulatedContent = "";
+      let projectTitle = "";
+      let explanation = "";
       let parsedData = null;
 
-      // Handle different response formats
-      if (res.data && typeof res.data === "object") {
-        // If response is an object with content property
-        if (res.data.content) {
-          codeContent = res.data.content;
+      // Make the POST request with streaming response handling
+      const response = await fetch("/api/image-to-code-ai", {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          description: record.description,
+          imageUrl: record.imageUrl,
+          mode: record.mode,
+          options: record.options,
+          model: record.model,
+          language: record.language,
+          userEmail: user?.primaryEmailAddress?.emailAddress,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`API request failed: ${response.status} - ${errorText}`);
+      }
+
+      // Check if response is streamed
+      const contentType = response.headers.get('Content-Type');
+
+      if (contentType && contentType.includes('text/event-stream')) {
+        // Handle streaming response
+        const reader = response.body?.getReader();
+        if (!reader) {
+          throw new Error("Failed to get response stream reader");
+        }
+
+        const decoder = new TextDecoder();
+
+        // Process the stream
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+
+          // Decode the chunk
+          const chunk = decoder.decode(value, { stream: true });
+
+          // Process SSE format (Server-Sent Events)
+          const lines = chunk.split('\n');
+          for (const line of lines) {
+            if (line.startsWith('data: ')) {
+              const data = line.slice(6).trim();
+
+              // Skip [DONE] message
+              if (data === '[DONE]') continue;
+
+              try {
+                // Parse the JSON data from the stream
+                const parsedChunk = JSON.parse(data);
+
+                if (parsedChunk.content) {
+                  // Accumulate content
+                  accumulatedContent += parsedChunk.content;
+                  // Update the response state progressively
+                  setResponse(prev => prev + parsedChunk.content);
+                } else if (parsedChunk.error) {
+                  throw new Error(parsedChunk.error);
+                } else if (parsedChunk.complete && parsedChunk.fullContent) {
+                  // Final message with complete content
+                  accumulatedContent = parsedChunk.fullContent;
+                  setResponse(parsedChunk.fullContent);
+                }
+              } catch (parseError) {
+                console.warn("Error parsing stream chunk:", parseError);
+                // If we couldn't parse as JSON, treat it as raw text
+                if (data && data !== '[DONE]') {
+                  accumulatedContent += data;
+                  setResponse(prev => prev + data);
+                }
+              }
+            }
+          }
+        }
+
+        // Process the accumulated content after stream is complete
+        try {
+          parsedData = JSON.parse(accumulatedContent);
+          projectTitle = parsedData?.projectTitle || "";
+          explanation = parsedData?.explanation || "";
+        } catch (e) {
+          // If not valid JSON, use as is
+          console.log("Accumulated content is not valid JSON, using as raw text");
+        }
+
+      } else {
+        // Handle non-streaming response (fallback)
+        const res = await response.json();
+
+        // Extract the content from the response
+        let codeContent;
+
+        // Handle different response formats
+        if (res && typeof res === "object") {
+          // If response is an object with content property
+          if (res.content) {
+            codeContent = res.content;
+            // Try to parse if it's a stringified JSON
+            try {
+              if (typeof codeContent === "string") {
+                parsedData = JSON.parse(codeContent);
+              } else {
+                parsedData = codeContent;
+              }
+            } catch (e) {
+              // If not valid JSON, use as is
+              parsedData = null;
+            }
+            setResponse(typeof codeContent === "string" ? codeContent : JSON.stringify(codeContent));
+            accumulatedContent = typeof codeContent === "string" ? codeContent : JSON.stringify(codeContent);
+          } else {
+            // If it's already the code object
+            parsedData = res;
+            codeContent = JSON.stringify(res);
+            setResponse(codeContent);
+            accumulatedContent = codeContent;
+          }
+        } else if (typeof res === "string") {
+          // If response is a string
+          codeContent = res;
           // Try to parse if it's a stringified JSON
           try {
-            if (typeof codeContent === "string") {
-              parsedData = JSON.parse(codeContent);
-            } else {
-              parsedData = codeContent;
-            }
+            parsedData = JSON.parse(codeContent);
           } catch (e) {
             // If not valid JSON, use as is
             parsedData = null;
           }
-          setResponse(typeof codeContent === "string" ? codeContent : JSON.stringify(codeContent));
-        } else {
-          // If it's already the code object
-          parsedData = res.data;
-          codeContent = JSON.stringify(res.data);
           setResponse(codeContent);
+          accumulatedContent = codeContent;
         }
-      } else if (typeof res.data === "string") {
-        // If response is a string
-        codeContent = res.data;
-        // Try to parse if it's a stringified JSON
-        try {
-          parsedData = JSON.parse(codeContent);
-        } catch (e) {
-          // If not valid JSON, use as is
-          parsedData = null;
-        }
-        setResponse(codeContent);
-      }
 
-      // Extract metadata from parsed data if available
-      const projectTitle = parsedData?.projectTitle || "";
-      const explanation = parsedData?.explanation || "";
+        // Extract metadata
+        projectTitle = parsedData?.projectTitle || "";
+        explanation = parsedData?.explanation || "";
+      }
 
       console.log("Saving to database with:", {
         projectTitle,
         explanation,
-
       });
 
       // Update the database with the new code
       await axios.put("/api/codetoimage", {
         uid: uid,
-        code: { content: codeContent },
+        code: { content: accumulatedContent },
         projectTitle: projectTitle,
         explanation: explanation,
       });
 
-
-
       setRegenerationCount((prev) => prev + 1);
+
     } catch (err) {
       handleError(err, "Error generating code:");
     } finally {

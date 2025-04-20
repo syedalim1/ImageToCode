@@ -1,9 +1,8 @@
-import Constants from "@/data/Constants";
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/configs/db";
 import { usersTable } from "@/configs/schema";
 import { eq } from "drizzle-orm";
-import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } from "@google/generative-ai";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 import { GoogleAIFileManager } from "@google/generative-ai/server";
 import mime from "mime-types";
 import fs from "fs";
@@ -16,7 +15,7 @@ const CONFIG = {
   },
   SITE: {
     URL: process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000",
-    NAME: process.env.SITE_NAME || "My Local App",
+    NAME: process.env.SITE_NAME || "My  Local App",
   },
   CREDITS: {
     GENERATION_COST: 10,
@@ -41,30 +40,30 @@ async function uploadToGemini(fileManager: GoogleAIFileManager, file: File | str
     if (file instanceof File) {
       const arrayBuffer = await file.arrayBuffer();
       const buffer = Buffer.from(arrayBuffer);
-      
+
       // Create temp directory if it doesn't exist
       const tempDir = path.join(process.cwd(), 'tmp');
       if (!fs.existsSync(tempDir)) {
         fs.mkdirSync(tempDir, { recursive: true });
       }
-      
+
       // Write to temp file
       const tempFilePath = path.join(tempDir, `${Date.now()}-${file.name}`);
       fs.writeFileSync(tempFilePath, buffer);
-      
+
       // Upload to Gemini
       const mimeType = file.type || mime.lookup(file.name) || "image/png";
       const uploadResult = await fileManager.uploadFile(tempFilePath, {
         mimeType,
         displayName: file.name,
       });
-      
+
       // Clean up temp file
       fs.unlinkSync(tempFilePath);
-      
+
       return uploadResult.file;
     }
-    
+
     // For file paths (string) from JSON request
     if (typeof file === 'string' && fs.existsSync(file)) {
       const mimeType = mime.lookup(file) || "image/png";
@@ -74,7 +73,7 @@ async function uploadToGemini(fileManager: GoogleAIFileManager, file: File | str
       });
       return uploadResult.file;
     }
-    
+
     throw new Error("Invalid file format provided");
   } catch (error) {
     console.error("Error uploading file to Gemini:", error);
@@ -87,10 +86,10 @@ export async function POST(req: NextRequest) {
     let userEmail = "";
     let code = "";
     let imageFile = null;
-    
+
     // Determine request content type and parse accordingly
     const contentType = req.headers.get("content-type") || "";
-    
+
     if (contentType.includes("multipart/form-data")) {
       // Handle form data request
       const formData = await req.formData();
@@ -109,10 +108,8 @@ export async function POST(req: NextRequest) {
     if (!userEmail) {
       return NextResponse.json({ error: "User email is required" }, { status: 400 });
     }
-    
-    if (!code) {
-      return NextResponse.json({ error: "Code to improve is required" }, { status: 400 });
-    }
+
+
 
     // Verify API configuration
     if (!CONFIG.API.KEY) {
@@ -122,7 +119,7 @@ export async function POST(req: NextRequest) {
     // Initialize Google Generative AI
     const genAI = new GoogleGenerativeAI(CONFIG.API.KEY);
     const fileManager = new GoogleAIFileManager(CONFIG.API.KEY);
-    
+
     // Fetch user and validate credits
     const [user] = await db
       .select()
@@ -132,7 +129,7 @@ export async function POST(req: NextRequest) {
     if (!user) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
-    
+
     const currentCredits = user.credits ?? 0;
     if (currentCredits < CONFIG.CREDITS.MINIMUM_BALANCE) {
       return NextResponse.json(
@@ -166,10 +163,10 @@ export async function POST(req: NextRequest) {
 
     // Setup chat session with appropriate prompt
     const improvePrompt = code + "\n\n" + "Fix All The Bug Run Proper Code";
-    
+
     let chatSession;
     let parts = [];
-    
+
     // Prepare message parts
     if (files.length > 0) {
       // Add file part
@@ -180,10 +177,10 @@ export async function POST(req: NextRequest) {
         }
       });
     }
-    
+
     // Add text part
     parts.push({ text: improvePrompt });
-    
+
     // Start chat session
     chatSession = model.startChat({
       generationConfig,
@@ -198,10 +195,10 @@ export async function POST(req: NextRequest) {
     try {
       // Send message to Gemini API
       const result = await chatSession.sendMessage("Please improve the code I provided");
-      
+
       // Process response
       const responseText = result.response.text();
-      
+
       // Strip markdown code blocks if present
       const cleanedResponse = responseText
         .replace(/```javascript|```typescript|```jsx|```tsx|```/g, "")
@@ -214,15 +211,15 @@ export async function POST(req: NextRequest) {
         .where(eq(usersTable.email, userEmail));
 
       // Return improved code
-      return NextResponse.json({ 
+      return NextResponse.json({
         improvedCode: cleanedResponse,
         creditsRemaining: currentCredits - CONFIG.CREDITS.GENERATION_COST
       });
     } catch (apiError) {
       console.error("Gemini API Request Error:", apiError);
       return NextResponse.json(
-        { 
-          error: "Failed to generate content", 
+        {
+          error: "Failed to generate content",
           details: String(apiError),
           requestId: Date.now().toString()
         },

@@ -52,7 +52,7 @@ interface SandpackProject {
   projectTitle?: string;
   explanation?: string;
   files: Record<string, { code: string }>;
- 
+
 }
 
 
@@ -229,9 +229,9 @@ const EnhancedCodeEditor: React.FC<EnhancedCodeEditorProps> = ({
     }
 
 
-    
 
-   
+
+
   }, [code]);
 
 

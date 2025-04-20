@@ -1,6 +1,5 @@
 "use client";
 
-import { db } from "@/configs/db";
 import { useUser } from "@clerk/nextjs";
 import React, { useEffect, useState, useRef } from "react";
 import axios from "axios";
@@ -95,7 +94,7 @@ const ModeSelector: React.FC<ModeSelectorProps> = ({
   // Define available modes with enhanced information
   const modes: ModeInfo[] = [
     {
-      id: "normal",
+      id: "basic",
       name: "Standard Mode",
       description: "Basic code generation with standard features",
       credits: 10,
@@ -113,8 +112,8 @@ const ModeSelector: React.FC<ModeSelectorProps> = ({
       recommended: false
     },
     {
-      id: "export",
-      name: "Premium Mode",
+      id: "professional",
+      name: "Professional Mode",
       description: "Advanced features with premium export options",
       credits: 30,
       features: [
@@ -132,8 +131,8 @@ const ModeSelector: React.FC<ModeSelectorProps> = ({
       recommended: true
     },
     {
-      id: "turbo",
-      name: "Turbo Mode",
+      id: "ultra",
+      name: "Ultra Mode",
       description: "Ultra-fast generation with advanced AI models",
       credits: 50,
       features: [

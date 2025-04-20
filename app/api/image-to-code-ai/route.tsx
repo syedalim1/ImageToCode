@@ -1,5 +1,10 @@
+import { db } from "@/configs/db";
+import { usersTable } from "@/configs/schema";
 import AIPrompt from "@/data/AIPrompt";
+import { eq } from "drizzle-orm";
 import { NextResponse } from "next/server";
+
+
 
 // Centralized configuration
 const CONFIG = {
@@ -14,15 +19,26 @@ const CONFIG = {
     NAME: process.env.SITE_NAME || "My Local App",
   },
   CREDITS: {
-    GENERATION_COST: 10,
+    // Different costs based on generation mode
+    COST_BY_MODE: {
+      basic: 10,
+      professional: 30,
+      ultra: 50
+    },
+    DEFAULT_COST: 10, // Fallback cost if mode is not recognized
     MINIMUM_BALANCE: 10,
   },
   GENERATION: {
     MAX_TOKENS: 15000,
     TIMEOUT_MS: 120000, // Increased timeout to 120 seconds (2 minutes)
   },
+  AI_MODEL: {
+    basic: "google/gemini-2.5-flash-preview",
+    professional: "google/gemini-2.5-flash-preview:thinking",
+    ultra: "google/gemini-2.5-pro-preview-03-25"
+  }
 };
-
+//openai/gpt-4.1  best google/gemini-2.5-pro-exp-03-25:free
 // Helper function to log detailed API response information
 const logResponseDetails = async (response: Response, label: string) => {
   try {
@@ -50,6 +66,67 @@ export async function POST(req: Request) {
       language,
     } = await req.json();
 
+    // Check if user email is provided
+    if (!userEmail) {
+      return NextResponse.json(
+        {
+          error: "User email is required",
+          details: "Please provide a valid user email to proceed",
+        },
+        { status: 400 }
+      );
+    }
+
+    // Fetch user data and check credits
+    const userData = await db
+      .select()
+      .from(usersTable)
+      .where(eq(usersTable.email, userEmail));
+
+    if (!userData || userData.length === 0) {
+      return NextResponse.json(
+        {
+          error: "User not found",
+          details: "No user account found with the provided email",
+        },
+        { status: 404 }
+      );
+    }
+
+    const user = userData[0];
+    // Ensure credits value is valid, default to 0 if null
+    const currentCredits = user.credits ?? 0;
+
+    // Determine credit cost based on mode
+    // Type-safety: ensure mode is one of the expected values or use default
+    const validMode = (mode && ['basic', 'professional', 'ultra'].includes(mode)) ? mode as 'basic' | 'professional' | 'ultra' : null;
+
+    const creditCost = validMode ? CONFIG.CREDITS.COST_BY_MODE[validMode] : CONFIG.CREDITS.DEFAULT_COST;
+    const newCreditBalance = currentCredits - creditCost;
+
+    // Check if user has enough credits
+    if (newCreditBalance < CONFIG.CREDITS.MINIMUM_BALANCE) {
+      return NextResponse.json(
+        {
+          error: "Insufficient credits",
+          details: `This operation requires ${creditCost} credits, but you only have ${currentCredits} credits remaining.`,
+          currentCredits,
+          requiredCredits: creditCost,
+        },
+        { status: 402 } // 402 Payment Required
+      );
+    }
+
+    // Update user credits
+    await db
+      .update(usersTable)
+      .set({ credits: newCreditBalance })
+      .where(eq(usersTable.email, userEmail));
+
+    console.log(`Updated credits for ${userEmail}: ${currentCredits} → ${newCreditBalance} (-${creditCost})`);
+
+    const modelName = CONFIG.AI_MODEL[validMode || 'basic'];
+
 
 
     // Verify API configuration
@@ -57,6 +134,8 @@ export async function POST(req: Request) {
       throw new Error("OpenRouter API key is missing");
     }
     let enhancedDescription = "";
+
+
 
     if (language == "react-tailwind") {
 
@@ -77,8 +156,8 @@ export async function POST(req: Request) {
 
     // Using Gemini model for image + text processing
     // Try a different model if the current one is having issues  
-    const modelName = "google/gemini-2.0-flash-001";
-// openai/gpt-4o-mini
+
+
     // Format payload according to OpenRouter's expected format
     const payload = {
       model: modelName,
@@ -91,7 +170,7 @@ export async function POST(req: Request) {
           ],
         },
       ],
-      stream: false, // Disable streaming for simplicity
+      stream: false, // Enable streaming for real-time updates
       max_tokens: CONFIG.GENERATION.MAX_TOKENS,
       temperature: 0.7, // Add temperature for more controlled outputs
       // Removed response_format as it might not be supported by all models
@@ -271,17 +350,24 @@ export async function POST(req: Request) {
             }
 
             // If all JSON parsing fails, return the raw content
-           return NextResponse.json({ content: codeContent.replace(/```json/g, ' ') });
+            const result = { content: codeContent.replace(/```json/g, ' ') };
+            // Deduct credits after successful generation
+
 
           }
         } catch (extractError) {
           console.error("Error extracting JSON:", extractError);
-          return NextResponse.json({ content: codeContent });
+          const result = { content: codeContent };
+          // Deduct credits after successful generation
+
+          return NextResponse.json(result);
         }
       } else {
         // If no code block, return the raw content
         console.log("No JSON code block found, returning raw content");
-        return NextResponse.json({ content: codeContent });
+        const result = { content: codeContent };
+        // Deduct credits after successful generation
+        return NextResponse.json(result);
       }
     } catch (apiError) {
       console.error("API Request Error:", apiError);
