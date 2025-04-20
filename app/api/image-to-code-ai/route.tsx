@@ -33,7 +33,7 @@ const CONFIG = {
     TIMEOUT_MS: 120000, // Increased timeout to 120 seconds (2 minutes)
   },
   AI_MODEL: {
-    basic: "google/gemini-2.5-flash-preview",
+    basic: "google/gemini-2.0-flash-001",
     professional: "google/gemini-2.5-flash-preview:thinking",
     ultra: "google/gemini-2.5-pro-preview-03-25"
   }

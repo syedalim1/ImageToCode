@@ -1,7 +1,7 @@
 import dedent from "dedent";
 
 export default {
-  
+
 
   CODE_GEN_PROMPT_REACT_TAILWIND: dedent`
     Generate a programming code structure for a React project using Vite. 
@@ -42,21 +42,34 @@ export default {
     - Use Unsplash for stock photos (valid URLs only)
   `,
   CODE_GEN_PROMPT_FORHTML_CSS: dedent`
-    Generate a beautiful and clean HTML + CSS project.
+        🏗️ HTML STRUCTURE REQUIREMENTS:
+    ➤ Use semantic HTML5 elements precisely (header, nav, main, section, article, aside, footer)
+    ➤ Implement proper HTML attributes for accessibility (aria-labels, role, alt text)
+    ➤ Use correct meta tags for SEO and responsive design
+    ➤ Structure content with proper heading hierarchy (h1-h6)
+    ➤ Implement forms with proper validation attributes and labels
+    ➤ Add descriptive class names that reflect component purpose
+    ➤ Include well-placed, helpful comments for major sections
 
-    ➤ Organize the code using semantic HTML5 elements
-    ➤ Use well-structured, production-quality CSS (preferably with Flexbox or Grid)
-    ➤ Do NOT use any external frameworks like Bootstrap, Tailwind, etc.
-    ➤ Make sure the design is fully responsive and user-friendly
-    ➤ Use emojis where needed for a better experience 😄
-    ➤ Add comments inside the HTML and CSS to describe major sections
-    ➤ Use placeholder images from:
-       https://archive.org/download/placeholder-image/placeholder-image.jpg
+    🎨 CSS IMPLEMENTATION REQUIREMENTS:
+    ➤ Create well-structured, production-quality CSS using modern techniques
+    ➤ Implement layouts using Flexbox and CSS Grid appropriately
+    ➤ Use CSS custom properties (variables) for colors and reusable values
+    ➤ Implement precise color matching with exact hex/RGB values
+    ➤ Create exact shadows, gradients, and effects as specified
+    ➤ Use proper CSS specificity to avoid selector conflicts
+    ➤ Implement BEM or similar methodology for class naming
+    ➤ Include detailed comments for complex CSS rules
+    ➤ Avoid !important unless absolutely necessary
 
-    ✅ **Important**: The main file must be created at **/index.html** only.
-    🔁 Do NOT place the HTML file in any subfolder. It must be exactly **/index.html**
+    
+    ✅ REQUIRED OUTPUT STRUCTURE:
+    ➤ Main file MUST be created at **/index.html** only
+    ➤ CSS file should be at **/style.css**
+    ➤ Additional CSS files only if logically needed
+    ➤ JavaScript should be in separate .js files
 
-    Use this output format:
+    Use this exact output format:
     {
       "projectTitle": "",
       "explanation": "",
@@ -72,8 +85,13 @@ export default {
      
     }
 
-    💡 Make it visually appealing — no boring or default styles!
-    🎨 Use Google Fonts via CDN only if needed
-    📸 Use Unsplash URLs for any background or content images
+    RESOURCES TO USE:
+    🖼️ Placeholder images: "https://source.unsplash.com/random/[WIDTHxHEIGHT]?[keyword]"
+    🔤 For custom fonts: Google Fonts via CDN (include specific font weights needed)
+    🎭 Icons: Use SVG icons inline for better performance
+    😄 Include appropriate emojis for better user experience
+
+    IMPORTANT: Create visually stunning, production-quality code with precise styling, accurate layouts, and error-free implementation. The code must render exactly as intended across all modern browsers.
+ 
   `,
 };
