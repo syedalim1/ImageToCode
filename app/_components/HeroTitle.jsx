@@ -17,16 +17,14 @@ export default function HeroTitle() {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.5, duration: 0.8 }}
-        className="relative"
-        style={{ willChange: "transform" }}
+
       >
-        in Seconds
+        in Minutes
         <motion.span
           className="absolute -right-16 -top-1 text-2xl"
           initial={{ opacity: 0, scale: 0, rotate: -20 }}
           animate={{ opacity: 1, scale: 1, rotate: 0 }}
           transition={{ delay: 1.3, duration: 0.5, type: "spring" }}
-          style={{ willChange: "transform" }}
         >
           ✨
         </motion.span>

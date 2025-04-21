@@ -272,9 +272,9 @@ function AppHeader() {
           stiffness: 260,
           damping: 20,
         }}
-        className={`sticky top-0 z-40 w-full transition-all duration-300 ${rainbowGradient} ${scrolled
-            ? "shadow-xl shadow-purple-200/20"
-            : "shadow-md shadow-blue-100/10"
+        className={`sticky top-0 z-40 w-full pb-7 transition-all duration-300 ${rainbowGradient} ${scrolled
+          ? "shadow-xl shadow-purple-200/20"
+          : "shadow-md shadow-blue-100/10"
           }`}
       >
         <div className="flex items-center justify-between w-full px-4 py-3 relative">
@@ -309,10 +309,10 @@ function AppHeader() {
                   className="p-1.5 rounded-lg bg-gradient-to-br from-indigo-600 to-purple-700 mr-2 shadow-lg shadow-purple-300/30"
                   animate={logoControls}
                 >
-                  <Image className="h-5 w-5 text-white drop-shadow-md" />
+                  <Image className="h-8 w-8 text-white drop-shadow-md" />
                 </motion.div>
-                <div className="text-xl font-bold bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 bg-clip-text text-transparent flex items-center relative">
-                  <span className="hidden sm:inline tracking-tight">
+                <div className="text-2xl font-bold bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 bg-clip-text text-transparent flex items-center relative">
+                  <span className="hidden sm:inline  tracking-tight">
                     ImageToCode
                   </span>
                   <span className="sm:hidden">I2C</span>
@@ -358,7 +358,7 @@ function AppHeader() {
                           href={`/${item.id}`}
                           onClick={() => setActiveTab(item.id)}
                           className={`
-                    flex items-center px-4 py-2.5 rounded-2xl text-sm font-semibold 
+                    flex items-center px-4 py-2.5 rounded-2xl text-xl font-semibold 
                     transition-all duration-300 group relative overflow-hidden
                     ${activeTab === item.id
                               ? `${item.color.activeBackground} text-white ${item.color.activeGlow}`
@@ -400,25 +400,7 @@ function AppHeader() {
                   </div>
                 </motion.div>
 
-                {/* Hover underline effect */}
-                <AnimatePresence>
-                  {hoveredNavItem && (
-                    <motion.div
-                      initial={{ opacity: 0, width: 0 }}
-                      animate={{
-                        opacity: 1,
-                        width: "100%",
-                        transition: { duration: 0.3 },
-                      }}
-                      exit={{
-                        opacity: 0,
-                        width: 0,
-                        transition: { duration: 0.2 },
-                      }}
-                      className="absolute bottom-0 left-0 h-0.5 bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500"
-                    />
-                  )}
-                </AnimatePresence>
+               
               </div>
             </nav>
           ) : null}
@@ -552,8 +534,8 @@ function AppHeader() {
                         <div className="flex items-center z-10">
                           <div
                             className={`p-2 rounded-lg ${activeTab === item.id
-                                ? "bg-white/30"
-                                : "bg-white/10"
+                              ? "bg-white/30"
+                              : "bg-white/10"
                               } mr-3`}
                           >
                             <item.icon className="w-4 h-4" />

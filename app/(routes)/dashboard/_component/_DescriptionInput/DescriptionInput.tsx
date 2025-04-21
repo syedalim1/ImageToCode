@@ -84,12 +84,7 @@ const DescriptionInput = () => {
         animate={{ opacity: 1 }}
         transition={{ delay: 0.2 }}
       >
-        <HeaderSection
-          setShowTemplates={setShowTemplates}
-          showTemplates={showTemplates}
-          setShowAiSuggestions={setShowAiSuggestions}
-          showAiSuggestions={showAiSuggestions}
-        />
+        <HeaderSection />
 
         <motion.div animate={controls}>
           <DescriptionTextarea

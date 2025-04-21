@@ -1,4 +1,5 @@
 import dedent from "dedent";
+import { Award, Crown, Sparkles, Star } from "lucide-react";
 
 export default {
   IMAGE_TO_REACTJS_PROMPT: dedent`
@@ -131,16 +132,64 @@ export default {
 
   ERROR_PREVENTION_PROMPTFORNEXTJS: `
 `,
-  CREDIT_COSTS: {
-    NORMAL_MODE: 10,
-    EXPERT_MODE: 40,
-    PRICING_PLANS: [
-      { price: 20, credits: 10 },
-      { price: 50, credits: 30, originalPrice: 60 },
-      { price: 120, credits: 90, originalPrice: 180 },
-      { price: 250, credits: 250, originalPrice: 500 },
-    ],
-  },
+  CREDIT_COSTS: [
+    {
+      title: "Basic",
+      price: 20,
+      originalPrice: "",
+      credits: "10 Credits",
+      features: ["1 Image-To-Code Generate"],
+      popular: false,
+      cta: "Buy Now",
+      save: undefined,
+      icon: Sparkles,
+      iconColor: "from-blue-400 to-cyan-500",
+      normalModeCost: 10,
+      expertModeCost: 40
+    },
+    {
+      title: "Standard",
+      price: 50,
+      originalPrice: 60,
+      credits: "30 Credits",
+      features: ["3 Image-To-Code Generate"],
+      popular: true,
+      cta: "Buy Now",
+      save: "SAVE 17%",
+      icon: Star,
+      iconColor: "from-violet-500 to-purple-600",
+      normalModeCost: 10,
+      expertModeCost: 40
+    },
+    {
+      title: "Premium",
+      price: 120,
+      originalPrice: 180,
+      credits: "90 Credits",
+      features: ["9 Image-To-Code Generate"],
+      popular: false,
+      cta: "Buy Now",
+      save: "SAVE 33%",
+      icon: Award,
+      iconColor: "from-fuchsia-500 to-pink-600",
+      normalModeCost: 10,
+      expertModeCost: 40
+    },
+    {
+      title: "Enterprise",
+      price: 250,
+      originalPrice: 500,
+      credits: "250 Credits",
+      features: ["25 Image-To-Code Generate"],
+      popular: false,
+      cta: "Buy Now",
+      save: "SAVE 50%",
+      icon: Crown,
+      iconColor: "from-indigo-400 via-blue-500 to-cyan-400",
+      normalModeCost: 10,
+      expertModeCost: 40
+    }
+  ],
   CODE_OPTIMIZER_PROMPT: `  
 Comprehensive Code Enhancement Guidelines
 

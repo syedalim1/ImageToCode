@@ -1,11 +1,11 @@
-// HeaderSection.jsx
+
 "use client";
 
 import { motion } from "framer-motion";
-import { Sparkles, Clock, Wand2 } from "lucide-react";
+import { Sparkles } from "lucide-react";
 import React from "react";
 
-export const HeaderSection = ({ setShowTemplates, showTemplates, setShowAiSuggestions, showAiSuggestions }) => {
+export const HeaderSection = () => {
     return (
         <>
             <div className="flex justify-between items-start mb-4">

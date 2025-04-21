@@ -19,6 +19,7 @@ import { ProjectTitleContext } from "@/app/context/ProjectTitleContext";
 import { UserDescriptionContext } from "@/app/context/UserDescriptionContext";
 import { IsUploadingContext } from "@/app/context/IsUploadingContext";
 import { UploadedImageUrlContext } from "@/app/context/UploadedImageUrlContext";
+import { CheckCircle, Code, Sparkles, Zap, Image } from "lucide-react";
 
 // Define the interface outside the component
 interface UploadedImageUrlContextValue {
@@ -542,7 +543,7 @@ const ImageUpload = () => {
                 </motion.div>
 
                 {/* Step label */}
-                <span className={`text-xs mt-1 hidden sm:block ${index <= currentStepIndex ? "text-gray-700 font-medium" : "text-gray-400"}`}>
+                <span className={`text-xl font-bold mt-1 hidden sm:block ${index <= currentStepIndex ? "text-gray-700 font-medium" : "text-gray-400"}`}>
                   {step.label}
                 </span>
               </motion.div>
@@ -787,50 +788,83 @@ const ImageUpload = () => {
                 </div>
               </div>
 
-              {/* Pro tips */}
-              <motion.div
-                className="mt-6 bg-gradient-to-r from-blue-50 to-indigo-50 p-4 rounded-lg border border-blue-100"
-                initial={{ opacity: 0.8 }}
-                whileHover={{ opacity: 1 }}
-              >
-                <div className="flex justify-between items-center mb-2">
-                  <h4 className="font-medium text-blue-800 flex items-center">
-                    <HiOutlineSparkles className="mr-2" />
-                    Pro Tips
-                  </h4>
-
-                </div>
-
-                <AnimatePresence>
-                  {showTips && (
-                    <motion.div
-                      initial={{ opacity: 0, height: 0 }}
-                      animate={{ opacity: 1, height: "auto" }}
-                      exit={{ opacity: 0, height: 0 }}
-                      transition={{ duration: 0.3 }}
-                      className="overflow-hidden"
-                    >
-                      <ul className="space-y-2 text-sm text-blue-700 mt-2">
-                        <li className="flex items-start">
-                          <span className="mr-2">•</span>
-                          <span>Add detailed descriptions for more accurate code generation</span>
-                        </li>
-                        <li className="flex items-start">
-                          <span className="mr-2">•</span>
-                          <span>Choose the right language based on your project requirements</span>
-                        </li>
-                        <li className="flex items-start">
-                          <span className="mr-2">•</span>
-                          <span>Use high-quality images for better results</span>
-                        </li>
-                      </ul>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </motion.div>
             </motion.div>
           )}
         </motion.div>
+
+        <div className="mt-8 relative overflow-hidden">
+          {/* Vibrant gradient background */}
+          <div className="absolute inset-0 bg-gradient-to-br from-purple-100 via-indigo-100 to-blue-100 rounded-xl opacity-80" />
+
+          {/* Glass-like card effect */}
+          <div className="relative p-5 border border-indigo-200 rounded-xl shadow-lg backdrop-blur-sm bg-white bg-opacity-20">
+            {/* Header with gradient text */}
+            <div className="flex justify-between items-center mb-3">
+              <div className="flex items-center">
+                <div className="p-2 bg-gradient-to-r from-purple-500 to-indigo-600 rounded-lg mr-3 shadow">
+                  <Sparkles className="w-5 h-5 text-white" />
+                </div>
+                <h4 className="font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-indigo-600 text-xl">Pro Tips</h4>
+              </div>
+
+
+            </div>
+
+            {/* Fancy divider */}
+            <div className="h-1 bg-gradient-to-r from-purple-300 via-indigo-400 to-blue-300 rounded-full mb-4 shadow-sm" />
+
+            {/* Content section */}
+
+            <div className="space-y-4 pt-2">
+              <div className="flex items-start bg-gradient-to-r from-purple-50 to-indigo-50 rounded-xl p-3 shadow-sm border border-purple-100 hover:shadow-md transition-all duration-200">
+                <div className="flex-shrink-0 p-2 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-lg text-white mr-3 shadow">
+                  <Zap size={16} />
+                </div>
+                <div>
+                  <p className="text-xl font-bold text-purple-800">Detailed Descriptions</p>
+                  <p className="text-lg text-indigo-600 mt-1">Add comprehensive details for more accurate code generation results</p>
+                </div>
+              </div>
+
+              <div className="flex items-start bg-gradient-to-r from-indigo-50 to-blue-50 rounded-xl p-3 shadow-sm border border-indigo-100 hover:shadow-md transition-all duration-200">
+                <div className="flex-shrink-0 p-2 bg-gradient-to-br from-indigo-500 to-blue-600 rounded-lg text-white mr-3 shadow">
+                  <Code size={16} />
+                </div>
+                <div>
+                  <p className="text-xl font-bold text-indigo-800">Choose the Right Language</p>
+                  <p className="text-lg text-blue-600 mt-1">Select programming languages that best align with your project needs</p>
+                </div>
+              </div>
+
+              <div className="flex items-start bg-gradient-to-r from-blue-50 to-cyan-50 rounded-xl p-3 shadow-sm border border-blue-100 hover:shadow-md transition-all duration-200">
+                <div className="flex-shrink-0 p-2 bg-gradient-to-br from-blue-500 to-cyan-600 rounded-lg text-white mr-3 shadow">
+                  <Image size={16} />
+                </div>
+                <div>
+                  <p className="text-xl font-bold text-blue-800">Quality Assets</p>
+                  <p className="text-lg text-cyan-600 mt-1">Use high-resolution images and quality resources for professional results</p>
+                </div>
+              </div>
+
+              <div className="flex items-start bg-gradient-to-r from-cyan-50 to-teal-50 rounded-xl p-3 shadow-sm border border-cyan-100 hover:shadow-md transition-all duration-200">
+                <div className="flex-shrink-0 p-2 bg-gradient-to-br from-cyan-500 to-teal-600 rounded-lg text-white mr-3 shadow">
+                  <CheckCircle size={16} />
+                </div>
+                <div>
+                  <p className="text-xl font-bold text-cyan-800">Test Frequently</p>
+                  <p className="text-lg text-teal-600 mt-1">Implement regular testing to catch and resolve issues early in development</p>
+                </div>
+              </div>
+            </div>
+
+
+            {/* Decorative footer element */}
+            <div className="mt-4 flex justify-center">
+              <div className="h-1 w-16 bg-gradient-to-r from-purple-300 via-indigo-400 to-blue-300 rounded-full opacity-70" />
+            </div>
+          </div>
+        </div>
+
       </AnimatePresence>
 
       {/* Progress Indicator */}
@@ -863,7 +897,7 @@ const ImageUpload = () => {
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          className="fixed inset-0 bg-black bg-opacity-70 flex h-[100vh] w-full items-center justify-center "
+          className="fixed inset-0 flex  items-center justify-center "
         >
           <motion.div
             className={`bg-white p-6 rounded-lg shadow-lg max-w-md w-full mx-4`}

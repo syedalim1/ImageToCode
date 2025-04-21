@@ -146,28 +146,14 @@ export default function FeaturesSection() {
   return (
     <div
       id="features"
-      className="py-24 relative overflow-hidden bg-gradient-to-b from-white to-purple-50"
+      className="py-24 relative overflow-hidden "
     >
-      {/* Enhanced background elements */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 0.2 }}
-        transition={{ duration: 2 }}
-        className="absolute top-0 right-0 w-full md:w-2/3 h-96 rounded-full bg-gradient-to-r from-purple-500 to-blue-500 filter blur-3xl opacity-10 transform -translate-y-1/2 translate-x-1/3"
-      />
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 0.15 }}
-        transition={{ duration: 2, delay: 0.5 }}
-        className="absolute bottom-0 left-0 w-full md:w-2/3 h-96 rounded-full bg-gradient-to-r from-pink-500 to-purple-500 filter blur-3xl opacity-10 transform translate-y-1/2 -translate-x-1/3"
-      />
+      
 
       {/* Radial gradient overlay */}
       <div className="absolute inset-0 bg-radial-gradient from-white via-white to-transparent opacity-70" />
 
-      {/* Improved floating geometric shapes */}
-      {typeof window !== "undefined" && renderShapes()}
-
+    
       {/* Glowing circular light */}
       <motion.div
         animate={{

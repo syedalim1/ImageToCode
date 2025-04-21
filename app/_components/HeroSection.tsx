@@ -3,7 +3,6 @@
 import { useScroll, useTransform } from "framer-motion";
 import dynamic from "next/dynamic";
 import { useEffect, useRef, useState } from "react";
-import AbstractShapes from "./AbstractShapes";
 import HeroTitle from "./HeroTitle";
 import HeroBadge from "./HeroBadge";
 import HeroDescription from "./HeroDescription";
@@ -25,12 +24,7 @@ export default function HeroSection() {
     offset: ["start start", "end end"],
   });
 
-  // Parallax effect values with optimized performance
-  const y1 = useTransform(scrollYProgress, [0, 1], [0, -200]);
-  const y2 = useTransform(scrollYProgress, [0, 1], [0, -100]);
-  const y3 = useTransform(scrollYProgress, [0, 1], [0, -300]);
-  const opacity = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
-
+ 
   useEffect(() => {
     let animationFrameId;
 
@@ -67,9 +61,7 @@ export default function HeroSection() {
         backfaceVisibility: "hidden",
       }}
     >
-      {/* Enhanced animated background elements */}
-      <AbstractShapes />
-
+    
       {/* Grid pattern overlay */}
       <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
 

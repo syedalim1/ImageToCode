@@ -114,7 +114,7 @@ export default function HeroDescription() {
 
         {/* First half of description */}
         <motion.p
-          className={`${textSize} text-gray-600 dark:text-gray-300 mb-2 leading-relaxed`}
+          className={`${textSize} text-gray-600 dark:text-gray-300 mb-2 leading-relaxed font-bold text-xg`}
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5, duration: 0.4 }}

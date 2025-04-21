@@ -97,7 +97,7 @@ export default function HeroBadge() {
         </motion.span>
 
         {/* Text content with animated icon */}
-        <span className="relative z-10 flex items-center">
+        <span className="relative z-10 flex items-center font-bold text-lg">
           New AI Model Released
           {/* Animated decorative icon */}
           <motion.svg
@@ -107,8 +107,7 @@ export default function HeroBadge() {
             animate={isHovered ? { rotate: [0, 15, 0, -15, 0] } : {}}
             transition={isHovered ? { duration: 1.5, repeat: Infinity } : {}}
           >
-            <path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z" />
-            <path d="M5 5a2 2 0 00-2 2v8a2 2 0 002 2h8a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z" />
+           
           </motion.svg>
         </span>
 

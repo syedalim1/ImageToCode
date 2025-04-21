@@ -456,19 +456,19 @@ const Page: React.FC = () => {
             onClick={navigateHome}
             className="flex items-center text-gray-600 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
           >
-            <Home className="h-4 w-4 mr-1" />
-            <span>Home</span>
+            <Home className="h-7 w-7 mr-1" />
+            <span className="text-xl font-bold">Home</span>
           </button>
-          <ChevronRight className="h-4 w-4 text-gray-400" />
+          <ChevronRight className="h-7 w-7 text-gray-400" />
           <button
             onClick={() => router.push("/designs")}
             className="text-gray-600 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
           >
-            Designs
+            <span className="text-xl font-bold">Designs</span>
           </button>
-          <ChevronRight className="h-4 w-4 text-gray-400" />
+          <ChevronRight className="h-7 w-7 text-gray-400" />
           <span className="text-indigo-600 dark:text-indigo-400 font-medium">
-            Generating Code
+            <span className="text-xl font-bold">Generating Code</span>
           </span>
         </nav>
 
@@ -478,8 +478,8 @@ const Page: React.FC = () => {
           className="flex items-center mb-4 text-gray-600 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
           whileHover={{ x: -5 }}
         >
-          <ArrowLeft className="h-4 w-4 mr-1" />
-          <span>Back</span>
+          <ArrowLeft className="h-7 w-7 mr-1" />
+          <span className="text-xl font-bold">Back</span>
         </motion.button>
 
         {/* Main content */}

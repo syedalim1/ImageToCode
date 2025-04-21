@@ -1,6 +1,5 @@
 "use client";
 
-import { is } from "drizzle-orm";
 import { motion } from "framer-motion";
 import {
   RefreshCw,
@@ -65,14 +64,6 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
     },
   };
 
-
-
-
-
-
-
-
-
   // Tooltip handler
   const handleTooltip = (tip: string) => {
     setShowTooltip(tip);
@@ -87,6 +78,8 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
     return () => clearTimeout(timer);
   }, [showTooltip]);
 
+  console.log(regenerationCount);
+
   return (
     <div className="space-y-4">
       {/* Main buttons container */}
@@ -97,7 +90,7 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
         animate="show"
       >
 
-        {onGenerate && (
+        {regenerationCount <= maxRegenerations && onGenerate && (
           <motion.button
             onClick={onGenerate}
             className={`relative flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-lg shadow-lg transition-all`}
@@ -124,7 +117,7 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
                 <Sparkles className="h-5 w-5" />
               </motion.div>
             )}
-            <span className="font-medium">
+            <span className="text-xl font-bold">
               {isLoading ? `Processing... ` : "Generate Code"}
             </span>
           </motion.button>
@@ -142,7 +135,7 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
             animate={{ opacity: 1, y: 0 }}
           >
             <Info className="h-5 w-5 text-yellow-600" />
-            <span className="font-medium text-sm">
+            <span className="text-xl font-bold">
               Max regenerations reached ({maxRegenerations}/{maxRegenerations})
             </span>
           </motion.div>

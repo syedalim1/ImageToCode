@@ -19,7 +19,7 @@ interface PricingCardProps {
   cta: string;
   save: string | undefined;
   color: string;
-  badge: string;
+
 }
 
 const PricingCard: React.FC<PricingCardProps> = ({
@@ -150,11 +150,10 @@ const PricingCard: React.FC<PricingCardProps> = ({
       onHoverStart={() => setIsHovered(true)}
       onHoverEnd={() => setIsHovered(false)}
       onViewportEnter={() => setIsVisible(true)}
-      className={`rounded-2xl overflow-hidden relative ${
-        popular
-          ? `bg-gradient-to-br ${scheme.gradient} text-white shadow-xl border-4 border-white`
-          : "bg-white text-gray-800 border border-gray-200"
-      }`}
+      className={`rounded-2xl overflow-hidden relative ${popular
+        ? `bg-gradient-to-br ${scheme.gradient} text-white shadow-xl border-4 border-white`
+        : "bg-white text-gray-800 border border-gray-200"
+        }`}
     >
       {/* Background decorative elements */}
       {popular && (
@@ -272,9 +271,9 @@ const PricingCard: React.FC<PricingCardProps> = ({
             animate={
               isHovered
                 ? {
-                    rotate: [0, 10, 0, -10, 0],
-                    scale: [1, 1.2, 1],
-                  }
+                  rotate: [0, 10, 0, -10, 0],
+                  scale: [1, 1.2, 1],
+                }
                 : {}
             }
             transition={{ duration: 1 }}
@@ -287,9 +286,8 @@ const PricingCard: React.FC<PricingCardProps> = ({
             )}
           </motion.div>
           <h3
-            className={`text-2xl font-bold ${
-              popular ? "text-white" : "text-gray-800"
-            }`}
+            className={`text-2xl font-bold ${popular ? "text-white" : "text-gray-800"
+              }`}
           >
             {title}
           </h3>
@@ -303,9 +301,8 @@ const PricingCard: React.FC<PricingCardProps> = ({
         >
           {originalPrice && (
             <span
-              className={`text-2xl font-bold line-through mr-2 ${
-                popular ? scheme.highlight : "text-gray-500"
-              }`}
+              className={`text-2xl font-bold line-through mr-2 ${popular ? scheme.highlight : "text-gray-500"
+                }`}
             >
               ₹{originalPrice}
             </span>
@@ -315,11 +312,11 @@ const PricingCard: React.FC<PricingCardProps> = ({
             animate={
               isHovered
                 ? {
-                    scale: [1, 1.1, 1],
-                    textShadow: popular
-                      ? "0 0 8px rgba(255,255,255,0.5)"
-                      : "none",
-                  }
+                  scale: [1, 1.1, 1],
+                  textShadow: popular
+                    ? "0 0 8px rgba(255,255,255,0.5)"
+                    : "none",
+                }
                 : {}
             }
             transition={{ duration: 0.5 }}
@@ -332,9 +329,8 @@ const PricingCard: React.FC<PricingCardProps> = ({
                   {[...Array(8)].map((_, i) => (
                     <motion.div
                       key={i}
-                      className={`absolute w-1.5 h-1.5 rounded-full ${
-                        popular ? "bg-yellow-300" : "bg-indigo-500"
-                      }`}
+                      className={`absolute w-1.5 h-1.5 rounded-full ${popular ? "bg-yellow-300" : "bg-indigo-500"
+                        }`}
                       initial={{
                         x: 0,
                         y: 0,
@@ -357,16 +353,15 @@ const PricingCard: React.FC<PricingCardProps> = ({
                     exit={{ opacity: 0, scale: 0 }}
                   >
                     <SparklesIcon
-                      className={`h-5 w-5 ${
-                        popular ? "text-yellow-300" : "text-yellow-500"
-                      }`}
+                      className={`h-5 w-5 ${popular ? "text-yellow-300" : "text-yellow-500"
+                        }`}
                     />
                   </motion.span>
                 </>
               )}
             </AnimatePresence>
           </motion.span>
-  
+
         </motion.div>
 
         {/* Display Credits with animation */}
@@ -377,11 +372,10 @@ const PricingCard: React.FC<PricingCardProps> = ({
           transition={{ delay: 0.5 }}
         >
           <div
-            className={`${
-              popular
-                ? "bg-white/10 backdrop-blur-sm border border-white/20"
-                : `bg-${color}-50 border border-${color}-100`
-            } rounded-lg px-4 py-3`}
+            className={`${popular
+              ? "bg-white/10 backdrop-blur-sm border border-white/20"
+              : `bg-${color}-50 border border-${color}-100`
+              } rounded-lg px-4 py-3`}
           >
             <div className="flex items-center justify-between">
               <div className="flex items-center">
@@ -399,14 +393,13 @@ const PricingCard: React.FC<PricingCardProps> = ({
                   <BoltIcon className={`h-5 w-5 mr-2 ${scheme.iconColor}`} />
                 </motion.div>
                 <span
-                  className={`${
-                    popular ? "text-white" : `text-${color}-700`
-                  } text-lg font-medium`}
+                  className={`${popular ? "text-white" : `text-${color}-700`
+                    } text-lg font-medium`}
                 >
                   {isVisible ? (
                     <>
-                      <span className="tabular-nums">{animateValue}</span>{" "}
-                      credits
+                      <span className="tabular-nums font-bold text-2xl">{animateValue} {" "}
+                        credits</span>
                     </>
                   ) : (
                     credits
@@ -414,15 +407,14 @@ const PricingCard: React.FC<PricingCardProps> = ({
                 </span>
               </div>
 
-             
+
             </div>
 
             {/* Credit value visualization */}
             <div className="mt-2 h-2.5 bg-white/20 rounded-full overflow-hidden">
               <motion.div
-                className={`h-full ${
-                  popular ? "bg-white" : `bg-${color}-500`
-                } rounded-full relative`}
+                className={`h-full ${popular ? "bg-white" : `bg-${color}-500`
+                  } rounded-full relative`}
                 initial={{ width: 0 }}
                 animate={{
                   width: `${Math.min(100, (creditsValue / 200) * 100)}%`,
@@ -503,7 +495,7 @@ const PricingCard: React.FC<PricingCardProps> = ({
                 />
               </div>
               <span
-                className={`${popular ? scheme.highlight : "text-gray-600"}`}
+                className={`${popular ? "text-white" : "text-gray-600"} font-bold text-2xl`}
               >
                 {feature}
               </span>
@@ -521,11 +513,10 @@ const PricingCard: React.FC<PricingCardProps> = ({
               "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)",
           }}
           whileTap={{ scale: 0.95 }}
-          className={`w-full py-3 px-6 rounded-lg font-semibold relative overflow-hidden ${
-            popular
-              ? "bg-white text-indigo-600 shadow-lg"
-              : `bg-gradient-to-r ${scheme.ctaGradient} text-white shadow-md`
-          }`}
+          className={`w-full py-3 px-6 rounded-lg font-semibold relative overflow-hidden ${popular
+            ? "bg-white text-indigo-600 shadow-lg"
+            : `bg-gradient-to-r ${scheme.ctaGradient} text-white shadow-md`
+            }`}
         >
           {/* Button shine effect */}
           <motion.div

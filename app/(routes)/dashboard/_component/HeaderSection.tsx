@@ -52,7 +52,7 @@ const HeaderSection = () => {
                 Image2Code Studio
               </h1>
             </div>
-            <p className="text-blue-100 max-w-xl font-medium">
+            <p className="text-blue-100 max-w-xl font-bold text-xg">
               Transform your visual designs into clean, production-ready code
               with AI-powered generation
             </p>

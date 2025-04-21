@@ -12,10 +12,10 @@ export default function Home() {
   return (
     <div className="">
       {/* Apply containment for better performance */}
-      <div style={{ contain: "content" }}>
+      <div >
         <HeroSection />
 
-        
+
         <FeaturesSection />
 
         <PricingSection />
