@@ -44,7 +44,7 @@ const logResponseDetails = async (response: Response, label: string) => {
   try {
     const clonedResponse = response.clone();
     const text = await clonedResponse.text();
-   return text;
+    return text;
   } catch (e) {
     console.error(`Error logging ${label}:`, e);
     return null;

@@ -1,12 +1,10 @@
 "use client";
 
-import { useState, useCallback } from "react";
-
+import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import CreditBalanceCard from "@/app/_components/CreditBalanceCard";
 import TransactionHistory from "@/app/_components/TransactionHistory";
-import CreditSystemExplainer from "@/app/_components/CreditSystemExplainer";
-import { Zap, Clock, Info } from "lucide-react";
+import { Zap, Clock } from "lucide-react";
 import { useUser } from "@clerk/nextjs";
 import PricingSection from "@/app/_components/PricingSection";
 
