@@ -100,7 +100,7 @@ const Page: React.FC = () => {
 
         if (result.length > 0) {
           setDesign(result[0] as Design);
-          console.log(result[0], "designs");
+          // console.log(result[0], "designs");
           setLanguage(result[0].language)
         } else {
           setError("No design found.");
@@ -115,7 +115,7 @@ const Page: React.FC = () => {
     fetchDesign();
 
 
-    console.log(design, "design");
+    // console.log(design, "design");
 
   }, [uid]);
   // Handle success message timeout
@@ -376,10 +376,10 @@ const Page: React.FC = () => {
         explanation = parsedData?.explanation || "";
       }
 
-      console.log("Saving to database with:", {
-        projectTitle,
-        explanation,
-      });
+      // console.log("Saving to database with:", {
+      //   projectTitle,
+      //   explanation,
+      // });
 
       // Update the database with the new code
       await axios.put("/api/codetoimage", {

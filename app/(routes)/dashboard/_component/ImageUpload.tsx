@@ -198,7 +198,7 @@ const ImageUpload = () => {
       });
 
       const result = await response.json();
-      console.log("✅ Uploaded Image URL:", result.url);
+      // console.log("✅ Uploaded Image URL:", result.url);
       setUploadedImageUrl(result.url);
 
     } catch (err) {
@@ -221,12 +221,12 @@ const ImageUpload = () => {
   const trackConversion = (uid: string, status: 'started' | 'completed' | 'failed', details?: any) => {
     try {
       // This would typically send data to your analytics service
-      console.log(`📊 Analytics - Conversion ${status}:`, {
-        uid,
-        timestamp: new Date().toISOString(),
-        user: user?.primaryEmailAddress?.emailAddress,
-        details
-      });
+      // console.log(`📊 Analytics - Conversion ${status}:`, {
+      //   uid,
+      //   timestamp: new Date().toISOString(),
+      //   user: user?.primaryEmailAddress?.emailAddress,
+      //   details
+      // });
 
       // You could implement actual analytics tracking here
       // Example: mixpanel.track('conversion_event', { status, uid, ... })
@@ -282,7 +282,7 @@ const ImageUpload = () => {
         aiEnhancements: aiEnhancements,
       };
 
-      console.log("📤 Sending Request:", payload);
+      // console.log("📤 Sending Request:", payload);
 
       // Track conversion started
       trackConversion(conversionUid, 'started', {
@@ -299,7 +299,7 @@ const ImageUpload = () => {
         )
       ]) as any;
 
-      console.log("✅ Success:", result.data);
+      // console.log("✅ Success:", result.data);
 
       // Track conversion completed
       trackConversion(conversionUid, 'completed', {

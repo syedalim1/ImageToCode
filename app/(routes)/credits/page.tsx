@@ -41,7 +41,7 @@ const transactions = [
 export default function CreditsPage() {
 
   const { user } = useUser();
-  console.log(user, "user");
+  // console.log(user, "user");
 
   const [activeTab, setActiveTab] = useState<
     "packages" | "history" | "explainer"

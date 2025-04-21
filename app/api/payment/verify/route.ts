@@ -21,18 +21,18 @@ export async function POST(req: Request) {
       userEmail,
     } = await req.json();
 
-    console.log("RAZORPAY_KEY_ID:", process.env.RAZORPAY_KEY_ID);
-    console.log("RAZORPAY_KEY_SECRET:", process.env.RAZORPAY_KEY_SECRET);
-    console.log("razorpay_order_id:", razorpay_order_id);
-    console.log("razorpay_payment_id:", razorpay_payment_id);
+    // console.log("RAZORPAY_KEY_ID:", process.env.RAZORPAY_KEY_ID);
+    // console.log("RAZORPAY_KEY_SECRET:", process.env.RAZORPAY_KEY_SECRET);
+    // console.log("razorpay_order_id:", razorpay_order_id);
+    // console.log("razorpay_payment_id:", razorpay_payment_id);
 
     const generatedSignature = crypto
       .createHmac("sha256", process.env.RAZORPAY_KEY_SECRET!)
       .update(`${razorpay_order_id}|${razorpay_payment_id}`)
       .digest("hex");
 
-    console.log("generatedSignature:", generatedSignature);
-    console.log("razorpay_signature:", razorpay_signature);
+    // console.log("generatedSignature:", generatedSignature);
+    // console.log("razorpay_signature:", razorpay_signature);
 
     if (generatedSignature === razorpay_signature) {
       // Payment verification successful

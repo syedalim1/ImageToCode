@@ -16,7 +16,7 @@ export async function PUT(req: NextRequest) {
       );
     }
 
-    console.log("🔹 Update Code Request:", { uid, codeLength: code?.length, email });
+    // console.log("🔹 Update Code Request:", { uid, codeLength: code?.length, email });
 
     // Ensure code is properly formatted as a JSON object with content property
     const formattedCode = typeof code === 'string' 
@@ -42,7 +42,7 @@ export async function PUT(req: NextRequest) {
       );
     }
 
-    console.log("✅ Code updated successfully for UID:", uid);
+    // console.log("✅ Code updated successfully for UID:", uid);
     
     // Return success response
     return NextResponse.json(

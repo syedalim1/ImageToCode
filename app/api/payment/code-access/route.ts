@@ -35,7 +35,7 @@ export async function POST(request: NextRequest) {
     // Mock database operation - in a real app, you'd save this to your database
     // Example: await db.payment.create({ ... })
 
-    console.log(`User ${user.id} purchased access to code ${codeId}`);
+    // console.log(`User ${user.id} purchased access to code ${codeId}`);
 
     // Return success response with a mock token
     return NextResponse.json({

@@ -5,7 +5,7 @@ import React, { useContext } from "react";
 function ProjectTitle() {
   const { projectTitle, setProjectTitle } = useContext(ProjectTitleContext);
 
-  console.log(projectTitle, " projectTitle");
+  // console.log(projectTitle, " projectTitle");
 
   return (
     <div>

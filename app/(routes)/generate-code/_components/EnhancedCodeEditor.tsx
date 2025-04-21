@@ -256,7 +256,7 @@ const EnhancedCodeEditor: React.FC<EnhancedCodeEditorProps> = ({
       }
     };
     fetchDesign();
-    console.log(design, "design");
+    // console.log(design, "design");
   }, [userUid]);
 
 

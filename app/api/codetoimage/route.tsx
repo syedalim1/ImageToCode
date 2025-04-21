@@ -32,7 +32,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    console.log("🔹 Incoming Request Data:", body);
+    // console.log("🔹 Incoming Request Data:", body);
     let result;
 
     // Ensure code is properly formatted as a JSON object with content property
@@ -57,7 +57,7 @@ export async function POST(req: NextRequest) {
       })
       .returning();
 
-    console.log("✅ Database Insert Result:", result);
+    // console.log("✅ Database Insert Result:", result);
 
     if (!result || result.length === 0) {
       return NextResponse.json(
@@ -148,7 +148,7 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    console.log("🔹 Fetching Data for UID:", uid);
+    // console.log("🔹 Fetching Data for UID:", uid);
 
     const result = await db
       .select()
@@ -163,7 +163,7 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    console.log("✅ Database Query Result:", result[0]);
+    // console.log("✅ Database Query Result:", result[0]);
 
     // Ensure the response has a consistent format for the code field
     const record = result[0];

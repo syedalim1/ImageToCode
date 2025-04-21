@@ -78,13 +78,13 @@ export default function RootLayout({
     >
       <html lang="en" className="scroll-smooth">
         <head>
-          <link rel="icon" href="/logo.png" />
-          <link rel="apple-touch-icon" href="/logo.png" />
-          <link rel="manifest" href="/manifest.json" />
+          <link rel="icon" href="logo.png" />
+          <link rel="apple-touch-icon" href="logo.png" />
+          <link rel="manifest" href="manifest.json" />
           <meta name="application-name" content="ImageToCode" />
-          <meta name="msapplication-TileImage" content="/logo.png" />
+          <meta name="msapplication-TileImage" content="logo.png" />
           <meta name="theme-color" content="#9333ea" />
-          
+
           {/* Schema.org structured data */}
           <script type="application/ld+json">
             {JSON.stringify({

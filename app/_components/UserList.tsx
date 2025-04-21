@@ -6,7 +6,7 @@ import React from "react";
 const  fetchUsers = async()=>{
   const response= await axios.get("/api/users");
   
-  console.log(response.data,"response");
+  // console.log(response.data,"response");
   
   return response.data;
 }
