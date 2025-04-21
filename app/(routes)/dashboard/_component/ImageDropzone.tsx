@@ -124,12 +124,12 @@ const ImageDropzone: React.FC<ImageDropzoneProps> = ({
         );
         const croppedUrl = URL.createObjectURL(croppedImage);
         setPreviewUrl(croppedUrl);
-        
+
         // Convert blob to file
         const fileName = 'cropped-image.jpg';
         const croppedFile = new File([croppedImage], fileName, { type: 'image/jpeg' });
         setSelectedFile(croppedFile);
-        
+
         setIsEditMode(false);
         setIsUploading(false);
         setZoom(1);
@@ -166,7 +166,7 @@ const ImageDropzone: React.FC<ImageDropzoneProps> = ({
           const dataUrl = reader.result as string;
           setPreviewUrl(dataUrl);
           saveToRecentImages(dataUrl);
-          
+
           // Simulate loading for better UX
           setTimeout(() => {
             setIsUploading(false);
@@ -196,7 +196,7 @@ const ImageDropzone: React.FC<ImageDropzoneProps> = ({
   const selectRecentImage = useCallback((dataUrl: string) => {
     setPreviewUrl(dataUrl);
     setIsUploading(true);
-    
+
     // Convert data URL to file
     fetch(dataUrl)
       .then(res => res.blob())
@@ -205,7 +205,7 @@ const ImageDropzone: React.FC<ImageDropzoneProps> = ({
         setSelectedFile(file);
         setIsUploading(false);
         setIsSuccess(true);
-        
+
         setTimeout(() => {
           setIsSuccess(false);
           setActiveTab("options");
@@ -260,10 +260,9 @@ const ImageDropzone: React.FC<ImageDropzoneProps> = ({
       <div
         {...getRootProps({
           className: `relative w-full h-full flex flex-col items-center justify-center rounded-xl border-2 border-dashed transition-all duration-300 overflow-hidden
-            ${
-              showDragActiveStyles
-                ? "border-indigo-500 bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-950/40 dark:to-purple-950/30"
-                : "border-gray-300 dark:border-gray-700 hover:border-indigo-400 hover:bg-gradient-to-br hover:from-indigo-50/50 hover:to-purple-50/50 dark:hover:from-indigo-950/20 dark:hover:to-purple-950/20"
+            ${showDragActiveStyles
+              ? "border-indigo-500 bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-950/40 dark:to-purple-950/30"
+              : "border-gray-300 dark:border-gray-700 hover:border-indigo-400 hover:bg-gradient-to-br hover:from-indigo-50/50 hover:to-purple-50/50 dark:hover:from-indigo-950/20 dark:hover:to-purple-950/20"
             } 
             ${error ? "border-red-400 bg-red-50 dark:bg-red-950/30" : ""} 
             ${isEditMode ? "border-indigo-500 bg-gradient-to-br from-indigo-50/80 to-purple-50/80" : ""}
@@ -334,7 +333,7 @@ const ImageDropzone: React.FC<ImageDropzoneProps> = ({
                   onZoomChange={setZoom}
                 />
               </div>
-              
+
               <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-md p-4 rounded-lg mt-4">
                 <div className="flex justify-between items-center mb-3">
                   <h3 className="text-sm font-medium text-indigo-800 dark:text-indigo-300">Edit Image</h3>
@@ -359,7 +358,7 @@ const ImageDropzone: React.FC<ImageDropzoneProps> = ({
                     </motion.button>
                   </div>
                 </div>
-                
+
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <p className="text-xs text-gray-600 dark:text-gray-300 mb-1">Zoom</p>
@@ -377,7 +376,7 @@ const ImageDropzone: React.FC<ImageDropzoneProps> = ({
                       <ZoomIn className="h-3 w-3 text-gray-500" />
                     </div>
                   </div>
-                  
+
                   <div>
                     <p className="text-xs text-gray-600 dark:text-gray-300 mb-1">Rotation</p>
                     <div className="flex items-center space-x-2">
@@ -407,19 +406,19 @@ const ImageDropzone: React.FC<ImageDropzoneProps> = ({
               className="w-full h-full flex flex-col items-center justify-center p-4"
             >
               <div className="relative w-full max-w-md overflow-hidden rounded-lg shadow-lg border-2 border-indigo-200 dark:border-indigo-800 mb-4">
-                <img 
-                  src={previewUrl} 
-                  alt="Preview" 
-                  className="w-full h-auto object-contain bg-white dark:bg-gray-900" 
+                <img
+                  src={previewUrl}
+                  alt="Preview"
+                  className="w-full h-auto object-contain bg-white dark:bg-gray-900"
                 />
-                <motion.div 
+                <motion.div
                   className="absolute inset-0 bg-gradient-to-r from-indigo-600/10 to-purple-600/10 pointer-events-none"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: [0, 0.5, 0] }}
                   transition={{ duration: 2, repeat: Infinity }}
                 />
               </div>
-              
+
               <div className="flex space-x-3 mb-4">
                 <motion.button
                   whileHover={{ scale: 1.05 }}
@@ -433,7 +432,7 @@ const ImageDropzone: React.FC<ImageDropzoneProps> = ({
                   <Trash2 className="h-4 w-4 mr-2" />
                   Remove
                 </motion.button>
-                
+
                 <motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
@@ -443,7 +442,7 @@ const ImageDropzone: React.FC<ImageDropzoneProps> = ({
                   <Crop className="h-4 w-4 mr-2" />
                   Edit
                 </motion.button>
-                
+
                 <motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
@@ -454,7 +453,7 @@ const ImageDropzone: React.FC<ImageDropzoneProps> = ({
                   Continue
                 </motion.button>
               </div>
-              
+
               <p className="text-sm text-gray-600 dark:text-gray-300 text-center max-w-xs">
                 Your image is ready to be transformed into beautiful code
               </p>
@@ -511,7 +510,7 @@ const ImageDropzone: React.FC<ImageDropzoneProps> = ({
                     Upload Your Design
                   </h2>
 
-                  <p className="text-gray-600 dark:text-gray-300 text-center max-w-xs mb-6">
+                  <p className="text-gray-600 dark:text-gray-300 text-center text-xl max-w-xs mb-6">
                     Drag and drop your image file, or click below to browse
                   </p>
 
@@ -527,39 +526,39 @@ const ImageDropzone: React.FC<ImageDropzoneProps> = ({
                       Choose Image
                     </span>
                   </motion.button>
-                  
+
                   {recentImages.length > 0 && (
-                    <motion.div 
+                    <motion.div
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       className="mb-6"
                     >
-                      <button 
+                      <button
                         onClick={() => setShowRecentImages(!showRecentImages)}
                         className="flex items-center text-sm text-indigo-600 dark:text-indigo-400 mb-2"
                       >
                         <History className="h-4 w-4 mr-1" />
                         {showRecentImages ? 'Hide' : 'Show'} recent images
                       </button>
-                      
+
                       {showRecentImages && (
-                        <motion.div 
+                        <motion.div
                           initial={{ height: 0, opacity: 0 }}
                           animate={{ height: 'auto', opacity: 1 }}
                           exit={{ height: 0, opacity: 0 }}
                           className="grid grid-cols-5 gap-2 overflow-hidden"
                         >
                           {recentImages.map((img, index) => (
-                            <motion.div 
+                            <motion.div
                               key={index}
                               whileHover={{ scale: 1.05 }}
                               whileTap={{ scale: 0.95 }}
                               className="relative w-12 h-12 rounded-md overflow-hidden border border-indigo-200 dark:border-indigo-800 cursor-pointer shadow-sm"
                               onClick={() => selectRecentImage(img)}
                             >
-                              <img 
-                                src={img} 
-                                alt={`Recent ${index + 1}`} 
+                              <img
+                                src={img}
+                                alt={`Recent ${index + 1}`}
                                 className="w-full h-full object-cover"
                               />
                             </motion.div>

@@ -6,9 +6,8 @@ import axios from "axios";
 import { useRouter } from "next/navigation";
 import { useUser } from "@clerk/nextjs";
 import { motion, AnimatePresence, useAnimation } from "framer-motion";
-import { FiUpload, FiSettings, FiEdit, FiEye } from "react-icons/fi";
-import { HiOutlineSparkles } from "react-icons/hi";
-import { BsLayoutTextWindowReverse, BsCodeSlash } from "react-icons/bs";
+import { FiUpload, FiSettings, FiEdit, FiEye, FiZoomIn, FiZoomOut, FiShare2, FiDownload } from "react-icons/fi";
+import { BsLayoutTextWindowReverse, BsCodeSlash, BsGrid1X2 } from "react-icons/bs";
 import ImageDropzone from "./ImageDropzone";
 import ModeSelector from "./ModeSelector";
 import DescriptionInput from "./_DescriptionInput/DescriptionInput";
@@ -19,7 +18,8 @@ import { ProjectTitleContext } from "@/app/context/ProjectTitleContext";
 import { UserDescriptionContext } from "@/app/context/UserDescriptionContext";
 import { IsUploadingContext } from "@/app/context/IsUploadingContext";
 import { UploadedImageUrlContext } from "@/app/context/UploadedImageUrlContext";
-import { CheckCircle, Code, Sparkles, Zap, Image } from "lucide-react";
+import { CheckCircle, Code, Sparkles, Zap, Image, } from "lucide-react";
+import { TbAspectRatio } from 'react-icons/tb';
 
 // Define the interface outside the component
 interface UploadedImageUrlContextValue {
@@ -47,7 +47,12 @@ const ImageUpload = () => {
   const [showTips, setShowTips] = useState(true);
   const [selectedTheme, setSelectedTheme] = useState("blue");
   const [previewScale, setPreviewScale] = useState(1);
+  const [layout, setLayout] = useState('vertical');
 
+  const zoomIn = () => setPreviewScale(prev => Math.min(prev + 0.1, 2));
+  const zoomOut = () => setPreviewScale(prev => Math.max(prev - 0.1, 0.5));
+  const resetZoom = () => setPreviewScale(1);
+  const toggleLayout = () => setLayout(prev => prev === 'vertical' ? 'horizontal' : 'vertical');
 
   // Animation controls
   const controls = useAnimation();
@@ -707,89 +712,130 @@ const ImageUpload = () => {
           {/* Preview Mode with enhanced features */}
           {activeTab === "preview" && (
             <motion.div
-              className={`p-6 rounded-xl shadow-md w-full bg-white border border-gray-100`}
+              className="p-6 rounded-xl shadow-lg w-full bg-white border border-gray-200"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4 }}
             >
               <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6">
-                <h3 className={`text-xl font-semibold mb-2 sm:mb-0 text-gray-800 flex items-center`}>
-                  <FiEye className="mr-2 text-blue-500" />
+                <h3 className="text-xl font-semibold mb-2 sm:mb-0 text-gray-800 flex items-center">
+                  <FiEye className="mr-2 text-blue-600" />
                   Preview Your Design
                 </h3>
 
+                <div className="flex items-center space-x-3">
+                  <button
+                    className="px-3 py-1 bg-blue-50 hover:bg-blue-100 text-blue-600 rounded flex items-center text-sm transition-colors"
+                    onClick={toggleLayout}
+                  >
+                    <BsGrid1X2 className="mr-1" />
+                    {layout === 'vertical' ? 'Horizontal' : 'Vertical'} Layout
+                  </button>
 
+                  
+                </div>
               </div>
 
-
-
-
-              {/* Image preview with zoom controls */}
-              {selectedFile && (
-                <div className="mb-6 border border-gray-200 rounded-lg overflow-hidden bg-gray-50 p-4">
-                  <div className="flex justify-between items-center mb-3">
-                    <h4 className="font-medium text-gray-700">Image Preview</h4>
-
+              <div className={`${layout === 'vertical' ? 'flex flex-col' : 'flex flex-col lg:flex-row lg:space-x-6'}`}>
+                {/* Image preview with zoom controls */}
+                {selectedFile && (
+                  <div className={`mb-6 ${layout === 'horizontal' ? 'lg:w-1/2' : 'w-full'}`}>
+                    <div className="border border-gray-200 rounded-lg overflow-hidden bg-gray-50 p-4">
+                      <div className="flex justify-between items-center mb-3">
+                        <h4 className="font-medium text-gray-700 flex items-center">
+                          <TbAspectRatio className="mr-2 text-blue-500" />
+                          Image Preview
+                        </h4>
+                        <div className="flex space-x-2">
+                          <button
+                            onClick={zoomIn}
+                            className="p-1 hover:bg-gray-200 rounded text-gray-600"
+                            title="Zoom In"
+                          >
+                            <FiZoomIn />
+                          </button>
+                          <button
+                            onClick={zoomOut}
+                            className="p-1 hover:bg-gray-200 rounded text-gray-600"
+                            title="Zoom Out"
+                          >
+                            <FiZoomOut />
+                          </button>
+                          <button
+                            onClick={resetZoom}
+                            className="p-1 hover:bg-gray-200 rounded text-gray-600 text-xs"
+                            title="Reset Zoom"
+                          >
+                            {Math.round(previewScale * 100)}%
+                          </button>
+                        </div>
+                      </div>
+                      <div className="flex justify-center overflow-hidden rounded-lg bg-white border border-gray-200 p-2">
+                        <motion.div
+                          animate={{ scale: previewScale }}
+                          transition={{ type: "spring", stiffness: 300, damping: 25 }}
+                          className="relative"
+                        >
+                          <img
+                            src={selectedFile ? URL.createObjectURL(selectedFile) : ""}
+                            alt="Preview"
+                            className="max-w-full h-auto max-h-64 object-contain"
+                          />
+                        </motion.div>
+                      </div>
+                    </div>
                   </div>
-                  <div className="flex justify-center overflow-hidden rounded-lg bg-white border border-gray-200 p-2">
-                    <motion.div
-                      animate={{ scale: previewScale }}
-                      transition={{ type: "spring", stiffness: 300, damping: 25 }}
-                      className="relative"
-                    >
-                      <img
-                        src={selectedFile ? URL.createObjectURL(selectedFile) : ""}
-                        alt="Preview"
-                        className="max-w-full h-auto max-h-[300px] object-contain"
-                      />
-                    </motion.div>
-                  </div>
-                </div>
-              )}
+                )}
 
-              {/* Summary of selections with enhanced styling */}
-              <div className="mt-6 bg-gray-50 p-4 rounded-lg border border-gray-200">
-                <h4 className="font-medium mb-3 text-gray-700 flex items-center">
-                  <BsLayoutTextWindowReverse className="mr-2" />
-                  Summary of Selections
-                </h4>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="bg-white p-3 rounded-lg border border-gray-200">
-                    <h5 className="text-sm font-medium text-gray-600 mb-2">Technical Specifications</h5>
-                    <ul className="space-y-2 text-sm">
-                      <li className="flex items-center">
-                        <span className="w-24 text-gray-500">Language:</span>
-                        <span className="font-medium text-gray-800">{selectedLanguage}</span>
-                      </li>
-                      <li className="flex items-center">
-                        <span className="w-24 text-gray-500">Mode:</span>
-                        <span className="font-medium text-gray-800">{selectedMode}</span>
-                      </li>
+                {/* Summary of selections with enhanced styling */}
+                <div className={`${layout === 'horizontal' ? 'lg:w-1/2' : 'w-full'}`}>
+                  <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                    <h4 className="font-medium mb-3 text-gray-700 flex items-center">
+                      <BsLayoutTextWindowReverse className="mr-2 text-blue-500" />
+                      Summary of Selections
+                    </h4>
+                    <div className="grid grid-cols-1 gap-4">
+                      <div className="bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
+                        <h5 className="text-sm font-medium text-gray-600 mb-3 pb-2 border-b">Technical Specifications</h5>
+                        <ul className="space-y-3">
+                          <li className="flex items-center">
+                            <span className="w-28 text-gray-500">Language:</span>
+                            <span className="font-medium text-gray-800">{selectedLanguage}</span>
+                          </li>
+                          <li className="flex items-center">
+                            <span className="w-28 text-gray-500">Mode:</span>
+                            <span className="font-medium text-gray-800">{selectedMode}</span>
+                          </li>
+                          <li className="flex items-center">
+                            <span className="w-28 text-gray-500">Scale:</span>
+                            <span className="font-medium text-gray-800">{Math.round(previewScale * 100)}%</span>
+                          </li>
+                        </ul>
+                      </div>
 
+                      <div className="bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
+                        <h5 className="text-sm font-medium text-gray-600 mb-3 pb-2 border-b">Features & Enhancements</h5>
+                        <div className="flex flex-wrap gap-2">
+                          {selectedOptions.map(option => (
+                            <span key={option} className="px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-xs font-medium">
+                              {option}
+                            </span>
+                          ))}
+                          {aiEnhancements.map(enhancement => (
+                            <span key={enhancement} className="px-3 py-1 bg-purple-50 text-purple-700 rounded-full text-xs font-medium">
+                              {enhancement}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
 
-                    </ul>
-                  </div>
-
-                  <div className="bg-white p-3 rounded-lg border border-gray-200">
-                    <h5 className="text-sm font-medium text-gray-600 mb-2">Features & Enhancements</h5>
-                    <div className="flex flex-wrap gap-2">
-                      {selectedOptions.map(option => (
-                        <span key={option} className="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs">
-                          {option}
-                        </span>
-                      ))}
-                      {aiEnhancements.map(enhancement => (
-                        <span key={enhancement} className="px-2 py-1 bg-purple-100 text-purple-800 rounded-full text-xs">
-                          {enhancement}
-                        </span>
-                      ))}
                     </div>
                   </div>
                 </div>
               </div>
-
             </motion.div>
-          )}
+          )
+          }
         </motion.div>
 
         <div className="mt-8 relative overflow-hidden">
