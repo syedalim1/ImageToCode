@@ -1,8 +1,6 @@
 import dedent from "dedent";
 
 export default {
-
-
   CODE_GEN_PROMPT_REACT_TAILWIND: dedent`
     Generate a programming code structure for a React project using Vite. 
     Create multiple components, organizing them in separate folders with filenames using the .js extension, if needed.
@@ -40,6 +38,15 @@ export default {
     - Designs must be beautiful, not generic – production-worthy!
     - JSX syntax + Tailwind CSS + React hooks are default
     - Use Unsplash for stock photos (valid URLs only)
+
+    🔍 **Code Quality & Error Checks**:
+    - **Crucial**: For *every* lucide-react icon used in a component (e.g., <Star />), ensure it is explicitly imported at the top of the file (e.g., import { Star } from "lucide-react";). Missing imports will cause errors.
+    - Ensure all other component imports are correct and paths are valid.
+    - Verify that only the specified lucide-react icons are used (Heart, Shield, Clock, Users, Play, Home, Search, Menu, User, Settings, Mail, Bell, Calendar, Star, Upload, Download, Trash, Edit, Plus, Minus, Check, X, ArrowRight). Do not import any other icons.
+    - Check for unused variables, imports, or functions.
+    - Implement basic error handling where appropriate (e.g., for data fetching).
+    - Ensure basic accessibility standards are met (e.g., alt text for images, appropriate ARIA attributes if needed).
+    - Code must be free of console errors during rendering.
   `,
   CODE_GEN_PROMPT_FORHTML_CSS: dedent`
         🏗️ HTML STRUCTURE REQUIREMENTS:
@@ -92,6 +99,13 @@ export default {
     😄 Include appropriate emojis for better user experience
 
     IMPORTANT: Create visually stunning, production-quality code with precise styling, accurate layouts, and error-free implementation. The code must render exactly as intended across all modern browsers.
- 
+
+    🔍 **Code Quality & Error Checks**:
+    - Validate HTML structure for correctness (e.g., proper nesting, no deprecated elements).
+    - Check CSS for syntax errors or invalid properties.
+    - Ensure all links (<a> tags) and image sources (<img> tags) point to valid URLs.
+    - Verify JavaScript code (if any) is free of syntax errors and basic runtime errors.
+    - Double-check that all specified accessibility requirements (aria-labels, roles, alt text) are correctly implemented.
+    - Ensure the final output is free of console errors when loaded in a browser.
   `,
 };

@@ -56,7 +56,7 @@ const Page: React.FC = () => {
   const params = useParams();
   const router = useRouter();
   const { user } = useUser();
-  const uid = Array.isArray(params.uid) ? params.uid[0] : params.uid || '';
+  const uid = Array.isArray(params.uid) ? params.uid[0] : params.uid || "";
   const [response, setResponse] = useState<string>("");
   const [loading, setLoading] = useState(false);
   const [record, setRecord] = useState<CodeRecord | null>(null);
@@ -64,7 +64,6 @@ const Page: React.FC = () => {
   const [success, setSuccess] = useState("");
   const [regenerationCount, setRegenerationCount] = useState(0);
   const { language, setLanguage } = useContext(LanguageContext);
-
 
   interface Design {
     id: number;
@@ -82,9 +81,6 @@ const Page: React.FC = () => {
   }
   const [design, setDesign] = useState<Design | null>(null);
 
-
-
-
   useEffect(() => {
     const fetchDesign = async () => {
       try {
@@ -97,11 +93,10 @@ const Page: React.FC = () => {
           .where(eq(imagetocodeTable.uid, uid ?? ""))
           .orderBy(desc(imagetocodeTable.createdAt));
 
-
         if (result.length > 0) {
           setDesign(result[0] as Design);
           // console.log(result[0], "designs");
-          setLanguage(result[0].language)
+          setLanguage(result[0].language);
         } else {
           setError("No design found.");
         }
@@ -114,9 +109,7 @@ const Page: React.FC = () => {
     };
     fetchDesign();
 
-
     // console.log(design, "design");
-
   }, [uid]);
   // Handle success message timeout
   useEffect(() => {
@@ -129,8 +122,6 @@ const Page: React.FC = () => {
   // Load record data
   useEffect(() => {
     uid && getRecordInfo(uid);
-
-
   }, [uid]);
 
   const getRecordInfo = async (uid: string) => {
@@ -185,7 +176,6 @@ const Page: React.FC = () => {
           )
           .trim() || ""
       );
-
     } catch (err) {
       handleError(err, "Error fetching record:");
     } finally {
@@ -201,7 +191,6 @@ const Page: React.FC = () => {
         : `${context} Unknown error`
     );
   };
-
 
   const generateCode = async (record: CodeRecord) => {
     const userdatabase = await db
@@ -238,9 +227,9 @@ const Page: React.FC = () => {
 
       // Make the POST request with streaming response handling
       const response = await fetch("/api/image-to-code-ai", {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           description: record.description,
@@ -255,13 +244,15 @@ const Page: React.FC = () => {
 
       if (!response.ok) {
         const errorText = await response.text();
-        throw new Error(`API request failed: ${response.status} - ${errorText}`);
+        throw new Error(
+          `API request failed: ${response.status} - ${errorText}`
+        );
       }
 
       // Check if response is streamed
-      const contentType = response.headers.get('Content-Type');
+      const contentType = response.headers.get("Content-Type");
 
-      if (contentType && contentType.includes('text/event-stream')) {
+      if (contentType && contentType.includes("text/event-stream")) {
         // Handle streaming response
         const reader = response.body?.getReader();
         if (!reader) {
@@ -279,13 +270,13 @@ const Page: React.FC = () => {
           const chunk = decoder.decode(value, { stream: true });
 
           // Process SSE format (Server-Sent Events)
-          const lines = chunk.split('\n');
+          const lines = chunk.split("\n");
           for (const line of lines) {
-            if (line.startsWith('data: ')) {
+            if (line.startsWith("data: ")) {
               const data = line.slice(6).trim();
 
               // Skip [DONE] message
-              if (data === '[DONE]') continue;
+              if (data === "[DONE]") continue;
 
               try {
                 // Parse the JSON data from the stream
@@ -295,7 +286,7 @@ const Page: React.FC = () => {
                   // Accumulate content
                   accumulatedContent += parsedChunk.content;
                   // Update the response state progressively
-                  setResponse(prev => prev + parsedChunk.content);
+                  setResponse((prev) => prev + parsedChunk.content);
                 } else if (parsedChunk.error) {
                   throw new Error(parsedChunk.error);
                 } else if (parsedChunk.complete && parsedChunk.fullContent) {
@@ -306,9 +297,9 @@ const Page: React.FC = () => {
               } catch (parseError) {
                 console.warn("Error parsing stream chunk:", parseError);
                 // If we couldn't parse as JSON, treat it as raw text
-                if (data && data !== '[DONE]') {
+                if (data && data !== "[DONE]") {
                   accumulatedContent += data;
-                  setResponse(prev => prev + data);
+                  setResponse((prev) => prev + data);
                 }
               }
             }
@@ -322,9 +313,10 @@ const Page: React.FC = () => {
           explanation = parsedData?.explanation || "";
         } catch (e) {
           // If not valid JSON, use as is
-          console.log("Accumulated content is not valid JSON, using as raw text");
+          console.log(
+            "Accumulated content is not valid JSON, using as raw text"
+          );
         }
-
       } else {
         // Handle non-streaming response (fallback)
         const res = await response.json();
@@ -348,8 +340,15 @@ const Page: React.FC = () => {
               // If not valid JSON, use as is
               parsedData = null;
             }
-            setResponse(typeof codeContent === "string" ? codeContent : JSON.stringify(codeContent));
-            accumulatedContent = typeof codeContent === "string" ? codeContent : JSON.stringify(codeContent);
+            setResponse(
+              typeof codeContent === "string"
+                ? codeContent
+                : JSON.stringify(codeContent)
+            );
+            accumulatedContent =
+              typeof codeContent === "string"
+                ? codeContent
+                : JSON.stringify(codeContent);
           } else {
             // If it's already the code object
             parsedData = res;
@@ -390,7 +389,6 @@ const Page: React.FC = () => {
       });
 
       setRegenerationCount((prev) => prev + 1);
-
     } catch (err) {
       handleError(err, "Error generating code:");
     } finally {
@@ -437,12 +435,8 @@ const Page: React.FC = () => {
     router.push("/");
   };
 
-
-
   return (
     <div className="min-h-screen transition-colors duration-300">
-
-
       {/* Theme toggle button - moved to client component */}
       <DarkModeToggle />
 
@@ -497,7 +491,6 @@ const Page: React.FC = () => {
             </div>
           </div>
 
-
           <div className="p-6 space-y-6">
             {/* Notifications */}
             <div className="space-y-2">
@@ -540,7 +533,6 @@ const Page: React.FC = () => {
                 />
               </div>
             )}
-
 
             {/* Code editor */}
             <div className="h-full">
