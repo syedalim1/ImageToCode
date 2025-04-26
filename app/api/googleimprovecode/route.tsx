@@ -9,17 +9,18 @@ export async function POST(request: Request) {
   const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
   const finalprompt =
-    AIPrompt.CODE_GEN_PROMPT_FORHTML_CSS + (description || "") + (options || "");
+    AIPrompt.CODE_GEN_PROMPT_FORHTML_CSS +
+    (description || "") +
+    (options || "");
   const response = await fetch(imageUrl);
   const imageArrayBuffer = await response.arrayBuffer();
-  const base64ImageData = Buffer.from(imageArrayBuffer).toString('base64');
-
+  const base64ImageData = Buffer.from(imageArrayBuffer).toString("base64");
 
   let finalResponse = null;
   try {
     // Make the API call directly without the nested function
     const response = await ai.models.generateContent({
-      model: "gemini-2.5-pro-preview-03-25",
+      model: "gemini-2.0-flash",
       contents: [
         {
           inlineData: {
@@ -31,12 +32,17 @@ export async function POST(request: Request) {
           text: finalprompt,
         },
       ],
+    
     });
 
     // Access the response correctly according to the GoogleGenAI API
     if (response && response.candidates && response.candidates[0]) {
       const candidate = response.candidates[0];
-      if (candidate.content && candidate.content.parts && candidate.content.parts.length > 0) {
+      if (
+        candidate.content &&
+        candidate.content.parts &&
+        candidate.content.parts.length > 0
+      ) {
         finalResponse = candidate.content.parts[0].text || "";
         finalResponse = finalResponse
           ?.replace("```json", "")

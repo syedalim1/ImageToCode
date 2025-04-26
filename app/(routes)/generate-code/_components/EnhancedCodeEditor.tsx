@@ -1,19 +1,18 @@
 "use client";
 
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect, useContext, useCallback, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   SandpackProvider,
   SandpackLayout,
   SandpackCodeEditor,
   SandpackPreview,
-  useActiveCode,
+
   SandpackConsole,
   SandpackFiles,
   SandpackFileExplorer,
   SandpackThemeProp,
 } from "@codesandbox/sandpack-react";
-
 import {
   Copy,
   Code,
@@ -22,10 +21,9 @@ import {
   Check,
   Moon,
   Sun,
-  RefreshCw,
+
   Terminal,
   AlertTriangle,
-  FolderTree,
   Maximize,
   Minimize,
   Share2,
@@ -38,9 +36,9 @@ import { desc, eq } from "drizzle-orm";
 import { UserUidContext } from "@/app/context/UserUidContext";
 import { UserDesignContext } from "@/app/context/UserDesignContext";
 import { LanguageContext } from "@/app/context/LanguageContext";
-import axios from "axios";
-import { useUser } from "@clerk/nextjs";
-import { useParams } from "next/navigation";
+import { SandpackPreviewRef, useSandpack, SandpackConsumer } from "@codesandbox/sandpack-react"
+import { useSandpackClient } from "@codesandbox/sandpack-react";
+import type { SandpackMessage } from "@codesandbox/sandpack-client";
 
 interface EnhancedCodeEditorProps {
   code: string;
@@ -52,10 +50,7 @@ interface SandpackProject {
   projectTitle?: string;
   explanation?: string;
   files: Record<string, { code: string }>;
-
 }
-
-
 
 // Function to ensure code is a valid React component
 const ensureValidReactComponent = (code: string): string => {
@@ -97,8 +92,6 @@ const convertToSandpackFiles = (
   return sandpackFiles;
 };
 
-
-
 // Available themes for the editor
 const availableThemes: Record<string, SandpackThemeProp> = {
   light: "light",
@@ -125,13 +118,45 @@ const EnhancedCodeEditor: React.FC<EnhancedCodeEditorProps> = ({
   const [isMultiFile, setIsMultiFile] = useState(false);
   const [isCopied, setIsCopied] = useState(false);
   const [showThemeSelector, setShowThemeSelector] = useState(false);
-
   const { userUid, setUserUid } = useContext(UserUidContext);
   const { language, setLanguage } = useContext(LanguageContext);
-
-  const { uid } = useParams();
   const { design, setDesign } = useContext(UserDesignContext);
-  const { user } = useUser();
+
+  // Type guard to check if a message has an error property
+  const hasErrorProperty = (obj: any): obj is { error: string } => {
+    return obj && typeof obj === 'object' && 'error' in obj;
+  };
+
+  // Error handler component that follows the Rules of Hooks
+  const SandpackErrorListener: React.FC<{ setHasError: (hasError: boolean) => void }> = ({ setHasError }) => {
+    const { listen } = useSandpackClient();
+
+    useEffect(() => {
+      if (!listen) return;
+
+     
+
+      const unsubscribe = listen((message: SandpackMessage) => {
+        // Handle different message types that might indicate errors
+        if (message.type === "start") {
+          // Reset error state when bundling starts
+          setHasError(false);
+        } else if (message.type === "status" || message.type === "compile") {
+          // Check if the message has an error property
+          if (hasErrorProperty(message)) {
+            console.log(`${message.type} error: syed aliiiiii`, message.error);
+            setHasError(true);
+          }
+        }
+      });
+
+      // Clean up listener on unmount
+      return unsubscribe;
+    }, [listen, setHasError]);
+
+    return null;
+  };
+
   useEffect(() => {
     let processedCode = code;
     setHasError(false);
@@ -142,7 +167,6 @@ const EnhancedCodeEditor: React.FC<EnhancedCodeEditorProps> = ({
       // Check if the code is a JSON string
       if (typeof code === "string" && code.trim().startsWith("{")) {
         const parsedData = JSON.parse(code);
-
 
         // Check if this is a Sandpack project format
         if (parsedData.files && typeof parsedData.files === "object") {
@@ -199,7 +223,6 @@ const EnhancedCodeEditor: React.FC<EnhancedCodeEditorProps> = ({
       // If parsing fails, continue with the original code
     }
 
-
     // Remove markdown code blocks if present
     if (typeof processedCode === "string") {
       processedCode = processedCode
@@ -210,10 +233,8 @@ const EnhancedCodeEditor: React.FC<EnhancedCodeEditorProps> = ({
         .trim();
     }
 
-
     // Set the processed code for single-file mode
     setCurrentCode(processedCode);
-
 
     // Ensure the code is a valid React component for the preview
     try {
@@ -227,14 +248,7 @@ const EnhancedCodeEditor: React.FC<EnhancedCodeEditorProps> = ({
         }`
       );
     }
-
-
-
-
-
   }, [code]);
-
-
 
   useEffect(() => {
     const fetchDesign = async () => {
@@ -259,7 +273,6 @@ const EnhancedCodeEditor: React.FC<EnhancedCodeEditorProps> = ({
     // console.log(design, "design");
   }, [userUid]);
 
-
   // Handle copying code
   const handleCopyCode = () => {
     if (typeof navigator !== "undefined") {
@@ -274,6 +287,8 @@ const EnhancedCodeEditor: React.FC<EnhancedCodeEditorProps> = ({
       setTimeout(() => setIsCopied(false), 2000);
     }
   };
+
+
 
   // Share code as URL
   const handleShareCode = () => {
@@ -357,10 +372,9 @@ const EnhancedCodeEditor: React.FC<EnhancedCodeEditorProps> = ({
     setIsFullscreen(!isFullscreen);
   };
 
-  useEffect(() => {
 
 
-  }, [projectData])
+
 
   return (
     <ClientOnly>
@@ -762,7 +776,6 @@ const EnhancedCodeEditor: React.FC<EnhancedCodeEditorProps> = ({
             </motion.div>
           </motion.div>
         )}
-
         {/* Editor container */}
         <div
           className={`rounded-xl overflow-hidden shadow-lg ${isFullscreen
@@ -772,7 +785,6 @@ const EnhancedCodeEditor: React.FC<EnhancedCodeEditorProps> = ({
         >
           {/* Tabs navigation */}
           {sandpackFiles && (
-
             <div className="flex items-center justify-between bg-slate-800 text-white p-2">
               <div className="flex space-x-1">
                 <button
@@ -785,7 +797,9 @@ const EnhancedCodeEditor: React.FC<EnhancedCodeEditorProps> = ({
                 </button>
                 <button
                   onClick={() => setActiveTab("preview")}
-                  className={`flex items-center px-3 py-1.5 rounded-md ${activeTab === "preview" ? "bg-blue-600" : "hover:bg-slate-700"
+                  className={`flex items-center px-3 py-1.5 rounded-md ${activeTab === "preview"
+                    ? "bg-blue-600"
+                    : "hover:bg-slate-700"
                     }`}
                 >
                   <Eye size={16} className="mr-1.5" />
@@ -793,7 +807,9 @@ const EnhancedCodeEditor: React.FC<EnhancedCodeEditorProps> = ({
                 </button>
                 <button
                   onClick={() => setActiveTab("console")}
-                  className={`flex items-center px-3 py-1.5 rounded-md ${activeTab === "console" ? "bg-blue-600" : "hover:bg-slate-700"
+                  className={`flex items-center px-3 py-1.5 rounded-md ${activeTab === "console"
+                    ? "bg-blue-600"
+                    : "hover:bg-slate-700"
                     }`}
                 >
                   <Terminal size={16} className="mr-1.5" />
@@ -822,27 +838,29 @@ const EnhancedCodeEditor: React.FC<EnhancedCodeEditorProps> = ({
                   {showThemeSelector && (
                     <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-md shadow-lg z-50 border border-gray-200 dark:border-gray-700">
                       <div className="py-1">
-                        {Object.entries(availableThemes).map(([name, theme]) => (
-                          <button
-                            key={name}
-                            className={`block w-full text-left px-4 py-2 text-sm ${currentTheme === name
-                              ? "bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300"
-                              : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
-                              }`}
-                            onClick={() => {
-                              setCurrentTheme(name);
-                              setShowThemeSelector(false);
-                            }}
-                          >
-                            {name
-                              .split("-")
-                              .map(
-                                (word) =>
-                                  word.charAt(0).toUpperCase() + word.slice(1)
-                              )
-                              .join(" ")}
-                          </button>
-                        ))}
+                        {Object.entries(availableThemes).map(
+                          ([name, theme]) => (
+                            <button
+                              key={name}
+                              className={`block w-full text-left px-4 py-2 text-sm ${currentTheme === name
+                                ? "bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300"
+                                : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                                }`}
+                              onClick={() => {
+                                setCurrentTheme(name);
+                                setShowThemeSelector(false);
+                              }}
+                            >
+                              {name
+                                .split("-")
+                                .map(
+                                  (word) =>
+                                    word.charAt(0).toUpperCase() + word.slice(1)
+                                )
+                                .join(" ")}
+                            </button>
+                          )
+                        )}
                       </div>
                     </div>
                   )}
@@ -850,7 +868,6 @@ const EnhancedCodeEditor: React.FC<EnhancedCodeEditorProps> = ({
               </div>
             </div>
           )}
-
 
           {/* Error indicator */}
           {hasError && !isLoading && (
@@ -890,6 +907,9 @@ const EnhancedCodeEditor: React.FC<EnhancedCodeEditorProps> = ({
                     },
                   }}
                 >
+                  {/* Error handling for Sandpack bundler */}
+                  <SandpackErrorListener setHasError={setHasError} />
+
                   <SandpackLayout>
                     {/* Always show file explorer when in multi-file mode */}
                     {(activeTab === "explorer" || activeTab === "code") && (
@@ -923,11 +943,16 @@ const EnhancedCodeEditor: React.FC<EnhancedCodeEditorProps> = ({
                         showOpenInCodeSandbox
                         showRefreshButton
                         style={{ height: "900px" }}
+                        actionsChildren={
+                          <button >
+                            Fix The Error
+                          </button>
+                        }
                       />
                     )}
-                    {activeTab === "console" && (
-                      <SandpackConsole style={{ height: "900px" }} />
-                    )}
+
+                    <SandpackConsole style={{ height: "900px" }} />
+
                   </SandpackLayout>
                 </SandpackProvider>
               ) : language == "html-css" && isMultiFile && sandpackFiles ? (
@@ -936,16 +961,21 @@ const EnhancedCodeEditor: React.FC<EnhancedCodeEditorProps> = ({
                   <SandpackProvider
                     theme={availableThemes[currentTheme]}
                     template="static"
-
                     files={sandpackFiles}
-
                   >
+                    {/* Error handling for Sandpack bundler */}
+                    <SandpackErrorListener setHasError={setHasError} />
+
                     <SandpackLayout>
                       {/* Always show file explorer when in multi-file mode */}
                       {(activeTab === "explorer" || activeTab === "code") && (
                         <div
                           className="sandpack-wrapper"
-                          style={{ display: "flex", height: "900px", width: "100%" }}
+                          style={{
+                            display: "flex",
+                            height: "900px",
+                            width: "100%",
+                          }}
                         >
                           <div
                             style={{
@@ -954,9 +984,11 @@ const EnhancedCodeEditor: React.FC<EnhancedCodeEditorProps> = ({
                               borderRight: "1px solid #e5e7eb",
                             }}
                           >
-                            <SandpackFileExplorer style={{ height: "100%", width: "100%" }} />
+                            <SandpackFileExplorer
+                              style={{ height: "100%", width: "100%" }}
+                            />
                           </div>
-                          <div style={{ width: "75%", height: "100%", }}>
+                          <div style={{ width: "75%", height: "100%" }}>
                             <SandpackCodeEditor
                               showTabs
                               showLineNumbers
@@ -973,19 +1005,24 @@ const EnhancedCodeEditor: React.FC<EnhancedCodeEditorProps> = ({
                           showOpenInCodeSandbox
                           showRefreshButton
                           style={{ height: "900px", width: "100%" }}
+                          actionsChildren={
+                            <button onClick={() => window.alert("Bug reported!")}>
+                              Report bug
+                            </button>
+                          }
                         />
                       )}
                       {activeTab === "console" && (
-                        <SandpackConsole style={{ height: "900px", width: "100%" }} />
+                        <SandpackConsole
+                          style={{ height: "900px", width: "100%" }}
+                        />
                       )}
                     </SandpackLayout>
                   </SandpackProvider>
                 </div>
               ) : (
                 // Single file Sandpack setup
-                <div>
-
-                </div>
+                <div></div>
               )}
             </motion.div>
           </AnimatePresence>

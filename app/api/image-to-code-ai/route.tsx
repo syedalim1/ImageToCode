@@ -195,32 +195,12 @@ export async function POST(req: Request) {
       basePrompt = AIPrompt.CODE_GEN_PROMPT_FORHTML_CSS; // Make sure this prompt specifies the JSON output format
     }
 
-    // Add explicit instruction for JSON format *if not already* in the base prompt
-    const jsonFormatInstruction = `
-    Generate code based on the description and/or image.
-    You MUST output the result ONLY as a single JSON object adhering strictly to the following format, without any markdown fences like \`\`\`json or \`\`\`:
-    {
-      "projectTitle": "A concise title for the project/component",
-      "explanation": "A brief explanation of the code and how it works",
-      "files": {
-        "/index.html": { // Or /App.js, etc. Use appropriate filenames.
-          "code": "The full code for this file as a single string..."
-        },
-        "/style.css": { // Optional, include if CSS is separate
-          "code": "The full CSS code..."
-        }
-        // Add more files as needed
-      }
-    }
-    Ensure the 'code' values are valid, escaped strings containing the complete file content.
-    Description: ${description || "Generate based on image."}
-    Options/Requirements: ${options || "None"}
-    `;
+    
 
     // Use the base prompt IF it already contains the strict JSON instruction, otherwise use the explicit one.
     // For safety, let's assume the base prompts might not be strict enough and add the explicit instruction.
     // You can refine this based on your actual AIPrompt content.
-    const enhancedDescription = basePrompt + "\n\n" + jsonFormatInstruction; // Combine if base prompt provides context
+    const enhancedDescription = basePrompt + "\n\n" + description; // Combine if base prompt provides context
 
     // Build message payload
     const messages = [];
