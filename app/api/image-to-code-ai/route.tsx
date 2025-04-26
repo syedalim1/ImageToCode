@@ -91,16 +91,7 @@ const extractAndParseJson = (content: string | null): any | null => {
       "Attempted JSON string snippet:",
       jsonString.substring(0, 200) + "..."
     );
-    // Add more robust cleaning if needed, e.g., for trailing commas
-    // const cleanedJsonString = jsonString.replace(/,\s*([}\]])/g, '$1');
-    // try {
-    //     const reparsedJson = JSON.parse(cleanedJsonString);
-    //     console.log("Successfully parsed JSON after cleaning.");
-    //     return reparsedJson;
-    // } catch (reparseError) {
-    //     console.error("JSON reparsing failed:", reparseError);
-    //     return null;
-    // }
+ 
     return null; // Parsing failed
   }
 };
@@ -233,7 +224,12 @@ export async function POST(req: Request) {
 
     // Build message payload
     const messages = [];
-    const contentPayload = [{ type: "text", text: enhancedDescription }];
+    // Define the types for the content payload
+    type TextContent = { type: "text"; text: string };
+    type ImageContent = { type: "image_url"; image_url: { url: string } };
+    type ContentItem = TextContent | ImageContent;
+    
+    const contentPayload: ContentItem[] = [{ type: "text", text: enhancedDescription }];
     if (imageUrl) {
       contentPayload.push({ type: "image_url", image_url: { url: imageUrl } });
     }
@@ -245,9 +241,7 @@ export async function POST(req: Request) {
       stream: false, // Ensure stream is false for a single JSON response
       max_tokens: CONFIG.GENERATION.MAX_TOKENS,
       temperature: 0.5, // Lower temperature might help with stricter formatting
-      // Consider adding response_format if the model supports it, e.g., for OpenAI models:
-      // response_format: { type: "json_object" },
-      // Check OpenRouter documentation for specific model support.
+   
     }; // --- API Call with Timeout ---
 
     const controller = new AbortController();

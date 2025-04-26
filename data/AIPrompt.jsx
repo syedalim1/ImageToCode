@@ -90,7 +90,7 @@ export default {
         ...
       },
      
-    }
+}
 
     RESOURCES TO USE:
     🖼️ Placeholder images: "https://source.unsplash.com/random/[WIDTHxHEIGHT]?[keyword]"

@@ -226,7 +226,7 @@ const Page: React.FC = () => {
       let parsedData = null;
 
       // Make the POST request with streaming response handling
-      const response = await fetch("/api/image-to-code-ai", {
+      const response = await fetch("/api/googleimprovecode", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
