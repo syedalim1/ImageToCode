@@ -19,7 +19,7 @@ export async function POST(request: Request) {
   try {
     // Make the API call directly without the nested function
     const response = await ai.models.generateContent({
-      model: "gemini-2.5-flash-preview-04-17",
+      model: "gemini-2.5-pro-preview-03-25",
       contents: [
         {
           inlineData: {
