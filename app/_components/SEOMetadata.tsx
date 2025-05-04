@@ -19,7 +19,7 @@ const SEOMetadata: React.FC<SEOMetadataProps> = ({
   description = 'Transform designs into code with ImageToCodeGenerator AI. Convert images to HTML, CSS, React & Next.js code instantly. Best AI prompt to code service by CodeNovaTech.',
   canonicalUrl = 'https://imagetocode.codenovatech.in',
   ogType = 'website',
-  ogImage = '/logo.png',
+  ogImage = 'logo.png',
   additionalKeywords = [],
   createdBy = 'CodeNovaTech',
   pageType = 'WebPage',
@@ -105,7 +105,7 @@ const SEOMetadata: React.FC<SEOMetadataProps> = ({
       {/* Additional SEO tags */}
       <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
       <meta name="application-name" content="ImageToCode" />
-      <meta name="msapplication-TileImage" content="/logo.png" />
+      <meta name="msapplication-TileImage" content="logo.png" />
       <meta name="theme-color" content="#9333ea" />
       <meta name="mobile-web-app-capable" content="yes" />
       <meta name="apple-mobile-web-app-capable" content="yes" />

@@ -8,19 +8,40 @@ import { ToastContainer } from "react-toastify"; // Import ToastContainer
 
 export const metadata: Metadata = {
   title: "ImageToCode | #1 AI Design to Code Generator Tool | CodeNovaTech",
-  description: "Transform designs into code with ImageToCodeGenerator AI. Convert images to HTML, CSS, React & Next.js code instantly. Best AI prompt to code service by CodeNovaTech.",
-  keywords: ["ImageToCodeGenerator", "AI design to code", "image to code converter", "AI prompt to code", "design to HTML", "UI design converter", "HTML generator", "CSS generator", "React code generator", "Next.js generator", "CodeNovaTech", "AI development tools", "mockup to html", "screenshot to code", "image to react", "UI automation", "free design to code", "design to frontend"],
+  description:
+    "Transform designs into code with ImageToCodeGenerator AI. Convert images to HTML, CSS, React & Next.js code instantly. Best AI prompt to code service by CodeNovaTech.",
+  keywords: [
+    "ImageToCodeGenerator",
+    "AI design to code",
+    "image to code converter",
+    "AI prompt to code",
+    "design to HTML",
+    "UI design converter",
+    "HTML generator",
+    "CSS generator",
+    "React code generator",
+    "Next.js generator",
+    "CodeNovaTech",
+    "AI development tools",
+    "mockup to html",
+    "screenshot to code",
+    "image to react",
+    "UI automation",
+    "free design to code",
+    "design to frontend",
+  ],
   authors: [{ name: "CodeNovaTech" }],
   creator: "CodeNovaTech",
   publisher: "CodeNovaTech",
   openGraph: {
     title: "ImageToCode | #1 AI Design to Code Generator Tool",
-    description: "Transform any UI designs into production-ready HTML/CSS/React code with our AI. Start for free today. Best design to code converter. Created by CodeNovaTech.",
+    description:
+      "Transform any UI designs into production-ready HTML/CSS/React code with our AI. Start for free today. Best design to code converter. Created by CodeNovaTech.",
     url: "https://imagetocode.codenovatech.in",
     siteName: "ImageToCode by CodeNovaTech",
     images: [
       {
-        url: "/logo.png",
+        url: "logo.png",
         width: 1200,
         height: 630,
         alt: "ImageToCode AI Generator - Transform Designs to Code",
@@ -32,8 +53,9 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "ImageToCode | #1 AI Design to Code Generator Tool",
-    description: "Transform any UI designs into production-ready HTML/CSS/React code with our AI. Start for free today. The fastest way to convert designs to code.",
-    images: ["/logo.png"],
+    description:
+      "Transform any UI designs into production-ready HTML/CSS/React code with our AI. Start for free today. The fastest way to convert designs to code.",
+    images: ["logo.png"],
     creator: "@CodeNovaTech",
   },
   robots: {
@@ -42,9 +64,9 @@ export const metadata: Metadata = {
     googleBot: {
       index: true,
       follow: true,
-      'max-video-preview': -1,
-      'max-image-preview': 'large',
-      'max-snippet': -1,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
     },
   },
   verification: {
@@ -90,34 +112,36 @@ export default function RootLayout({
             {JSON.stringify({
               "@context": "https://schema.org",
               "@type": "WebApplication",
-              "name": "ImageToCode",
-              "alternateName": "ImageToCodeGenerator",
-              "description": "Transform designs into code with ImageToCodeGenerator AI. Convert images to HTML, CSS & React code instantly. Best AI prompt to code service by CodeNovaTech.",
-              "applicationCategory": "DeveloperApplication",
-              "operatingSystem": "Web",
-              "offers": {
+              name: "ImageToCode",
+              alternateName: "ImageToCodeGenerator",
+              description:
+                "Transform designs into code with ImageToCodeGenerator AI. Convert images to HTML, CSS & React code instantly. Best AI prompt to code service by CodeNovaTech.",
+              applicationCategory: "DeveloperApplication",
+              operatingSystem: "Web",
+              offers: {
                 "@type": "Offer",
-                "price": "0",
-                "priceCurrency": "USD"
+                price: "0",
+                priceCurrency: "USD",
               },
-              "aggregateRating": {
+              aggregateRating: {
                 "@type": "AggregateRating",
-                "ratingValue": "4.8",
-                "ratingCount": "156",
-                "bestRating": "5",
-                "worstRating": "1"
+                ratingValue: "4.8",
+                ratingCount: "156",
+                bestRating: "5",
+                worstRating: "1",
               },
-              "featureList": "AI-powered design recognition, HTML/CSS generation, React/Next.js conversion, responsive design, export options",
-              "screenshot": "https://imagetocode.codenovatech.in/screenshot.png",
-              "creator": {
+              featureList:
+                "AI-powered design recognition, HTML/CSS generation, React/Next.js conversion, responsive design, export options",
+              screenshot: "https://imagetocode.codenovatech.in/screenshot.png",
+              creator: {
                 "@type": "Organization",
-                "name": "CodeNovaTech",
-                "url": "https://imagetocode.codenovatech.in",
-                "logo": {
+                name: "CodeNovaTech",
+                url: "https://imagetocode.codenovatech.in",
+                logo: {
                   "@type": "ImageObject",
-                  "url": "https://imagetocode.codenovatech.in/logo.png"
-                }
-              }
+                  url: "https://imagetocode.codenovatech.in/logo.png",
+                },
+              },
             })}
           </script>
         </head>

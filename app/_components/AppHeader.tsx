@@ -272,10 +272,11 @@ function AppHeader() {
           stiffness: 260,
           damping: 20,
         }}
-        className={`sticky top-0 z-40 w-full pb-7 transition-all duration-300 ${rainbowGradient} ${scrolled
-          ? "shadow-xl shadow-purple-200/20"
-          : "shadow-md shadow-blue-100/10"
-          }`}
+        className={`sticky top-0 z-40 w-full pb-7 transition-all duration-300 ${rainbowGradient} ${
+          scrolled
+            ? "shadow-xl shadow-purple-200/20"
+            : "shadow-md shadow-blue-100/10"
+        }`}
       >
         <div className="flex items-center justify-between w-full px-4 py-3 relative">
           {/* Left section with logo and mobile menu button */}
@@ -360,10 +361,11 @@ function AppHeader() {
                           className={`
                     flex items-center px-4 py-2.5 rounded-2xl text-xl font-semibold 
                     transition-all duration-300 group relative overflow-hidden
-                    ${activeTab === item.id
-                              ? `${item.color.activeBackground} text-white ${item.color.activeGlow}`
-                              : "text-gray-600 hover:bg-white/80 hover:text-gray-900"
-                            }
+                    ${
+                      activeTab === item.id
+                        ? `${item.color.activeBackground} text-white ${item.color.activeGlow}`
+                        : "text-gray-600 hover:bg-white/80 hover:text-gray-900"
+                    }
                   `}
                         >
                           {/* Subtle background effect for active state */}
@@ -379,10 +381,11 @@ function AppHeader() {
                           <item.icon
                             className={`
                       h-5 w-5 mr-2 
-                      ${activeTab === item.id
-                                ? "text-white"
-                                : "text-gray-500 group-hover:text-gray-700"
-                              }
+                      ${
+                        activeTab === item.id
+                          ? "text-white"
+                          : "text-gray-500 group-hover:text-gray-700"
+                      }
                     `}
                           />
                           {item.label}
@@ -399,8 +402,6 @@ function AppHeader() {
                     ))}
                   </div>
                 </motion.div>
-
-               
               </div>
             </nav>
           ) : null}
@@ -507,9 +508,10 @@ function AppHeader() {
                       <Link
                         href={`/${item.id}`}
                         className={`flex items-center justify-between px-4 py-3 rounded-xl text-sm font-medium relative overflow-hidden
-                          ${activeTab === item.id
-                            ? `${item.color.gradient} text-white ${item.color.glow} shadow-lg`
-                            : "text-white/80 hover:bg-white/10 hover:text-white"
+                          ${
+                            activeTab === item.id
+                              ? `${item.color.gradient} text-white ${item.color.glow} shadow-lg`
+                              : "text-white/80 hover:bg-white/10 hover:text-white"
                           }`}
                         onClick={() => {
                           setActiveTab(item.id);
@@ -533,10 +535,11 @@ function AppHeader() {
                         )}
                         <div className="flex items-center z-10">
                           <div
-                            className={`p-2 rounded-lg ${activeTab === item.id
-                              ? "bg-white/30"
-                              : "bg-white/10"
-                              } mr-3`}
+                            className={`p-2 rounded-lg ${
+                              activeTab === item.id
+                                ? "bg-white/30"
+                                : "bg-white/10"
+                            } mr-3`}
                           >
                             <item.icon className="w-4 h-4" />
                           </div>
