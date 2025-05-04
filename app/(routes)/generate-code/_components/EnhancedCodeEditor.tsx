@@ -436,12 +436,13 @@ const EnhancedCodeEditor: React.FC<EnhancedCodeEditorProps> = ({
                 {[...Array(12)].map((_, i) => (
                   <motion.div
                     key={i}
-                    className={`absolute rounded-full ${i % 3 === 0
-                      ? "bg-indigo-500/40 dark:bg-indigo-400/40"
-                      : i % 3 === 1
+                    className={`absolute rounded-full ${
+                      i % 3 === 0
+                        ? "bg-indigo-500/40 dark:bg-indigo-400/40"
+                        : i % 3 === 1
                         ? "bg-cyan-500/40 dark:bg-cyan-400/40"
                         : "bg-purple-500/40 dark:bg-purple-400/40"
-                      }`}
+                    }`}
                     style={{
                       width: `${Math.max(2, Math.random() * 6)}px`,
                       height: `${Math.max(2, Math.random() * 6)}px`,
@@ -778,10 +779,11 @@ const EnhancedCodeEditor: React.FC<EnhancedCodeEditorProps> = ({
         )}
         {/* Editor container */}
         <div
-          className={`rounded-xl overflow-hidden shadow-lg ${isFullscreen
-            ? "fixed inset-0 z-50 p-4 bg-white dark:bg-gray-900"
-            : ""
-            }`}
+          className={`rounded-xl overflow-hidden shadow-lg ${
+            isFullscreen
+              ? "fixed inset-0 z-50 p-4 bg-white dark:bg-gray-900"
+              : ""
+          }`}
         >
           {/* Tabs navigation */}
           {sandpackFiles && (
@@ -789,28 +791,31 @@ const EnhancedCodeEditor: React.FC<EnhancedCodeEditorProps> = ({
               <div className="flex space-x-1">
                 <button
                   onClick={() => setActiveTab("code")}
-                  className={`flex items-center px-3 py-1.5 rounded-md ${activeTab === "code" ? "bg-blue-600" : "hover:bg-slate-700"
-                    }`}
+                  className={`flex items-center px-3 py-1.5 rounded-md ${
+                    activeTab === "code" ? "bg-blue-600" : "hover:bg-slate-700"
+                  }`}
                 >
                   <Code size={16} className="mr-1.5" />
                   <span>Code + Files</span>
                 </button>
                 <button
                   onClick={() => setActiveTab("preview")}
-                  className={`flex items-center px-3 py-1.5 rounded-md ${activeTab === "preview"
-                    ? "bg-blue-600"
-                    : "hover:bg-slate-700"
-                    }`}
+                  className={`flex items-center px-3 py-1.5 rounded-md ${
+                    activeTab === "preview"
+                      ? "bg-blue-600"
+                      : "hover:bg-slate-700"
+                  }`}
                 >
                   <Eye size={16} className="mr-1.5" />
                   <span>Preview</span>
                 </button>
                 <button
                   onClick={() => setActiveTab("console")}
-                  className={`flex items-center px-3 py-1.5 rounded-md ${activeTab === "console"
-                    ? "bg-blue-600"
-                    : "hover:bg-slate-700"
-                    }`}
+                  className={`flex items-center px-3 py-1.5 rounded-md ${
+                    activeTab === "console"
+                      ? "bg-blue-600"
+                      : "hover:bg-slate-700"
+                  }`}
                 >
                   <Terminal size={16} className="mr-1.5" />
                   <span>Console</span>
@@ -842,10 +847,11 @@ const EnhancedCodeEditor: React.FC<EnhancedCodeEditorProps> = ({
                           ([name, theme]) => (
                             <button
                               key={name}
-                              className={`block w-full text-left px-4 py-2 text-sm ${currentTheme === name
-                                ? "bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300"
-                                : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
-                                }`}
+                              className={`block w-full text-left px-4 py-2 text-sm ${
+                                currentTheme === name
+                                  ? "bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300"
+                                  : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                              }`}
                               onClick={() => {
                                 setCurrentTheme(name);
                                 setShowThemeSelector(false);
@@ -915,7 +921,11 @@ const EnhancedCodeEditor: React.FC<EnhancedCodeEditorProps> = ({
                     {(activeTab === "explorer" || activeTab === "code") && (
                       <div
                         className="sandpack-wrapper"
-                        style={{ display: "flex", height: "900px" }}
+                        style={{
+                          display: "flex",
+                          height: "900px",
+                          width: "100%",
+                        }}
                       >
                         <div
                           style={{
@@ -943,15 +953,9 @@ const EnhancedCodeEditor: React.FC<EnhancedCodeEditorProps> = ({
                         showOpenInCodeSandbox
                         showRefreshButton
                         style={{ height: "900px" }}
-                        actionsChildren={
-                          <button >
-                            Fix The Error
-                          </button>
-                        }
+                        actionsChildren={<button>Fix The Error</button>}
                       />
                     )}
-
-                    <SandpackConsole style={{ height: "900px" }} />
 
                   </SandpackLayout>
                 </SandpackProvider>
@@ -1006,7 +1010,9 @@ const EnhancedCodeEditor: React.FC<EnhancedCodeEditorProps> = ({
                           showRefreshButton
                           style={{ height: "900px", width: "100%" }}
                           actionsChildren={
-                            <button onClick={() => window.alert("Bug reported!")}>
+                            <button
+                              onClick={() => window.alert("Bug reported!")}
+                            >
                               Report bug
                             </button>
                           }
